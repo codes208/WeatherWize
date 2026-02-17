@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - WeatherWize</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/weatherWize.CSS">
+    <script src="./js/auth.js" defer></script>
+</head>
+
+<body class="login-page">
+    <div class="weather-cycle" aria-hidden="true">
+        <div class="weather-scene scene-sunny">
+            <div class="sun"></div>
+            <div class="scene-cloud cloud-a"></div>
+            <div class="scene-cloud cloud-b"></div>
+            <div class="scene-cloud cloud-c"></div>
+        </div>
+        <div class="weather-scene scene-storm">
+            <div class="scene-cloud storm-a"></div>
+            <div class="scene-cloud storm-b"></div>
+            <div class="scene-cloud storm-c"></div>
+            <div class="rain-layer">
+                <span class="drop d1"></span>
+                <span class="drop d2"></span>
+                <span class="drop d3"></span>
+                <span class="drop d4"></span>
+                <span class="drop d5"></span>
+                <span class="drop d6"></span>
+                <span class="drop d7"></span>
+                <span class="drop d8"></span>
+                <span class="drop d9"></span>
+                <span class="drop d10"></span>
+                <span class="drop d11"></span>
+                <span class="drop d12"></span>
+                <span class="drop d13"></span>
+                <span class="drop d14"></span>
+            </div>
+            <div class="storm-flash"></div>
+            <div class="storm-bolt bolt-a"></div>
+            <div class="storm-bolt bolt-b"></div>
+        </div>
+        <div class="weather-scene scene-snow">
+            <div class="scene-cloud snow-a"></div>
+            <div class="scene-cloud snow-b"></div>
+            <div class="scene-cloud snow-c"></div>
+            <div class="snow-layer">
+                <span class="flake f1"></span>
+                <span class="flake f2"></span>
+                <span class="flake f3"></span>
+                <span class="flake f4"></span>
+                <span class="flake f5"></span>
+                <span class="flake f6"></span>
+                <span class="flake f7"></span>
+                <span class="flake f8"></span>
+                <span class="flake f9"></span>
+                <span class="flake f10"></span>
+                <span class="flake f11"></span>
+                <span class="flake f12"></span>
+            </div>
+        </div>
+    </div>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2 class="auth-title">WeatherWize</h2>
+            <form id="login-form">
+                <div id="login-error" class="text-danger text-center hidden" style="margin-bottom: 15px;"></div>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-block">Login</button>
+            </form>
+            <div class="auth-link">
+                <p>Don't have an account? <a href="./register.html">Register here</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

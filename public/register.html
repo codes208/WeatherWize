@@ -5,11 +5,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - WeatherWize</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <script src="/js/auth.js" defer></script>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/weatherWize.CSS">
+    <script src="./js/auth.js" defer></script>
 </head>
 
-<body>
+<body class="register-page">
+    <div class="sky-wrap storm-wrap" aria-hidden="true">
+        <div class="cloud cloud-1 storm-cloud"></div>
+        <div class="cloud cloud-2 storm-cloud"></div>
+        <div class="cloud cloud-3 storm-cloud"></div>
+        <div class="rain-layer">
+            <span class="drop d1"></span>
+            <span class="drop d2"></span>
+            <span class="drop d3"></span>
+            <span class="drop d4"></span>
+            <span class="drop d5"></span>
+            <span class="drop d6"></span>
+            <span class="drop d7"></span>
+            <span class="drop d8"></span>
+            <span class="drop d9"></span>
+            <span class="drop d10"></span>
+            <span class="drop d11"></span>
+            <span class="drop d12"></span>
+            <span class="drop d13"></span>
+            <span class="drop d14"></span>
+        </div>
+        <div class="lightning-flash"></div>
+        <div class="lightning-bolt bolt-1"></div>
+        <div class="lightning-bolt bolt-2"></div>
+    </div>
     <div class="auth-container">
         <div class="auth-card">
             <h2 class="auth-title">Create Account</h2>
@@ -30,7 +55,7 @@
                 <button type="submit" class="btn btn-block">Register</button>
             </form>
             <div class="auth-link">
-                <p>Already have an account? <a href="/index.html">Login here</a></p>
+                <p>Already have an account? <a href="./index.html">Login here</a></p>
             </div>
         </div>
     </div>
