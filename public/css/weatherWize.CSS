@@ -377,6 +377,14 @@ body {
     backdrop-filter: blur(6px);
 }
 
+.auth-logo {
+    display: block;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 12px;
+    border-radius: 14px;
+}
+
 .auth-title {
     margin-top: 0;
     margin-bottom: 18px;
