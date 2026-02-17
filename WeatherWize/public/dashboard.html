@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - WeatherWize</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/dashboard.js" defer></script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container nav-content">
+            <div class="nav-brand">WeatherWize</div>
+            <div class="nav-links">
+                <span id="username-display"></span>
+                <button id="logout-btn" class="btn-text">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container dashboard-content">
+        <div class="weather-search">
+            <form id="weather-form" style="width: 100%; display: flex; gap: 10px;">
+                <input type="text" name="location" placeholder="Enter city name..." required>
+                <button type="submit" class="btn">Search</button>
+            </form>
+        </div>
+
+        <div id="weather-result" class="weather-card hidden">
+            <h2 id="location-name">City Name</h2>
+            <div class="weather-temp"><span id="temp-value">--</span>&deg;F</div>
+            <div id="condition-text" style="font-size: 1.2rem;">Sunny</div>
+
+            <div class="weather-details">
+                <div>
+                    <div>Humidity</div>
+                    <div id="humidity-value">--%</div>
+                </div>
+                <div>
+                    <div>Wind</div>
+                    <div id="wind-value">-- mph</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button id="save-location-btn" class="btn">Save Location</button>
+            </div>
+        </div>
+
+        <div class="saved-locations">
+            <h3>Saved Locations</h3>
+            <div id="saved-locations-list" class="location-grid">
+                <!-- Location cards will be injected here -->
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
