@@ -1,2 +1,2 @@
-# WeatherWise
+# WeatherWize
 Weather application
