@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const username = registerForm.username.value;
             const password = registerForm.password.value;
             const confirmPassword = registerForm.confirmPassword.value;
+            const role = registerForm.role?.value || 'general';
             const errorDiv = document.getElementById('register-error');
 
             if (password !== confirmPassword) {
@@ -54,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = await fetch(`${API_URL}/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify({ username, password, role })
                 });
 
                 const data = await response.json();

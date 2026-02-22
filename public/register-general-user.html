@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create General User Account - WeatherWize</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/weatherWize.CSS">
+    <script src="./js/auth.js" defer></script>
+</head>
+
+<body class="register-page">
+    <a href="./index.html" class="page-logo-link" aria-label="WeatherWize home">
+        <img src="./images/weatherewize_logo.png" alt="WeatherWize logo" class="page-logo">
+    </a>
+    <div class="sky-wrap" aria-hidden="true">
+        <div class="cloud still-cloud still-cloud-1"></div>
+        <div class="cloud still-cloud still-cloud-2"></div>
+        <div class="cloud still-cloud still-cloud-3"></div>
+    </div>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2 class="auth-title">Create General Account</h2>
+            <p class="account-choice-subtitle">Free access for core weather features.</p>
+            <form id="register-form">
+                <div id="register-error" class="text-danger text-center hidden" style="margin-bottom: 15px;"></div>
+                <input type="hidden" name="role" value="general">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+                <button type="submit" class="btn btn-block">Create General Account</button>
+            </form>
+            <div class="auth-link">
+                <p>Want the paid plan? <a href="./register-advanced-user.html">Register as Advanced</a></p>
+            </div>
+            <div class="auth-link">
+                <p>Choose another account type? <a href="./select-account-type.html">Back to account options</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

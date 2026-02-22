@@ -62,7 +62,8 @@ label {
     color: var(--text-secondary);
 }
 
-input {
+input,
+select {
     width: 100%;
     padding: 12px;
     border-radius: 6px;
@@ -73,7 +74,8 @@ input {
     transition: border-color 0.3s;
 }
 
-input:focus {
+input:focus,
+select:focus {
     outline: none;
     border-color: var(--accent);
 }
@@ -205,6 +207,45 @@ input:focus {
     margin-top: 40px;
 }
 
+.hourly-report {
+    margin-top: 28px;
+}
+
+.hourly-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 14px;
+    margin-top: 14px;
+}
+
+.hourly-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+}
+
+.hourly-time {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.hourly-temp {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+.hourly-condition {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+.hourly-meta {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+}
+
 .location-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -225,3 +266,58 @@ input:focus {
     transform: translateY(-5px);
     border-color: var(--accent);
 }
+
+.weather-location-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.location-title {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.location-temp {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1.1;
+}
+
+.location-condition {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.location-meta {
+    display: grid;
+    gap: 4px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.delete-location-btn {
+    margin-top: 8px;
+    align-self: flex-start;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.82rem;
+    cursor: pointer;
+}
+
+.delete-location-btn:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+

@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const weatherForm = document.getElementById('weather-form');
     const weatherResult = document.getElementById('weather-result');
+    const hourlyReport = document.getElementById('hourly-report');
+    const hourlyReportList = document.getElementById('hourly-report-list');
     const savedLocationsContainer = document.getElementById('saved-locations-list');
 
     // Fetch Weather
@@ -54,23 +56,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    async function fetchWeatherData(location) {
+        const response = await fetch(`/api/weather?location=${encodeURIComponent(location)}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || 'Error fetching weather');
+        }
+
+        return data;
+    }
+
     async function fetchWeather(location) {
         try {
-            const response = await fetch(`/api/weather?location=${encodeURIComponent(location)}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                displayWeather(data);
-                weatherResult.classList.remove('hidden');
-            } else {
-                alert(data.message || 'Error fetching weather');
+            const data = await fetchWeatherData(location);
+            displayWeather(data);
+            weatherResult.classList.remove('hidden');
+            try {
+                await loadHourlyForecast(location);
+                hourlyReport.classList.remove('hidden');
+            } catch (error) {
+                console.error(error);
+                hourlyReport.classList.add('hidden');
+                alert(error.message || 'Error fetching hourly forecast');
             }
         } catch (error) {
             console.error(error);
-            alert('Error fetching weather');
+            alert(error.message || 'Error fetching weather');
         }
     }
 
@@ -82,6 +96,41 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('wind-value').textContent = `${data.windSpeed} mph`;
     }
 
+    function formatForecastTime(dtText) {
+        const date = new Date(dtText.replace(' ', 'T'));
+        if (Number.isNaN(date.getTime())) return dtText;
+        return date.toLocaleString([], {
+            weekday: 'short',
+            hour: 'numeric',
+            minute: '2-digit'
+        });
+    }
+
+    async function loadHourlyForecast(location) {
+        const response = await fetch(`/api/weather/hourly?location=${encodeURIComponent(location)}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Error fetching hourly forecast');
+        }
+
+        hourlyReportList.innerHTML = '';
+        data.intervals.forEach((slot) => {
+            const card = document.createElement('article');
+            card.className = 'hourly-card';
+            card.innerHTML = `
+                <div class="hourly-time">${formatForecastTime(slot.time)}</div>
+                <div class="hourly-temp">${Math.round(slot.temp)}&deg;F</div>
+                <div class="hourly-condition">${slot.condition}</div>
+                <div class="hourly-meta">Humidity ${slot.humidity}%</div>
+                <div class="hourly-meta">Wind ${slot.windSpeed} mph</div>
+            `;
+            hourlyReportList.appendChild(card);
+        });
+    }
+
     async function loadSavedLocations() {
         try {
             const response = await fetch('/api/weather/saved', {
@@ -90,15 +139,79 @@ document.addEventListener('DOMContentLoaded', () => {
             const locations = await response.json();
 
             savedLocationsContainer.innerHTML = '';
-            locations.forEach(loc => {
-                const card = document.createElement('div');
-                card.className = 'location-card';
-                card.textContent = loc.location_name;
-                card.addEventListener('click', () => fetchWeather(loc.location_name));
+            if (!locations.length) {
+                savedLocationsContainer.innerHTML = '<p class="empty-state">No saved locations yet.</p>';
+                return;
+            }
+
+            const weatherTiles = await Promise.all(
+                locations.map(async (loc) => {
+                    try {
+                        const weather = await fetchWeatherData(loc.location_name);
+                        return { id: loc.id, location: loc.location_name, weather };
+                    } catch (error) {
+                        return { id: loc.id, location: loc.location_name, weather: null };
+                    }
+                })
+            );
+
+            weatherTiles.forEach(({ id, location, weather }) => {
+                const card = document.createElement('article');
+                card.className = 'location-card weather-location-card';
+                card.addEventListener('click', () => fetchWeather(location));
+
+                if (weather) {
+                    card.innerHTML = `
+                        <h4 class="location-title">${weather.location}</h4>
+                        <div class="location-temp">${Math.round(weather.temp)}&deg;F</div>
+                        <div class="location-condition">${weather.condition}</div>
+                        <div class="location-meta">
+                            <span>Humidity: ${weather.humidity}%</span>
+                            <span>Wind: ${weather.windSpeed} mph</span>
+                        </div>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <h4 class="location-title">${location}</h4>
+                        <div class="location-condition">Weather unavailable</div>
+                    `;
+                }
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.type = 'button';
+                deleteBtn.className = 'delete-location-btn';
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    await deleteSavedLocation(id);
+                });
+
+                card.appendChild(deleteBtn);
+
                 savedLocationsContainer.appendChild(card);
             });
         } catch (error) {
             console.error(error);
+            savedLocationsContainer.innerHTML = '<p class="empty-state">Unable to load saved locations.</p>';
+        }
+    }
+
+    async function deleteSavedLocation(locationId) {
+        try {
+            const response = await fetch(`/api/weather/saved/${locationId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to delete location');
+            }
+
+            await loadSavedLocations();
+        } catch (error) {
+            console.error(error);
+            alert(error.message || 'Failed to delete location');
         }
     }
 
