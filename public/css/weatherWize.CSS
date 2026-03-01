@@ -482,6 +482,14 @@ body.register-page {
     padding-top: 84px;
 }
 
+.account-select-page .auth-container {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 84px 40px 40px;
+}
+
 .page-logo-link {
     position: fixed;
     top: 16px;
@@ -506,23 +514,24 @@ body.register-page {
 .register-page .still-cloud-1 {
     width: 170px;
     height: 54px;
-    top: 18%;
-    left: 4%;
+    top: 6%;
+    left: 3%;
 }
 
 .register-page .still-cloud-2 {
     width: 182px;
     height: 56px;
-    top: 26%;
-    right: 4%;
+    top: 6%;
+    right: 3%;
     left: auto;
 }
 
 .register-page .still-cloud-3 {
     width: 150px;
     height: 48px;
-    bottom: 10%;
-    left: 10%;
+    bottom: 6%;
+    right: 5%;
+    left: auto;
     top: auto;
     opacity: 0.8;
 }
@@ -542,11 +551,11 @@ body.register-page {
 .role-tile {
     display: block;
     border: 1px solid rgba(95, 59, 179, 0.22);
-    border-radius: 16px;
+    border-radius: 6px;
     background: rgba(255, 255, 255, 0.9);
     box-shadow: 0 10px 24px rgba(30, 12, 72, 0.16);
-    padding: 16px 14px;
-    min-height: 132px;
+    padding: 24px 22px;
+    min-height: 80px;
     cursor: pointer;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
 }
@@ -579,7 +588,8 @@ body.register-page {
 }
 
 .account-choice-card {
-    width: min(100%, 760px);
+    width: 100%;
+    max-width: 1140px;
 }
 
 .account-choice-subtitle {
@@ -706,4 +716,75 @@ body.register-page {
     .role-tile-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* Dashboard page — purple sky background, dark cards */
+body.dashboard-page {
+    --card-bg: #252525;
+    --bg-secondary: rgba(38, 22, 84, 0.85);
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --border: #3d2d6e;
+    --accent: #8356f4;
+    --accent-hover: #6a4bbf;
+    background:
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.12) 0, rgba(255, 255, 255, 0) 40%),
+        radial-gradient(circle at 16% 18%, rgba(255, 255, 255, 0.09) 0, rgba(255, 255, 255, 0) 34%),
+        linear-gradient(350deg, #3a2674 0%, #5b3ea5 56%, #7d62c2 100%);
+}
+
+.dashboard-page .navbar {
+    position: relative;
+    z-index: 2;
+    background: rgba(42, 18, 90, 0.82);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dashboard-page .dashboard-content {
+    position: relative;
+    z-index: 1;
+}
+
+.dashboard-page .weather-card,
+.dashboard-page .hourly-card,
+.dashboard-page .location-card {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(6px);
+    color: #2f2554;
+}
+
+.dashboard-page .weather-card h2,
+.dashboard-page .weather-card .weather-temp,
+.dashboard-page .location-title,
+.dashboard-page .hourly-temp {
+    color: #2f2554;
+}
+
+.dashboard-page .weather-details,
+.dashboard-page .hourly-time,
+.dashboard-page .hourly-condition,
+.dashboard-page .hourly-meta,
+.dashboard-page .location-condition,
+.dashboard-page .location-meta {
+    color: #6a6192;
+}
+
+.dashboard-page .location-temp {
+    color: var(--accent);
+}
+
+.dashboard-page #condition-text {
+    color: #6a6192;
+}
+
+.dashboard-page .delete-location-btn {
+    border-color: rgba(95, 59, 179, 0.3);
+    color: #6a6192;
+    background: transparent;
+}
+
+.dashboard-page .delete-location-btn:hover {
+    border-color: var(--danger);
+    color: var(--danger);
 }

@@ -167,6 +167,13 @@ select:focus {
     color: var(--accent);
 }
 
+.nav-logo {
+    height: 42px;
+    width: 42px;
+    border-radius: 10px;
+    display: block;
+}
+
 .nav-links button {
     margin-left: 20px;
 }
@@ -188,6 +195,25 @@ select:focus {
     border-radius: 12px;
     text-align: center;
     margin-top: 20px;
+    position: relative;
+}
+
+.weather-card-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 0 4px;
+    transition: color 0.2s;
+}
+
+.weather-card-close:hover {
+    color: var(--danger);
 }
 
 .weather-temp {

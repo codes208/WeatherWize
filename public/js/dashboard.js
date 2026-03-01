@@ -22,6 +22,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const hourlyReport = document.getElementById('hourly-report');
     const hourlyReportList = document.getElementById('hourly-report-list');
     const savedLocationsContainer = document.getElementById('saved-locations-list');
+    const saveLocationBtn = document.getElementById('save-location-btn');
+
+    const savedLocationNames = new Set();
+
+    // Close weather card
+    document.getElementById('close-weather-btn').addEventListener('click', () => {
+        weatherResult.classList.add('hidden');
+        hourlyReport.classList.add('hidden');
+    });
 
     // Fetch Weather
     weatherForm.addEventListener('submit', async (e) => {
@@ -45,11 +54,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ location })
             });
 
+            saveLocationBtn.classList.add('hidden');
             if (response.ok) {
-                alert('Location saved!');
                 loadSavedLocations();
-            } else {
-                alert('Failed to save location');
             }
         } catch (error) {
             console.error(error);
@@ -94,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('condition-text').textContent = data.condition;
         document.getElementById('humidity-value').textContent = `${data.humidity}%`;
         document.getElementById('wind-value').textContent = `${data.windSpeed} mph`;
+        saveLocationBtn.classList.toggle('hidden', savedLocationNames.has(data.location.toLowerCase()));
     }
 
     function formatForecastTime(dtText) {
@@ -137,6 +145,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const locations = await response.json();
+
+            savedLocationNames.clear();
+            locations.forEach(loc => savedLocationNames.add(loc.location_name.toLowerCase()));
 
             savedLocationsContainer.innerHTML = '';
             if (!locations.length) {

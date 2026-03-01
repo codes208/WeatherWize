@@ -6,13 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - WeatherWize</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/weatherWize.CSS">
     <script src="/js/dashboard.js" defer></script>
 </head>
 
-<body>
+<body class="dashboard-page">
+    <div class="sky-wrap" aria-hidden="true">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+    </div>
     <nav class="navbar">
         <div class="container nav-content">
-            <div class="nav-brand">WeatherWize</div>
+            <div class="nav-brand">
+                <img src="/images/weatherewize_logo.png" alt="WeatherWize" class="nav-logo">
+            </div>
             <div class="nav-links">
                 <span id="username-display"></span>
                 <button id="logout-btn" class="btn-text">Logout</button>
@@ -29,6 +37,7 @@
         </div>
 
         <div id="weather-result" class="weather-card hidden">
+            <button id="close-weather-btn" class="weather-card-close" aria-label="Close">&times;</button>
             <h2 id="location-name">City Name</h2>
             <div class="weather-temp"><span id="temp-value">--</span>&deg;F</div>
             <div id="condition-text" style="font-size: 1.2rem;">Sunny</div>
@@ -60,6 +69,8 @@
                 <!-- Location cards will be injected here -->
             </div>
         </div>
+
+
     </div>
 </body>
 

@@ -2,6 +2,18 @@ const db = require('../config/db');
 
 const OPENWEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
 const OPENWEATHER_FORECAST_URL = 'https://api.openweathermap.org/data/2.5/forecast';
+const OPENWEATHER_GEO_URL = 'http://api.openweathermap.org/geo/1.0/direct';
+
+async function geocodeLocation(location, apiKey) {
+    const geoUrl = `${OPENWEATHER_GEO_URL}?q=${encodeURIComponent(location)}&limit=1&appid=${apiKey}`;
+    const geoResponse = await fetch(geoUrl);
+    if (!geoResponse.ok) return null;
+    const geoData = await geoResponse.json();
+    if (!geoData.length) return null;
+    const { name, state, country, lat, lon } = geoData[0];
+    const displayName = state ? `${name}, ${state}` : `${name}, ${country}`;
+    return { name, state, country, lat, lon, displayName };
+}
 
 exports.getWeather = async (req, res) => {
     try {
@@ -17,7 +29,12 @@ exports.getWeather = async (req, res) => {
             });
         }
 
-        const url = `${OPENWEATHER_BASE_URL}?q=${encodeURIComponent(location)}&appid=${apiKey}&units=imperial`;
+        const geo = await geocodeLocation(location, apiKey);
+        if (!geo) {
+            return res.status(404).json({ message: 'Location not found' });
+        }
+
+        const url = `${OPENWEATHER_BASE_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}&units=imperial`;
         const response = await fetch(url);
         const data = await response.json();
 
@@ -32,13 +49,13 @@ exports.getWeather = async (req, res) => {
         }
 
         const weatherData = {
-            location: `${data.name}${data.sys?.country ? `, ${data.sys.country}` : ''}`,
+            location: geo.displayName,
             temp: data.main?.temp,
             condition: data.weather?.[0]?.main || 'Unknown',
             humidity: data.main?.humidity,
             windSpeed: data.wind?.speed,
-            lat: data.coord?.lat,
-            lon: data.coord?.lon
+            lat: geo.lat,
+            lon: geo.lon
         };
 
         return res.json(weatherData);
@@ -62,7 +79,12 @@ exports.getHourlyForecast = async (req, res) => {
             });
         }
 
-        const url = `${OPENWEATHER_FORECAST_URL}?q=${encodeURIComponent(location)}&appid=${apiKey}&units=imperial&cnt=8`;
+        const geo = await geocodeLocation(location, apiKey);
+        if (!geo) {
+            return res.status(404).json({ message: 'Location not found' });
+        }
+
+        const url = `${OPENWEATHER_FORECAST_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}&units=imperial&cnt=8`;
         const response = await fetch(url);
         const data = await response.json();
 
@@ -85,7 +107,7 @@ exports.getHourlyForecast = async (req, res) => {
         }));
 
         return res.json({
-            location: `${data.city?.name || location}${data.city?.country ? `, ${data.city.country}` : ''}`,
+            location: geo.displayName,
             intervals: hourly
         });
     } catch (error) {
@@ -101,6 +123,14 @@ exports.saveLocation = async (req, res) => {
 
         if (!location) {
             return res.status(400).json({ message: 'Location is required' });
+        }
+
+        const [existing] = await db.query(
+            'SELECT id FROM saved_locations WHERE user_id = ? AND LOWER(location_name) = LOWER(?)',
+            [userId, location]
+        );
+        if (existing.length > 0) {
+            return res.status(409).json({ message: 'Location already saved' });
         }
 
         await db.query('INSERT INTO saved_locations (user_id, location_name) VALUES (?, ?)', [userId, location]);
