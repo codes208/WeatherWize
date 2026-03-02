@@ -390,7 +390,7 @@ body {
     margin-bottom: 18px;
     text-align: center;
     letter-spacing: 0.6px;
-    color: var(--accent);
+    color: #3501d1;  /* <- Change this */
 }
 
 .form-group label {
@@ -561,11 +561,23 @@ body.register-page {
 }
 
 .role-title {
-    display: block;
-    color: #4e3a8b;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #3905d4;
     font-weight: 800;
     font-size: 1.02rem;
     margin-bottom: 8px;
+}
+
+.role-price {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #fff;
+    background: #5f3bb3;
+    border-radius: 20px;
+    padding: 2px 10px;
+    letter-spacing: 0.02em;
 }
 
 .role-desc {
@@ -575,9 +587,16 @@ body.register-page {
     color: #6f6594;
 }
 
+.role-tile:hover {
+    border-color: #3905d4;
+    box-shadow: 0 0 0 3px rgba(57, 5, 212, 0.16), 0 14px 28px rgba(32, 16, 77, 0.2);
+    transform: translateY(-1px);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 241, 255, 0.96));
+}
+
 .role-input:checked + .role-tile {
-    border-color: #5f3bb3;
-    box-shadow: 0 0 0 3px rgba(95, 59, 179, 0.16), 0 14px 28px rgba(32, 16, 77, 0.2);
+    border-color: #3905d4;
+    box-shadow: 0 0 0 3px rgba(57, 5, 212, 0.16), 0 14px 28px rgba(32, 16, 77, 0.2);
     transform: translateY(-1px);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 241, 255, 0.96));
 }
@@ -590,6 +609,36 @@ body.register-page {
 .account-choice-card {
     width: 100%;
     max-width: 1140px;
+}
+
+.payment-divider {
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #7a6fb0;
+    margin: 24px 0 16px;
+    position: relative;
+}
+
+.payment-divider::before,
+.payment-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 28%;
+    height: 1px;
+    background: rgba(122, 111, 176, 0.35);
+}
+
+.payment-divider::before { left: 0; }
+.payment-divider::after  { right: 0; }
+
+.payment-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
 }
 
 .account-choice-subtitle {
@@ -733,10 +782,25 @@ body.dashboard-page {
         linear-gradient(350deg, #3a2674 0%, #5b3ea5 56%, #7d62c2 100%);
 }
 
+.dashboard-page .weather-search input {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+.dashboard-page .weather-search input::placeholder {
+    color: rgba(255, 255, 255, 0.88);
+}
+
+.dashboard-page .hourly-report h3,
+.dashboard-page .saved-locations h3 {
+    color: #ffffff;
+}
+
 .dashboard-page .navbar {
     position: relative;
     z-index: 2;
-    background: rgba(42, 18, 90, 0.82);
+    background: rgba(217, 212, 239, 0.82);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -752,6 +816,17 @@ body.dashboard-page {
     background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(6px);
     color: #2f2554;
+}
+
+.dashboard-page .location-card {
+    transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.dashboard-page .location-card:hover {
+    border-color: #3905d4;
+    box-shadow: 0 0 0 3px rgba(57, 5, 212, 0.16), 0 14px 28px rgba(32, 16, 77, 0.2);
+    transform: translateY(-1px);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 241, 255, 0.96));
 }
 
 .dashboard-page .weather-card h2,
