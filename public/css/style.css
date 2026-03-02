@@ -189,6 +189,7 @@ select:focus {
     gap: 10px;
 }
 
+/* Inside your saved location weather card */
 .weather-card {
     background-color: var(--card-bg);
     padding: 30px;
@@ -346,4 +347,3 @@ select:focus {
     border-color: var(--danger);
     color: var(--danger);
 }
-
