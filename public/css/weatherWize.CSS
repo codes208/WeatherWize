@@ -494,7 +494,7 @@ body {
     width: 100%;
     box-sizing: border-box;
     border-radius: 10px;
-    border: 1px solid rgba(95, 59, 179, 0.35);
+    border: 1px solid rgba(27, 117, 190, 0.35);
     background-color: #ffffff;
     color: #2f2554;
     padding: 11px 12px;
@@ -507,15 +507,15 @@ body {
 }
 
 .form-group input:focus {
-    border-color: var(--accent);
+    border-color: #1b75be;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(95, 59, 179, 0.15);
+    box-shadow: 0 0 0 3px rgba(27, 117, 190, 0.15);
 }
 
 .form-group select:focus {
-    border-color: var(--accent);
+    border-color: #1b75be;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(95, 59, 179, 0.15);
+    box-shadow: 0 0 0 3px rgba(27, 117, 190, 0.15);
 }
 
 .btn.btn-block {
@@ -533,7 +533,7 @@ body {
 
 .btn.btn-block:hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 18px rgba(78, 39, 158, 0.35);
+    box-shadow: 0 8px 18px rgba(27, 117, 190, 0.35);
 }
 
 .auth-link {
@@ -618,6 +618,18 @@ body.register-page {
     opacity: 0.8;
 }
 
+.advanced-price-badge {
+    display: block;
+    background: #1b75be;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
 .role-tile-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -646,7 +658,7 @@ body.register-page {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #3905d4;
+    color: #1b75be;
     font-weight: 800;
     font-size: 1.02rem;
     margin-bottom: 8px;
@@ -656,7 +668,7 @@ body.register-page {
     font-size: 0.82rem;
     font-weight: 700;
     color: #fff;
-    background: #5f3bb3;
+    background: #1b75be;
     border-radius: 20px;
     padding: 2px 10px;
     letter-spacing: 0.02em;
@@ -666,7 +678,7 @@ body.register-page {
     margin: 0;
     font-size: 0.92rem;
     line-height: 1.35;
-    color: #6f6594;
+    color: #383838;
 }
 
 .role-tile:hover {
@@ -683,7 +695,7 @@ body.register-page {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 241, 255, 0.96));
 }
 
-.role-input:focus-visible+.role-tile {
+.role-input:focus-visible + .role-tile {
     border-color: #5f3bb3;
     box-shadow: 0 0 0 3px rgba(95, 59, 179, 0.22);
 }
@@ -699,7 +711,7 @@ body.register-page {
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #7a6fb0;
+    color: #1b75be;
     margin: 24px 0 16px;
     position: relative;
 }
@@ -727,7 +739,7 @@ body.register-page {
     margin-top: -2px;
     margin-bottom: 16px;
     text-align: center;
-    color: #6a6192;
+    color: #383838;
     font-weight: 600;
 }
 
@@ -741,7 +753,7 @@ body.register-page {
     font-size: 0.86rem;
     font-weight: 700;
     letter-spacing: 0.02em;
-    color: #5a3caf;
+    color: #1b75be;
     text-transform: uppercase;
 }
 
@@ -953,6 +965,14 @@ body.dashboard-page {
         linear-gradient(350deg, #3a2674 0%, #5b3ea5 56%, #7d62c2 100%);
 }
 
+.dashboard-page .btn {
+    background-color: #1b75be;
+}
+
+.dashboard-page .btn:hover {
+    background-color: #1565a8;
+}
+
 .dashboard-page .weather-search input {
     background: rgba(255, 255, 255, 0.25);
     color: #ffffff;
@@ -994,7 +1014,7 @@ body.dashboard-page {
 }
 
 .dashboard-page .location-card:hover {
-    border-color: #3905d4;
+    border-color: #1565a8;
     box-shadow: 0 0 0 3px rgba(57, 5, 212, 0.16), 0 14px 28px rgba(32, 16, 77, 0.2);
     transform: translateY(-1px);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 241, 255, 0.96));

@@ -59,7 +59,7 @@ body {
 label {
     display: block;
     margin-bottom: 8px;
-    color: var(--text-secondary);
+    color: #383838;
 }
 
 input,
