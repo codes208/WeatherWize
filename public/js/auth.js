@@ -23,7 +23,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (response.ok) {
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
-                    window.location.href = '/dashboard.html';
+
+                    if (data.user.role === 'admin') {
+                        window.location.href = '/admin-dashboard.html';
+                    } else if (data.user.role === 'advanced') {
+                        window.location.href = '/advanced-dashboard.html';
+                    } else {
+                        window.location.href = '/dashboard.html';
+                    }
                 } else {
                     errorDiv.textContent = data.message;
                     errorDiv.classList.remove('hidden');

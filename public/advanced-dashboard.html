@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Dashboard - WeatherWize</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/weatherWize.CSS">
+    <script src="./js/auth-check.js" defer></script>
+    <script src="./js/advanced-dashboard.js" defer></script>
+</head>
+
+<body data-allowed-roles="advanced,admin">
+    <div class="sky-wrap" aria-hidden="true">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+    </div>
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="dashboard.html" class="nav-brand">
+                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo"
+                    style="display:inline-block; vertical-align:middle;">
+                WeatherWize
+            </a>
+            <div class="nav-links">
+                <button class="btn btn-text" onclick="window.location.href='historical-data.html'">Historical
+                    Data</button>
+                <button class="btn btn-text" onclick="window.location.href='alerts-manager.html'">Manage Alerts</button>
+                <button class="btn btn-text" onclick="window.location.href='profile.html'">Profile</button>
+                <button id="logout-btn" class="btn" onclick="window.location.href='index.html'">Logout</button>
+            </div>
+        </div>
+    </nav>
+    <main class="container dashboard-content">
+        <div class="weather-search">
+            <input type="text" id="city-search" placeholder="Search for a city... (Unlimited Saves)">
+            <button id="search-btn" class="btn">Search</button>
+        </div>
+        <div class="saved-locations" id="locations-container">
+            <h3>Your Prioritized Locations</h3>
+            <!-- Weather Cards Go Here -->
+            <div class="location-grid">
+                <a href="weather-details.html?location=New%20York" class="location-card weather-location-card">
+                    <h4 class="location-title">New York, NY</h4>
+                    <div class="location-temp">72°F</div>
+                    <div class="location-condition">Sunny</div>
+                    <div class="location-meta">
+                        <span>Hum: 45%</span>
+                        <span>Wind: 5 mph</span>
+                    </div>
+                    <button class="delete-location-btn">Remove</button>
+                </a>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

@@ -297,9 +297,9 @@ document.addEventListener('DOMContentLoaded', () => {
             );
 
             weatherTiles.forEach(({ id, location, weather }) => {
-                const card = document.createElement('article');
+                const card = document.createElement('a'); // Changed to <a> tag
+                card.href = `weather-details.html?location=${encodeURIComponent(location)}`; // Navigation link
                 card.className = 'location-card weather-location-card';
-                card.addEventListener('click', () => fetchWeather(location));
 
                 if (weather) {
                     card.innerHTML = `
@@ -323,6 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 deleteBtn.className = 'delete-location-btn';
                 deleteBtn.textContent = 'Delete';
                 deleteBtn.addEventListener('click', async (e) => {
+                    e.preventDefault(); // Prevent navigating when clicking delete
                     e.stopPropagation();
                     await deleteSavedLocation(id);
                 });

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerts Manager - WeatherWize</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/weatherWize.CSS">
+    <script src="./js/auth-check.js" defer></script>
+</head>
+
+<body data-allowed-roles="advanced,admin">
+    <div class="sky-wrap" aria-hidden="true">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+    </div>
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="dashboard.html" class="nav-brand">
+                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo"
+                    style="display:inline-block; vertical-align:middle;">
+                WeatherWize
+            </a>
+            <div class="nav-links">
+                <button class="btn btn-text" onclick="window.location.href='advanced-dashboard.html'">Dashboard</button>
+                <button id="logout-btn" class="btn" onclick="window.location.href='index.html'">Logout</button>
+            </div>
+        </div>
+    </nav>
+    <main class="container dashboard-content">
+        <h2>Severe Weather Alerts</h2>
+        <div class="auth-card" style="max-width: 600px; margin-top: 20px;">
+            <div class="form-group">
+                <label>Location</label>
+                <select>
+                    <option>New York, NY</option>
+                    <option>Seattle, WA</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Alert Trigger Type</label>
+                <select>
+                    <option>Temperature drops below</option>
+                    <option>Temperature goes above</option>
+                    <option>Precipitation chance exceeds</option>
+                    <option>Severe Storm Warning</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Threshold Value</label>
+                <input type="number" placeholder="e.g. 32">
+            </div>
+            <button class="btn btn-block">Save Alert</button>
+        </div>
+
+        <h3 style="margin-top: 40px;">Active Alerts</h3>
+        <div class="location-card" style="margin-top: 15px; border-left: 4px solid var(--danger);">
+            <h4>Seattle, WA</h4>
+            <p style="color: var(--text-secondary);">Alert me if: Temperature drops below 32°F</p>
+            <button class="delete-location-btn">Delete</button>
+        </div>
+    </main>
+</body>
+
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users - WeatherWize Admin</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/weatherWize.CSS">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: var(--card-bg);
+            color: var(--text-secondary);
+        }
+    </style>
+    <script src="./js/auth-check.js" defer></script>
+    <script src="./js/admin.js" defer></script>
+</head>
+
+<body data-allowed-roles="admin">
+    <div class="sky-wrap" aria-hidden="true">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+    </div>
+    <nav class="navbar" style="border-bottom: 2px solid var(--danger);">
+        <div class="container nav-content">
+            <a href="dashboard.html" class="nav-brand" style="color: var(--danger);">
+                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo"
+                    style="display:inline-block; vertical-align:middle;">
+                WeatherWize
+            </a>
+            <div class="nav-links">
+                <button class="btn btn-text" onclick="window.location.href='admin-dashboard.html'">Back to
+                    Dashboard</button>
+                <button id="logout-btn" class="btn" onclick="window.location.href='index.html'">Logout</button>
+            </div>
+        </div>
+    </nav>
+    <main class="container dashboard-content">
+        <h2>User Management</h2>
+
+        <div class="weather-search">
+            <input type="text" placeholder="Search users by username or ID...">
+            <button class="btn">Search</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>john_doe</td>
+                    <td>
+                        <select style="width: auto; padding: 6px;">
+                            <option selected>General</option>
+                            <option>Advanced</option>
+                            <option>Admin</option>
+                        </select>
+                    </td>
+                    <td><span style="color: var(--success);">Active</span></td>
+                    <td>
+                        <button class="btn" style="padding: 6px 12px;">Save Role</button>
+                        <button class="btn" style="padding: 6px 12px; background-color: var(--danger);">Suspend</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>storm_chaser99</td>
+                    <td>
+                        <select style="width: auto; padding: 6px;">
+                            <option>General</option>
+                            <option selected>Advanced</option>
+                            <option>Admin</option>
+                        </select>
+                    </td>
+                    <td><span style="color: var(--danger);">Suspended</span></td>
+                    <td>
+                        <button class="btn" style="padding: 6px 12px;">Save Role</button>
+                        <button class="btn"
+                            style="padding: 6px 12px; background-color: var(--success);">Unsuspend</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+</body>
+
+</html>
