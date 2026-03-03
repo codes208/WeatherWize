@@ -43,6 +43,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(precipMap);
 
+            // Custom pane with blur to smooth out radar tile edges
+            precipMap.createPane('radarPane');
+            precipMap.getPane('radarPane').style.filter = 'blur(2px)';
+            precipMap.getPane('radarPane').style.zIndex = 300;
+
             await loadRadarFrames();
 
             document.getElementById('radar-play-btn').addEventListener('click', () => {
@@ -71,8 +76,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             radarFrames.forEach((frame) => {
                 const layer = L.tileLayer(
-                    `https://tilecache.rainviewer.com${frame.path}/256/{z}/{x}/{y}/2/1_1.png`,
-                    { opacity: 0, zIndex: 200, attribution: '&copy; RainViewer' }
+                    `https://tilecache.rainviewer.com${frame.path}/512/{z}/{x}/{y}/6/1_1.png`,
+                    {
+                        opacity: 0,
+                        attribution: '&copy; RainViewer',
+                        tileSize: 512,
+                        zoomOffset: -1,
+                        maxNativeZoom: 8,
+                        maxZoom: 18,
+                        pane: 'radarPane'
+                    }
                 );
                 layer.addTo(precipMap);
                 radarLayers.push(layer);
