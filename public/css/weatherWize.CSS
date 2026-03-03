@@ -1038,6 +1038,43 @@ body.dashboard-page {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.dashboard-page .navbar .nav-content {
+    justify-content: space-between;
+}
+
+.dashboard-page .navbar .nav-links {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.dashboard-page .navbar .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dashboard-page .navbar .btn {
+    background-color: transparent;
+    color: #5b3ea5;
+    box-shadow: none;
+}
+
+.dashboard-page .navbar .btn:hover {
+    background-color: rgba(91, 62, 165, 0.12);
+    color: #3a2674;
+}
+
+.dashboard-page .navbar #logout-btn {
+    background-color: #1b75be;
+    color: #ffffff;
+}
+
+.dashboard-page .navbar #logout-btn:hover {
+    background-color: #1565a8;
+}
+
 .dashboard-page .dashboard-content {
     position: relative;
     z-index: 1;

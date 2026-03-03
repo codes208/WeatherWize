@@ -10,7 +10,7 @@
     <script src="./js/auth-check.js" defer></script>
 </head>
 
-<body data-allowed-roles="admin">
+<body data-allowed-roles="admin" class="dashboard-page">
     <div class="sky-wrap" aria-hidden="true">
         <div class="cloud cloud-1"></div>
         <div class="cloud cloud-2"></div>
@@ -26,7 +26,10 @@
             <div class="nav-links">
                 <button class="btn btn-text" onclick="window.location.href='admin-users.html'">Manage Users</button>
                 <button class="btn btn-text" onclick="window.location.href='settings.html'">System Settings</button>
+                <button class="btn btn-text" onclick="window.location.href='locations.html'">Locations</button>
                 <button class="btn btn-text" onclick="window.location.href='profile.html'">Profile</button>
+            </div>
+            <div class="nav-right">
                 <button id="logout-btn" class="btn" onclick="window.location.href='index.html'">Logout</button>
             </div>
         </div>

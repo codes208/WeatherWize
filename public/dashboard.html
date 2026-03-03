@@ -26,8 +26,11 @@
                 WeatherWize
             </a>
             <div class="nav-links">
-                <a href="profile.html" id="username-display"
-                    style="text-decoration: none; font-weight: bold; margin-right: 15px;"></a>
+                <button class="btn btn-text" onclick="window.location.href='locations.html'">Manage Locations</button>
+                <button class="btn btn-text" onclick="window.location.href='profile.html'">Profile</button>
+            </div>
+            <div class="nav-right">
+                <span id="username-display" style="font-weight: bold;"></span>
                 <button id="logout-btn" class="btn">Logout</button>
             </div>
         </div>
@@ -86,7 +89,7 @@
         </div>
 
         <div class="saved-locations">
-            <h3>Saved Locations</h3>
+            <h3>Your Prioritized Locations</h3>
             <div id="saved-locations-list" class="location-grid">
                 <!-- Location cards will be injected here -->
             </div>

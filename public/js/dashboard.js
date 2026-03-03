@@ -135,13 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
         precipMapSection.classList.add('hidden');
     });
 
-    // Fetch Weather
-    weatherForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const location = weatherForm.location.value;
-        await fetchWeather(location);
-    });
-
     // Save Location
     document.getElementById('save-location-btn').addEventListener('click', async () => {
         const location = document.getElementById('location-name').textContent;
@@ -164,6 +157,13 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error(error);
         }
+    });
+
+    // Fetch Weather
+    weatherForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const location = weatherForm.location.value;
+        await fetchWeather(location);
     });
 
     async function fetchWeatherData(location) {
@@ -296,10 +296,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             );
 
-            weatherTiles.forEach(({ id, location, weather }) => {
-                const card = document.createElement('a'); // Changed to <a> tag
-                card.href = `weather-details.html?location=${encodeURIComponent(location)}`; // Navigation link
+            weatherTiles.forEach(({ location, weather }) => {
+                const card = document.createElement('article');
                 card.className = 'location-card weather-location-card';
+                card.addEventListener('click', () => {
+                    window.location.href = `weather-details.html?location=${encodeURIComponent(location)}`;
+                });
 
                 if (weather) {
                     card.innerHTML = `
@@ -318,42 +320,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                 }
 
-                const deleteBtn = document.createElement('button');
-                deleteBtn.type = 'button';
-                deleteBtn.className = 'delete-location-btn';
-                deleteBtn.textContent = 'Delete';
-                deleteBtn.addEventListener('click', async (e) => {
-                    e.preventDefault(); // Prevent navigating when clicking delete
-                    e.stopPropagation();
-                    await deleteSavedLocation(id);
-                });
-
-                card.appendChild(deleteBtn);
-
                 savedLocationsContainer.appendChild(card);
             });
         } catch (error) {
             console.error(error);
             savedLocationsContainer.innerHTML = '<p class="empty-state">Unable to load saved locations.</p>';
-        }
-    }
-
-    async function deleteSavedLocation(locationId) {
-        try {
-            const response = await fetch(`/api/weather/saved/${locationId}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.message || 'Failed to delete location');
-            }
-
-            await loadSavedLocations();
-        } catch (error) {
-            console.error(error);
-            alert(error.message || 'Failed to delete location');
         }
     }
 

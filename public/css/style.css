@@ -164,11 +164,15 @@ select:focus {
 .nav-brand {
     font-size: 1.5rem;
     font-weight: bold;
-    color: var(--accent);
+    color: #1565a8;
     text-decoration: none;
 }
 
-#username-display,
+#username-display {
+    color: #1b75be;
+    font-weight: bold;
+}
+
 .nav-links a {
     color: var(--text-primary);
     text-decoration: none;
@@ -177,7 +181,6 @@ select:focus {
     transition: color 0.3s;
 }
 
-#username-display:hover,
 .nav-links a:hover {
     color: var(--accent);
 }

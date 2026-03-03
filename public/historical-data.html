@@ -10,7 +10,7 @@
     <script src="./js/auth-check.js" defer></script>
 </head>
 
-<body data-allowed-roles="advanced,admin">
+<body data-allowed-roles="advanced,admin" class="dashboard-page">
     <div class="sky-wrap" aria-hidden="true">
         <div class="cloud cloud-1"></div>
         <div class="cloud cloud-2"></div>
@@ -23,8 +23,8 @@
                     style="display:inline-block; vertical-align:middle;">
                 WeatherWize
             </a>
-            <div class="nav-links">
-                <button class="btn btn-text" onclick="window.location.href='advanced-dashboard.html'">Dashboard</button>
+            <div class="nav-right">
+                <button class="btn btn-text" onclick="window.history.back()">Back</button>
                 <button id="logout-btn" class="btn" onclick="window.location.href='index.html'">Logout</button>
             </div>
         </div>
