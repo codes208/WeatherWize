@@ -101,6 +101,30 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('condition-text').textContent = data.condition;
         document.getElementById('humidity-value').textContent = `${data.humidity}%`;
         document.getElementById('wind-value').textContent = `${data.windSpeed} mph`;
+
+        const feelsLikeEl = document.getElementById('feels-like-text');
+        if (data.feelsLike != null) {
+            feelsLikeEl.innerHTML = `Feels like: <span class="hi-lo-value">${Math.round(data.feelsLike)}°F</span>`;
+        } else {
+            feelsLikeEl.textContent = '';
+        }
+
+        const hiLoEl = document.getElementById('hi-lo-text');
+        if (data.tempHigh != null && data.tempLow != null) {
+            hiLoEl.innerHTML = `Hi: <span class="hi-lo-value">${Math.round(data.tempHigh)}°F</span>  |  Lo: <span class="hi-lo-value">${Math.round(data.tempLow)}°F</span>`;
+        } else {
+            hiLoEl.textContent = '';
+        }
+
+        const aqiEl = document.getElementById('aqi-value');
+        if (data.airQuality) {
+            aqiEl.textContent = data.airQuality.label;
+            aqiEl.dataset.aqi = data.airQuality.index;
+        } else {
+            aqiEl.textContent = '--';
+            delete aqiEl.dataset.aqi;
+        }
+
         saveLocationBtn.classList.toggle('hidden', savedLocationNames.has(data.location.toLowerCase()));
     }
 
@@ -132,8 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="hourly-time">${formatForecastTime(slot.time)}</div>
                 <div class="hourly-temp">${Math.round(slot.temp)}&deg;F</div>
                 <div class="hourly-condition">${slot.condition}</div>
-                <div class="hourly-meta">Humidity ${slot.humidity}%</div>
-                <div class="hourly-meta">Wind ${slot.windSpeed} mph</div>
+                <div class="hourly-meta">Humidity <span class="meta-value">${slot.humidity}%</span></div>
+                <div class="hourly-meta">Wind <span class="meta-value">${slot.windSpeed} mph</span></div>
             `;
             hourlyReportList.appendChild(card);
         });
@@ -177,8 +201,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="location-temp">${Math.round(weather.temp)}&deg;F</div>
                         <div class="location-condition">${weather.condition}</div>
                         <div class="location-meta">
-                            <span>Humidity: ${weather.humidity}%</span>
-                            <span>Wind: ${weather.windSpeed} mph</span>
+                            <span>Humidity: <span class="meta-value">${weather.humidity}%</span></span>
+                            <span>Wind: <span class="meta-value">${weather.windSpeed} mph</span></span>
                         </div>
                     `;
                 } else {

@@ -3,6 +3,9 @@ const db = require('../config/db');
 const OPENWEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
 const OPENWEATHER_FORECAST_URL = 'https://api.openweathermap.org/data/2.5/forecast';
 const OPENWEATHER_GEO_URL = 'http://api.openweathermap.org/geo/1.0/direct';
+const OPENWEATHER_AQI_URL = 'http://api.openweathermap.org/data/2.5/air_pollution';
+
+const AQI_LABELS = { 1: 'Good', 2: 'Fair', 3: 'Moderate', 4: 'Poor', 5: 'Very Poor' };
 
 async function geocodeLocation(location, apiKey) {
     const geoUrl = `${OPENWEATHER_GEO_URL}?q=${encodeURIComponent(location)}&limit=1&appid=${apiKey}`;
@@ -35,7 +38,10 @@ exports.getWeather = async (req, res) => {
         }
 
         const url = `${OPENWEATHER_BASE_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}&units=imperial`;
-        const response = await fetch(url);
+        const [response, aqiResponse] = await Promise.all([
+            fetch(url),
+            fetch(`${OPENWEATHER_AQI_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}`)
+        ]);
         const data = await response.json();
 
         if (!response.ok) {
@@ -48,12 +54,23 @@ exports.getWeather = async (req, res) => {
             return res.status(response.status).json({ message: apiMessage });
         }
 
+        let airQuality = null;
+        if (aqiResponse.ok) {
+            const aqiData = await aqiResponse.json();
+            const aqiIndex = aqiData.list?.[0]?.main?.aqi;
+            if (aqiIndex) airQuality = { index: aqiIndex, label: AQI_LABELS[aqiIndex] || 'Unknown' };
+        }
+
         const weatherData = {
             location: geo.displayName,
             temp: data.main?.temp,
+            feelsLike: data.main?.feels_like,
+            tempHigh: data.main?.temp_max,
+            tempLow: data.main?.temp_min,
             condition: data.weather?.[0]?.main || 'Unknown',
             humidity: data.main?.humidity,
             windSpeed: data.wind?.speed,
+            airQuality,
             lat: geo.lat,
             lon: geo.lon
         };

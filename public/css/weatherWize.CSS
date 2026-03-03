@@ -1021,28 +1021,72 @@ body.dashboard-page {
 }
 
 .dashboard-page .weather-card h2,
-.dashboard-page .weather-card .weather-temp,
-.dashboard-page .location-title,
-.dashboard-page .hourly-temp {
+.dashboard-page .location-title {
     color: #2f2554;
 }
 
+.dashboard-page .weather-card .weather-temp,
+.dashboard-page .hourly-temp {
+    color: #1565a8;
+}
+
 .dashboard-page .weather-details,
-.dashboard-page .hourly-time,
 .dashboard-page .hourly-condition,
+.dashboard-page .location-condition {
+    color: #252525;
+}
+
 .dashboard-page .hourly-meta,
-.dashboard-page .location-condition,
 .dashboard-page .location-meta {
-    color: #6a6192;
+    color: #2f2554;
+}
+
+.dashboard-page .meta-value {
+    color: #1565a8;
+}
+
+.dashboard-page #humidity-value,
+.dashboard-page #wind-value {
+    color: #1565a8;
+}
+
+.dashboard-page .hourly-time {
+    color: #2f2554;
+    font-weight: 700;
 }
 
 .dashboard-page .location-temp {
-    color: var(--accent);
+    color: #1565a8;
 }
 
 .dashboard-page #condition-text {
-    color: #6a6192;
+    color: #030303;
 }
+
+.dashboard-page .weather-feels-like {
+    font-size: 0.95rem;
+    color: #000000;
+    margin-top: 4px;
+}
+
+.dashboard-page .weather-hi-lo {
+    font-size: 0.95rem;
+    color: #2f2554;
+    font-weight: 600;
+    margin-top: 2px;
+    margin-bottom: 12px;
+}
+
+.dashboard-page .hi-lo-value {
+    color: #1565a8;
+}
+
+/* AQI color coding */
+.dashboard-page #aqi-value[data-aqi="1"] { color: #2e7d32; }  /* Good - green */
+.dashboard-page #aqi-value[data-aqi="2"] { color: #f9a825; }  /* Fair - yellow */
+.dashboard-page #aqi-value[data-aqi="3"] { color: #e65100; }  /* Moderate - orange */
+.dashboard-page #aqi-value[data-aqi="4"] { color: #b71c1c; }  /* Poor - red */
+.dashboard-page #aqi-value[data-aqi="5"] { color: #4a148c; }  /* Very Poor - dark purple */
 
 .dashboard-page .delete-location-btn {
     border-color: rgba(95, 59, 179, 0.3);
