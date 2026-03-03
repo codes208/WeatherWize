@@ -193,3 +193,33 @@ exports.deleteSavedLocation = async (req, res) => {
         return res.status(500).json({ message: 'Error deleting saved location' });
     }
 };
+
+const ALLOWED_MAP_LAYERS = new Set([
+    'precipitation_new', 'clouds_new', 'temp_new', 'wind_new', 'pressure_new'
+]);
+
+exports.getMapTile = async (req, res) => {
+    try {
+        const { layer, z, x, y } = req.params;
+
+        if (!ALLOWED_MAP_LAYERS.has(layer)) {
+            return res.status(400).end();
+        }
+
+        const apiKey = process.env.OPENWEATHER_API_KEY;
+        const tileUrl = `https://tile.openweathermap.org/map/${layer}/${z}/${x}/${y}.png?appid=${apiKey}`;
+        const tileResponse = await fetch(tileUrl);
+
+        if (!tileResponse.ok) {
+            return res.status(tileResponse.status).end();
+        }
+
+        const buffer = await tileResponse.arrayBuffer();
+        res.set('Content-Type', 'image/png');
+        res.set('Cache-Control', 'public, max-age=600');
+        return res.send(Buffer.from(buffer));
+    } catch (error) {
+        console.error(error);
+        return res.status(500).end();
+    }
+};

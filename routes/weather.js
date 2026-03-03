@@ -8,6 +8,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 // Let's protect everything for now to match the "Dashboard" feel.
 router.get('/', authMiddleware, weatherController.getWeather);
 router.get('/hourly', authMiddleware, weatherController.getHourlyForecast);
+router.get('/tiles/:layer/:z/:x/:y', weatherController.getMapTile);
 router.post('/save', authMiddleware, weatherController.saveLocation);
 router.get('/saved', authMiddleware, weatherController.getSavedLocations);
 router.delete('/saved/:id', authMiddleware, weatherController.deleteSavedLocation);

@@ -7,6 +7,8 @@
     <title>Dashboard - WeatherWize</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/weatherWize.CSS">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="/js/dashboard.js" defer></script>
 </head>
 
@@ -62,6 +64,17 @@
             <div style="margin-top: 20px;">
                 <button id="save-location-btn" class="btn">Save Location</button>
             </div>
+        </div>
+
+        <div id="precip-map-section" class="precip-map-section hidden">
+            <h3>Radar Map</h3>
+            <div class="radar-controls">
+                <button id="radar-play-btn" class="btn radar-btn">&#9646;&#9646;</button>
+                <span class="radar-time-label">Time:</span>
+                <span id="radar-timestamp" class="radar-timestamp">--</span>
+                <span id="radar-frame-label" class="radar-frame-label"></span>
+            </div>
+            <div id="precip-map"></div>
         </div>
 
         <div id="hourly-report" class="hourly-report hidden">
