@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Details - WeatherWize</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/weatherWize.CSS">
+    <script src="./js/auth-check.js" defer></script>
+</head>
+
+<body data-allowed-roles="general,advanced,admin">
+    <div class="sky-wrap" aria-hidden="true">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+    </div>
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="dashboard.html" class="nav-brand">
+                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo"
+                    style="display:inline-block; vertical-align:middle;">
+                WeatherWize
+            </a>
+            <div class="nav-links">
+                <button id="logout-btn" class="btn" onclick="window.location.href='index.html'">Logout</button>
+            </div>
+        </div>
+    </nav>
+    <main class="container dashboard-content">
+        <h2>Detailed Forecast: Seattle</h2>
+        <div class="weather-card">
+            <div class="weather-temp">65°F</div>
+            <p>Cloudy</p>
+            <div class="weather-details">
+                <span>Humidity: 70%</span>
+                <span>Wind: 10 mph</span>
+                <span>UV Index: Mod</span>
+            </div>
+        </div>
+        <div class="hourly-report">
+            <h3>Hourly Forecast</h3>
+            <div class="hourly-grid">
+                <div class="hourly-card">
+                    <div class="hourly-time">1:00 PM</div>
+                    <div class="hourly-temp">65°</div>
+                    <div class="hourly-condition">Cloudy</div>
+                    <div class="hourly-meta">Precip: 10%</div>
+                </div>
+                <div class="hourly-card">
+                    <div class="hourly-time">2:00 PM</div>
+                    <div class="hourly-temp">64°</div>
+                    <div class="hourly-condition">Rain</div>
+                    <div class="hourly-meta">Precip: 60%</div>
+                </div>
+                <!-- More cards can be added here -->
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

@@ -165,6 +165,21 @@ select:focus {
     font-size: 1.5rem;
     font-weight: bold;
     color: var(--accent);
+    text-decoration: none;
+}
+
+#username-display,
+.nav-links a {
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: bold;
+    margin-right: 15px;
+    transition: color 0.3s;
+}
+
+#username-display:hover,
+.nav-links a:hover {
+    color: var(--accent);
 }
 
 .nav-logo {
@@ -287,6 +302,9 @@ select:focus {
     cursor: pointer;
     transition: transform 0.2s;
     border: 1px solid var(--border);
+    text-decoration: none;
+    color: inherit;
+    display: block;
 }
 
 .location-card:hover {

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Locations - WeatherWize</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/weatherWize.CSS">
+    <script src="./js/auth-check.js" defer></script>
+</head>
+
+<body data-allowed-roles="general,advanced,admin">
+    <div class="sky-wrap" aria-hidden="true">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+    </div>
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="dashboard.html" class="nav-brand">
+                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo"
+                    style="display:inline-block; vertical-align:middle;">
+                WeatherWize
+            </a>
+            <div class="nav-links">
+                <button class="btn btn-text" onclick="window.history.back()">Back</button>
+                <button id="logout-btn" class="btn" onclick="window.location.href='index.html'">Logout</button>
+            </div>
+        </div>
+    </nav>
+    <main class="container dashboard-content">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Manage Saved Locations</h2>
+            <button class="btn">Add New Location</button>
+        </div>
+
+        <div class="location-grid" style="grid-template-columns: 1fr; margin-top: 30px;">
+            <div class="location-card" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h4 style="margin-bottom: 5px;">Seattle, WA</h4>
+                    <span style="color: var(--text-secondary); font-size: 0.9rem;">Added on Oct 24, 2023</span>
+                </div>
+                <button class="delete-location-btn" style="margin-top: 0;">Remove</button>
+            </div>
+
+            <div class="location-card" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h4 style="margin-bottom: 5px;">New York, NY</h4>
+                    <span style="color: var(--text-secondary); font-size: 0.9rem;">Added on Oct 25, 2023</span>
+                </div>
+                <button class="delete-location-btn" style="margin-top: 0;">Remove</button>
+            </div>
+
+            <div class="location-card" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h4 style="margin-bottom: 5px;">London, UK</h4>
+                    <span style="color: var(--text-secondary); font-size: 0.9rem;">Added on Nov 1, 2023</span>
+                </div>
+                <button class="delete-location-btn" style="margin-top: 0;">Remove</button>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>
