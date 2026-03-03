@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/weatherWize.CSS">
     <script src="./js/auth-check.js" defer></script>
+    <script src="./js/profile.js" defer></script>
 </head>
 
 <body data-allowed-roles="general,advanced,admin" class="dashboard-page">
@@ -29,19 +30,17 @@
             </div>
         </div>
     </nav>
-    <main class="container dashboard-content">
-        <h2>Your Profile</h2>
-
-        <div class="auth-card" style="max-width: 600px; margin-top: 30px;">
+    <main class="auth-container" style="min-height: calc(100vh - 80px);">
+        <div class="auth-card">
+            <h2 class="auth-title">Your Profile</h2>
             <form>
                 <div class="form-group">
                     <label>Username</label>
-                    <input type="text" value="current_user" disabled
-                        style="background-color: var(--bg-primary); cursor: not-allowed;">
+                    <input type="text" id="username-input" disabled>
                 </div>
                 <div class="form-group">
                     <label>Email Address</label>
-                    <input type="email" value="user@example.com">
+                    <input type="email" id="email-input">
                 </div>
                 <div class="form-group">
                     <label>New Password (Optional)</label>
@@ -50,11 +49,9 @@
                 <button type="submit" class="btn btn-block">Update Profile</button>
             </form>
 
-            <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border);">
-                <h3 style="color: var(--danger); margin-bottom: 15px;">Danger Zone</h3>
-                <button class="btn btn-block"
-                    style="background-color: transparent; border: 1px solid var(--danger); color: var(--danger);">Delete
-                    Account</button>
+            <div class="danger-zone">
+                <h3 style="margin-bottom: 15px;">Danger Zone</h3>
+                <button class="btn btn-block btn-outline-danger">Delete Account</button>
             </div>
         </div>
     </main>

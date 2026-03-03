@@ -9,10 +9,15 @@ exports.register = async (req, res) => {
     try {
         const username = req.body.username?.trim();
         const password = req.body.password;
+        const email = req.body.email?.trim() || null;
         const requestedRole = (req.body.role || 'general').toLowerCase();
 
         if (!username || !password) {
             return res.status(400).json({ message: 'Username and password are required' });
+        }
+
+        if (!email) {
+            return res.status(400).json({ message: 'Email address is required' });
         }
 
         if (!SELF_REGISTRATION_ROLES.has(requestedRole)) {
@@ -27,8 +32,8 @@ exports.register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         await db.query(
-            'INSERT INTO users (username, password, role) VALUES (?, ?, ?)',
-            [username, hashedPassword, requestedRole]
+            'INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)',
+            [username, hashedPassword, email, requestedRole]
         );
 
         res.status(201).json({ message: 'User registered successfully' });
@@ -47,7 +52,7 @@ exports.login = async (req, res) => {
         }
 
         const [users] = await db.query(
-            'SELECT id, username, password, role FROM users WHERE username = ?',
+            'SELECT id, username, password, email, role FROM users WHERE username = ?',
             [username]
         );
 
@@ -70,7 +75,7 @@ exports.login = async (req, res) => {
 
         res.json({
             token,
-            user: { id: user.id, username: user.username, role: user.role }
+            user: { id: user.id, username: user.username, email: user.email, role: user.role }
         });
     } catch (error) {
         console.error(error);

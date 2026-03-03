@@ -451,7 +451,7 @@ body {
     width: min(100%, 420px);
     padding: 30px 26px;
     border-radius: 22px;
-    background: var(--card-bg);
+    background: white;
     box-shadow: 0 14px 36px rgba(30, 12, 72, 0.28);
     backdrop-filter: blur(6px);
 }
@@ -983,6 +983,8 @@ body.dashboard-page {
     color: rgba(255, 255, 255, 0.88);
 }
 
+.dashboard-page .dashboard-content h2,
+.dashboard-page .dashboard-content h3,
 .dashboard-page .hourly-report h3,
 .dashboard-page .saved-locations h3,
 .dashboard-page .precip-map-section h3 {
@@ -1082,7 +1084,8 @@ body.dashboard-page {
 
 .dashboard-page .weather-card,
 .dashboard-page .hourly-card,
-.dashboard-page .location-card {
+.dashboard-page .location-card,
+.dashboard-page .auth-card {
     background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(6px);
     color: #2f2554;

@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = registerForm.username.value;
+            const email = registerForm.email.value;
             const password = registerForm.password.value;
             const confirmPassword = registerForm.confirmPassword.value;
             const role = registerForm.role?.value || 'general';
@@ -62,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = await fetch(`${API_URL}/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password, role })
+                    body: JSON.stringify({ username, email, password, role })
                 });
 
                 const data = await response.json();
