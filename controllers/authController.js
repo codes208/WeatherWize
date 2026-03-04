@@ -116,3 +116,49 @@ exports.updateUserRole = async (req, res) => {
         res.status(500).json({ message: 'Server error while updating role' });
     }
 };
+
+exports.getAllUsers = async (req, res) => {
+    try {
+        const [users] = await db.query(
+            'SELECT id, username, email, role, status FROM users'
+        );
+        res.json(users);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error while fetching users' });
+    }
+};
+
+exports.updateUserStatus = async (req, res) => {
+    try {
+        const userId = Number(req.params.id);
+        const { status } = req.body;
+
+        if (!Number.isInteger(userId) || userId <= 0) {
+            return res.status(400).json({ message: 'Invalid user id' });
+        }
+
+        if (status !== 'active' && status !== 'suspended') {
+            return res.status(400).json({ message: 'Invalid status. Use active or suspended.' });
+        }
+
+        const [users] = await db.query('SELECT id, username FROM users WHERE id = ?', [userId]);
+        if (users.length === 0) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        await db.query('UPDATE users SET status = ? WHERE id = ?', [status, userId]);
+
+        res.json({
+            message: 'User status updated successfully',
+            user: {
+                id: users[0].id,
+                username: users[0].username,
+                status
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error while updating status' });
+    }
+};

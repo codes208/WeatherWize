@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadUsers() {
         try {
-            const response = await fetch('/api/auth/users', { // Note: Assume an admin endpoint exists or will be stubbed
+            const response = await fetch('/api/auth/users', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -19,13 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const users = await response.json();
             renderUsers(users);
         } catch (error) {
-            console.warn(error.message);
-            // Fallback for Demo without building new backend routes:
-            renderUsers([
-                { id: 1, username: 'admin', role: 'admin', is_suspended: false },
-                { id: 2, username: 'weatherfan99', role: 'general', is_suspended: false },
-                { id: 3, username: 'stormchaser', role: 'advanced', is_suspended: true }
-            ]);
+            console.error('Error loading users:', error);
+            alert('Failed to load users');
         }
     }
 
@@ -34,11 +29,13 @@ document.addEventListener('DOMContentLoaded', () => {
         users.forEach(user => {
             const tr = document.createElement('tr');
 
-            const statusColor = user.is_suspended ? 'var(--danger)' : 'var(--success)';
-            const statusText = user.is_suspended ? 'Suspended' : 'Active';
+            const isSuspended = user.status === 'suspended';
+            const statusColor = isSuspended ? 'var(--danger)' : 'var(--success)';
+            const statusText = isSuspended ? 'Suspended' : 'Active';
 
-            const suspendActionText = user.is_suspended ? 'Unsuspend' : 'Suspend';
-            const suspendActionColor = user.is_suspended ? 'var(--success)' : 'var(--danger)';
+            const suspendActionText = isSuspended ? 'Unsuspend' : 'Suspend';
+            const suspendActionColor = isSuspended ? 'var(--success)' : 'var(--danger)';
+            const newStatus = isSuspended ? 'active' : 'suspended';
 
             tr.innerHTML = `
                 <td>${user.username}</td>
@@ -52,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td><span style="color: ${statusColor};">${statusText}</span></td>
                 <td>
                     <button class="btn save-role-btn" data-id="${user.id}" style="padding: 6px 12px;">Save Role</button>
-                    <button class="btn toggle-suspend-btn" data-id="${user.id}" style="padding: 6px 12px; background-color: ${suspendActionColor};">${suspendActionText}</button>
+                    <button class="btn toggle-suspend-btn" data-id="${user.id}" data-new-status="${newStatus}" style="padding: 6px 12px; background-color: ${suspendActionColor};">${suspendActionText}</button>
                 </td>
             `;
             usersTableBody.appendChild(tr);
@@ -69,9 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Mock Suspend for Demo
         document.querySelectorAll('.toggle-suspend-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                alert('Account status toggled. (Demo Mode)');
-                loadUsers(); // Re-render mock
+            btn.addEventListener('click', async (e) => {
+                const id = e.target.dataset.id;
+                const newStatus = e.target.dataset.newStatus;
+                await updateStatus(id, newStatus);
             });
         });
     }
@@ -94,7 +92,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert(data.message || 'Error updating role');
             }
         } catch (e) {
-            alert('Role updated (Demo Mode)');
+            alert('Error updating role');
+            console.error(e);
+        }
+    }
+
+    async function updateStatus(userId, status) {
+        try {
+            const response = await fetch(`/api/auth/users/${userId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status })
+            });
+
+            if (response.ok) {
+                loadUsers(); // Re-render the list
+            } else {
+                const data = await response.json();
+                alert(data.message || 'Error updating status');
+            }
+        } catch (e) {
+            alert('Error updating status');
+            console.error(e);
         }
     }
 

@@ -25,4 +25,15 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = '/index.html';
         });
     });
+
+    // Fix Logo Link Redirection based on Role
+    const navBrands = document.querySelectorAll('.nav-brand');
+    navBrands.forEach(brand => {
+        brand.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (user.role === 'admin') window.location.href = '/admin-dashboard.html';
+            else if (user.role === 'advanced') window.location.href = '/advanced-dashboard.html';
+            else window.location.href = '/dashboard.html';
+        });
+    });
 });

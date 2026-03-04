@@ -31,6 +31,26 @@ async function initDatabase() {
         await connection.query(schema);
 
         console.log('✅ Database and tables created successfully!');
+
+        // 4. Create default admin user
+        const bcrypt = require('bcrypt');
+
+        // Select the database explicitly to insert into users table
+        await connection.query('USE weatherwize');
+
+        const [users] = await connection.query("SELECT id FROM users WHERE username = 'admin'");
+        if (users.length === 0) {
+            console.log('⚙️  Creating default admin user...');
+            const hashedPassword = await bcrypt.hash('admin', 10);
+            await connection.query(
+                "INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)",
+                ['admin', hashedPassword, 'admin@weatherwize.com', 'admin']
+            );
+            console.log('✅ Default admin user created successfully!');
+        } else {
+            console.log('ℹ️  Admin user already exists.');
+        }
+
         await connection.end();
     } catch (error) {
         console.error('❌ Error initializing database:', error.message);

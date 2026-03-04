@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
   password VARCHAR(255) NOT NULL,
   email VARCHAR(255),
   role ENUM('admin', 'general', 'advanced') NOT NULL DEFAULT 'general',
+  status ENUM('active', 'suspended') NOT NULL DEFAULT 'active',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
