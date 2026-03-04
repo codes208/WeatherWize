@@ -991,6 +991,19 @@ body.dashboard-page {
     color: #ffffff;
 }
 
+.dashboard-page .dashboard-content .auth-card h3 {
+    color: #1b75be;
+}
+
+.dashboard-page .dashboard-content .auth-card p,
+.dashboard-page .location-card p {
+    color: #000000;
+}
+
+.alert-title {
+    color: var(--danger);
+}
+
 .dashboard-page .precip-map-section {
     margin-top: 20px;
 }
