@@ -1,3 +1,13 @@
+/**
+ * @file public/js/map.js
+ * @description Radar / precipitation map using Leaflet.js and RainViewer API.
+ *
+ * Features:
+ *  - Initializes Leaflet map (centers on last searched location or Seattle default)
+ *  - Fetches radar tile timestamps from RainViewer public API
+ *  - Animates through radar frames with play/pause button
+ *  - Displays formatted timestamp and forecast/past indicator
+ */
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
 

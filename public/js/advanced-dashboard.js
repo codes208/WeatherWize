@@ -1,3 +1,13 @@
+/**
+ * @file public/js/advanced-dashboard.js
+ * @description Advanced user dashboard logic (extends general dashboard features).
+ *
+ * Includes everything from dashboard.js plus:
+ *  - UV index display
+ *  - Air quality index (AQI) via OpenWeatherMap Air Pollution API
+ *  - Extended weather details (dew point, visibility, sunrise/sunset)
+ *  - Navigation links to radar map, weather alerts, and historical data
+ */
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');

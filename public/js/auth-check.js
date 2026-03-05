@@ -1,3 +1,14 @@
+/**
+ * @file public/js/auth-check.js
+ * @description Global authentication guard loaded on every protected page.
+ *
+ * Responsibilities:
+ *  - Redirects to login if no JWT token is present
+ *  - Enforces role-based page access via data-allowed-roles attribute on <body>
+ *  - Redirects unauthorized users to their correct dashboard
+ *  - Wires up logout button (clears localStorage)
+ *  - Overrides nav-brand click to redirect by role (admin → admin-dashboard, etc.)
+ */
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');

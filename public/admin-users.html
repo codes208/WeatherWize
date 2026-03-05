@@ -53,9 +53,8 @@
     <main class="container dashboard-content">
         <h2>User Management</h2>
 
-        <div class="weather-search">
-            <input type="text" placeholder="Search users by username or ID...">
-            <button class="btn">Search</button>
+        <div class="weather-search" style="margin-bottom: 10px;">
+            <input type="text" id="user-search-input" placeholder="Search users by username or email...">
         </div>
 
         <table style="background-color: white;">
@@ -68,37 +67,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>john_doe</td>
-                    <td>
-                        <select style="width: auto; padding: 6px;">
-                            <option selected>General</option>
-                            <option>Advanced</option>
-                            <option>Admin</option>
-                        </select>
-                    </td>
-                    <td><span style="color: var(--success);">Active</span></td>
-                    <td>
-                        <button class="btn" style="padding: 6px 12px;">Save Role</button>
-                        <button class="btn" style="padding: 6px 12px; background-color: var(--danger);">Suspend</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>storm_chaser99</td>
-                    <td>
-                        <select style="width: auto; padding: 6px;">
-                            <option>General</option>
-                            <option selected>Advanced</option>
-                            <option>Admin</option>
-                        </select>
-                    </td>
-                    <td><span style="color: var(--danger);">Suspended</span></td>
-                    <td>
-                        <button class="btn" style="padding: 6px 12px;">Save Role</button>
-                        <button class="btn"
-                            style="padding: 6px 12px; background-color: var(--success);">Unsuspend</button>
-                    </td>
-                </tr>
+                <!-- Populated dynamically by admin.js -->
             </tbody>
         </table>
         </div>

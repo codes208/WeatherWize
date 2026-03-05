@@ -1,3 +1,17 @@
+/**
+ * @file public/js/historical-data.js
+ * @description Historical weather query page logic (advanced/admin only).
+ *
+ * Features:
+ *  - Populates location dropdown from saved locations
+ *  - Date range picker (start/end date)
+ *  - Fetches data from /api/weather/history
+ *  - Renders temperature + humidity chart using Chart.js
+ *
+ * Note: On the free OpenWeatherMap tier, this uses the 5-day forecast API
+ * as a proxy. The date range inputs are validated but the returned data
+ * reflects the next 5 days of forecast, not true historical records.
+ */
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     if (!token) return;

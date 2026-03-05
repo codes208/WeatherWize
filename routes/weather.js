@@ -1,3 +1,11 @@
+/**
+ * @file routes/weather.js
+ * @description Weather data and saved location routes.
+ *
+ * Auth:     GET / (current weather), GET /hourly, POST /save, GET /saved, DELETE /saved/:id
+ * Advanced: GET /history
+ * Public:   GET /tiles/:layer/:z/:x/:y (map tile proxy)
+ */
 const express = require('express');
 const router = express.Router();
 const weatherController = require('../controllers/weatherController');

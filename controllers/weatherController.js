@@ -1,3 +1,23 @@
+/**
+ * @file controllers/weatherController.js
+ * @description Weather data and location management controller.
+ *
+ * External APIs:
+ *  - OpenWeatherMap Geocoding API — resolves city names to lat/lon
+ *  - OpenWeatherMap Current Weather API — current conditions
+ *  - OpenWeatherMap 5-day/3-hour Forecast API — hourly forecasts
+ *  - OpenWeatherMap Map Tiles API — precipitation/cloud/temp overlays
+ *  - OpenWeatherMap Air Quality API — air quality index
+ *
+ * Exports:
+ *  - getWeather           — Fetch current weather for a city
+ *  - getHourlyForecast    — Fetch 5-day / 3-hour forecast
+ *  - getHistoricalWeather — Weather history (uses forecast as proxy on free tier)
+ *  - getMapTile           — Proxy OpenWeather map tiles for Leaflet
+ *  - saveLocation         — Geocode and save a location (duplicates rejected)
+ *  - getSavedLocations    — List user's saved locations
+ *  - deleteSavedLocation  — Delete a saved location by ID
+ */
 const db = require('../config/db');
 
 const OPENWEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';

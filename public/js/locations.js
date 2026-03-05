@@ -1,3 +1,13 @@
+/**
+ * @file public/js/locations.js
+ * @description Manage saved locations page logic.
+ *
+ * Features:
+ *  - Lists saved locations from /api/weather/saved
+ *  - Add new location (geocoded by backend to prevent duplicates)
+ *  - Delete with confirmation dialog showing the location name
+ *  - Duplicate location toast feedback
+ */
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     const locationGrid = document.getElementById('locations-list');
@@ -32,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 removeBtn.className = 'delete-location-btn';
                 removeBtn.textContent = 'Remove';
                 removeBtn.style.marginTop = '0';
-                removeBtn.addEventListener('click', () => deleteLocation(id));
+                removeBtn.addEventListener('click', () => deleteLocation(id, location_name));
 
                 card.appendChild(removeBtn);
                 locationGrid.appendChild(card);
@@ -43,7 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function deleteLocation(id) {
+    async function deleteLocation(id, name) {
+        // Confirmation modal (UC-007)
+        if (!confirm(`Are you sure you want to remove "${name}"?`)) return;
+
         try {
             const response = await fetch(`/api/weather/saved/${id}`, {
                 method: 'DELETE',
@@ -53,6 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             if (!response.ok) throw new Error(data.message || 'Failed to remove location');
 
+            showToast('Location removed', 'success');
             loadLocations();
         } catch (error) {
             console.error(error);

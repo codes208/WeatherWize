@@ -1,3 +1,14 @@
+/**
+ * @file public/js/dashboard.js
+ * @description General user dashboard logic.
+ *
+ * Features:
+ *  - City weather search (calls /api/weather)
+ *  - Hourly forecast display (calls /api/weather/hourly)
+ *  - Save location button (calls /api/weather/save, geocoded by backend)
+ *  - Saved locations sidebar with click-to-load weather
+ *  - Close weather card, search clear, and keyboard shortcuts
+ */
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');

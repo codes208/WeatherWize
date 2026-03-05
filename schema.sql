@@ -1,3 +1,12 @@
+-- =============================================================================
+-- schema.sql — WeatherWize Database Schema
+--
+-- Tables:
+--   users            — User accounts with role (general/advanced/admin) and status
+--   saved_locations   — Geocoded locations saved by users (FK → users)
+--   alerts           — Weather alert rules per user (FK → users)
+--   system_settings  — Key-value config (maintenance_mode, api_throttle_limit)
+-- =============================================================================
 CREATE DATABASE IF NOT EXISTS weatherwize;
 USE weatherwize;
 

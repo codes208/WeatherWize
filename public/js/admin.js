@@ -1,9 +1,23 @@
+/**
+ * @file public/js/admin.js
+ * @description Admin user management table logic.
+ *
+ * Features:
+ *  - Loads all users from /api/auth/users (cached in allUsers array)
+ *  - Renders user table with role dropdown, status, save-role, suspend buttons
+ *  - Real-time search bar filtering by username or email
+ *  - Confirmation dialog before suspending/unsuspending a user
+ *  - Updates role via PUT /api/auth/users/:id/role
+ *  - Updates status via PUT /api/auth/users/:id/status
+ */
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     if (!token) return; // auth-check.js handles relocation
 
     const usersTableBody = document.querySelector('tbody');
     if (!usersTableBody) return; // Not on the admin-users page
+
+    let allUsers = []; // cached for search filtering
 
     async function loadUsers() {
         try {
@@ -17,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const users = await response.json();
+            allUsers = users;
             renderUsers(users);
         } catch (error) {
             console.error('Error loading users:', error);
@@ -49,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td><span style="color: ${statusColor};">${statusText}</span></td>
                 <td>
                     <button class="btn save-role-btn" data-id="${user.id}" style="padding: 6px 12px;">Save Role</button>
-                    <button class="btn toggle-suspend-btn" data-id="${user.id}" data-new-status="${newStatus}" style="padding: 6px 12px; background-color: ${suspendActionColor};">${suspendActionText}</button>
+                    <button class="btn toggle-suspend-btn" data-id="${user.id}" data-new-status="${newStatus}" data-username="${user.username}" style="padding: 6px 12px; background-color: ${suspendActionColor};">${suspendActionText}</button>
                 </td>
             `;
             usersTableBody.appendChild(tr);
@@ -64,11 +79,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Mock Suspend for Demo
+        // Suspend confirmation (UC-013)
         document.querySelectorAll('.toggle-suspend-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const id = e.target.dataset.id;
                 const newStatus = e.target.dataset.newStatus;
+                const username = e.target.dataset.username;
+                const action = newStatus === 'suspended' ? 'suspend' : 'unsuspend';
+                if (!confirm(`Are you sure you want to ${action} user "${username}"?`)) return;
                 await updateStatus(id, newStatus);
             });
         });
@@ -109,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
+                showToast('User status updated', 'success');
                 loadUsers(); // Re-render the list
             } else {
                 const data = await response.json();
@@ -121,4 +140,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     loadUsers();
+
+    // UC-012: Search bar filtering
+    const searchInput = document.getElementById('user-search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.trim().toLowerCase();
+            if (!query) {
+                renderUsers(allUsers);
+                return;
+            }
+            const filtered = allUsers.filter(u =>
+                u.username.toLowerCase().includes(query) ||
+                (u.email && u.email.toLowerCase().includes(query))
+            );
+            renderUsers(filtered);
+        });
+    }
 });

@@ -1,3 +1,12 @@
+/**
+ * @file public/js/profile.js
+ * @description User profile page logic.
+ *
+ * Features:
+ *  - Pre-fills username (disabled) and email from localStorage
+ *  - Submits email/password updates to PUT /api/auth/profile
+ *  - Hides "Danger Zone" (Delete Account) for admin users
+ */
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -10,6 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const emailInput = document.getElementById('email-input');
     if (emailInput && user.email) {
         emailInput.value = user.email;
+    }
+
+    // Hide "Delete Account" for admin users
+    if (user.role === 'admin') {
+        const dangerZone = document.getElementById('danger-zone');
+        if (dangerZone) dangerZone.style.display = 'none';
     }
 
     // Handle profile form submission

@@ -1,3 +1,9 @@
+/**
+ * @file routes/settings.js
+ * @description System settings routes (admin only).
+ *
+ * GET / — retrieve all settings, PUT / — update settings.
+ */
 const express = require('express');
 const router = express.Router();
 const settingsController = require('../controllers/settingsController');

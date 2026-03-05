@@ -1,3 +1,14 @@
+/**
+ * @file controllers/alertsController.js
+ * @description Weather alerts controller (advanced/admin only).
+ *
+ * Exports:
+ *  - createAlert  — Create a new weather alert for a location with
+ *                   a trigger type (temp_above, temp_below, wind_above,
+ *                   humidity_above) and threshold value.
+ *  - getAlerts    — List all alerts belonging to the authenticated user.
+ *  - deleteAlert  — Delete an alert by ID (owner-only).
+ */
 const db = require('../config/db');
 
 // Create a new alert

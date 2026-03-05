@@ -1,3 +1,16 @@
+/**
+ * @file server.js
+ * @description Express application entry point for WeatherWize.
+ *
+ * Responsibilities:
+ *  - Loads environment variables from .env
+ *  - Configures Express middleware (CORS, JSON parsing)
+ *  - Implements global maintenance-mode middleware (UC-014) that blocks
+ *    non-admin requests when maintenance_mode is enabled in system_settings
+ *  - Serves the static frontend from /public
+ *  - Mounts API route handlers for auth, weather, alerts, and settings
+ *  - Starts the HTTP server on the configured PORT
+ */
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
