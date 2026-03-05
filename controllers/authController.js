@@ -96,6 +96,13 @@ exports.updateUserRole = async (req, res) => {
             return res.status(400).json({ message: 'Invalid role. Use admin, general, or advanced.' });
         }
 
+        // Self-demotion guard (UC-012)
+        if (req.user.id === userId && role !== 'admin') {
+            return res.status(403).json({
+                message: 'Action prohibited: You cannot demote your own administrative account to prevent system lockouts.'
+            });
+        }
+
         const [users] = await db.query('SELECT id, username, role FROM users WHERE id = ?', [userId]);
         if (users.length === 0) {
             return res.status(404).json({ message: 'User not found' });
@@ -126,6 +133,78 @@ exports.getAllUsers = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error while fetching users' });
+    }
+};
+
+// UC-015: Update own profile (email and/or password)
+exports.updateProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { email, password } = req.body;
+
+        if (!email && !password) {
+            return res.status(400).json({ message: 'Please provide an email or new password to update.' });
+        }
+
+        if (email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                return res.status(400).json({ message: 'Please enter a valid email address.' });
+            }
+            await db.query('UPDATE users SET email = ? WHERE id = ?', [email.trim(), userId]);
+        }
+
+        if (password) {
+            if (password.length < 6) {
+                return res.status(400).json({ message: 'Password must be at least 6 characters.' });
+            }
+            const hashed = await bcrypt.hash(password, 10);
+            await db.query('UPDATE users SET password = ? WHERE id = ?', [hashed, userId]);
+        }
+
+        // Fetch updated user to return
+        const [rows] = await db.query('SELECT id, username, email, role FROM users WHERE id = ?', [userId]);
+        res.json({ message: 'Profile updated successfully.', user: rows[0] });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error while updating profile' });
+    }
+};
+
+// UC-004: Forgot password (stub — logs token, returns generic message)
+exports.forgotPassword = async (req, res) => {
+    try {
+        const username = req.body.username?.trim();
+        if (!username) {
+            return res.status(400).json({ message: 'Username is required.' });
+        }
+
+        // Always return same message to prevent enumeration
+        const [users] = await db.query('SELECT id, email FROM users WHERE username = ?', [username]);
+        if (users.length > 0) {
+            const resetToken = require('crypto').randomBytes(32).toString('hex');
+            console.log(`[FORGOT PASSWORD] Reset token for user "${username}": ${resetToken}`);
+        }
+
+        res.json({ message: 'If an account with that username exists, reset instructions have been sent.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+// UC-011: Admin dashboard stats
+exports.getDashboardStats = async (req, res) => {
+    try {
+        const [[{ totalUsers }]] = await db.query('SELECT COUNT(*) AS totalUsers FROM users WHERE status = "active"');
+        const [[{ premiumUsers }]] = await db.query('SELECT COUNT(*) AS premiumUsers FROM users WHERE role = "advanced" AND status = "active"');
+        const [[{ totalLocations }]] = await db.query('SELECT COUNT(*) AS totalLocations FROM saved_locations');
+        const [[{ suspendedUsers }]] = await db.query('SELECT COUNT(*) AS suspendedUsers FROM users WHERE status = "suspended"');
+
+        res.json({ totalUsers, premiumUsers, totalLocations, suspendedUsers });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error fetching stats' });
     }
 };
 

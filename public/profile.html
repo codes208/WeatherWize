@@ -33,7 +33,8 @@
     <main class="auth-container" style="min-height: calc(100vh - 80px);">
         <div class="auth-card">
             <h2 class="auth-title">Your Profile</h2>
-            <form>
+            <form id="profile-form">
+                <div id="profile-message" class="text-center" style="margin-bottom: 15px; display: none;"></div>
                 <div class="form-group">
                     <label>Username</label>
                     <input type="text" id="username-input" disabled>
@@ -44,7 +45,7 @@
                 </div>
                 <div class="form-group">
                     <label>New Password (Optional)</label>
-                    <input type="password" placeholder="Leave blank to keep current password">
+                    <input type="password" id="password-input" placeholder="Leave blank to keep current password">
                 </div>
                 <button type="submit" class="btn btn-block">Update Profile</button>
             </form>

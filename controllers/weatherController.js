@@ -133,6 +133,52 @@ exports.getHourlyForecast = async (req, res) => {
     }
 };
 
+exports.getHistoricalWeather = async (req, res) => {
+    try {
+        const location = req.query.location?.trim();
+        if (!location) {
+            return res.status(400).json({ message: 'Location is required' });
+        }
+
+        const apiKey = process.env.OPENWEATHER_API_KEY;
+        if (!apiKey || apiKey === 'your_openweather_api_key') {
+            return res.status(503).json({
+                message: 'Weather API key is missing or not configured.'
+            });
+        }
+
+        const geo = await geocodeLocation(location, apiKey);
+        if (!geo) {
+            return res.status(404).json({ message: 'Location not found' });
+        }
+
+        // Use the 5-day/3-hour forecast endpoint (available on free tier)
+        const url = `${OPENWEATHER_FORECAST_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}&units=imperial`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!response.ok) {
+            return res.status(response.status).json({ message: data?.message || 'Error fetching forecast data' });
+        }
+
+        const intervals = (data.list || []).map((entry) => ({
+            time: entry.dt_txt,
+            temp: entry.main?.temp,
+            humidity: entry.main?.humidity,
+            condition: entry.weather?.[0]?.main || 'Unknown',
+            windSpeed: entry.wind?.speed
+        }));
+
+        return res.json({
+            location: geo.displayName,
+            intervals
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Error fetching historical data' });
+    }
+};
+
 exports.saveLocation = async (req, res) => {
     try {
         const { location } = req.body;

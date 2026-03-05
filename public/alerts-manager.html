@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/weatherWize.CSS">
     <script src="./js/auth-check.js" defer></script>
+    <script src="./js/alerts-manager.js" defer></script>
 </head>
 
 <body data-allowed-roles="advanced,admin" class="dashboard-page">
@@ -32,35 +33,31 @@
     <main class="container dashboard-content">
         <h2 style="text-align:center;">Severe Weather Alerts</h2>
         <div class="auth-card" style="max-width: 600px; margin: 20px auto 0;">
+            <div id="alert-message" class="text-center" style="margin-bottom: 15px; display: none;"></div>
             <div class="form-group">
                 <label>Location</label>
-                <select>
-                    <option>New York, NY</option>
-                    <option>Seattle, WA</option>
+                <select id="alert-location">
+                    <option disabled selected>Loading locations...</option>
                 </select>
             </div>
             <div class="form-group">
                 <label>Alert Trigger Type</label>
-                <select>
-                    <option>Temperature drops below</option>
-                    <option>Temperature goes above</option>
-                    <option>Precipitation chance exceeds</option>
-                    <option>Severe Storm Warning</option>
+                <select id="alert-trigger">
+                    <option value="Temperature drops below">Temperature drops below</option>
+                    <option value="Temperature goes above">Temperature goes above</option>
+                    <option value="Precipitation chance exceeds">Precipitation chance exceeds</option>
+                    <option value="Wind speed exceeds">Wind speed exceeds</option>
                 </select>
             </div>
             <div class="form-group">
                 <label>Threshold Value</label>
-                <input type="number" placeholder="e.g. 32">
+                <input type="number" id="alert-threshold" placeholder="e.g. 32">
             </div>
-            <button class="btn btn-block">Save Alert</button>
+            <button id="save-alert-btn" class="btn btn-block">Save Alert</button>
         </div>
 
         <h3 style="margin-top: 40px;">Active Alerts</h3>
-        <div class="location-card" style="margin-top: 15px; border-left: 4px solid var(--danger);">
-            <h4>Seattle, WA</h4>
-            <p style="color: var(--text-secondary);">Alert me if: Temperature drops below 32°F</p>
-            <button class="delete-location-btn">Delete</button>
-        </div>
+        <div id="alerts-list"></div>
     </main>
 </body>
 

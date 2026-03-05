@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/weatherWize.CSS">
     <script src="./js/auth-check.js" defer></script>
+    <script src="./js/settings.js" defer></script>
 </head>
 
 <body data-allowed-roles="admin" class="dashboard-page">
@@ -33,6 +34,7 @@
         <h2 style="text-align:center;">Global System Settings</h2>
 
         <div class="auth-card" style="max-width: 800px; width:100%; margin-top: 30px;">
+            <div id="settings-message" class="text-center" style="margin-bottom: 15px; display: none;"></div>
             <div class="form-group"
                 style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 20px;">
                 <div>
@@ -41,7 +43,8 @@
                         shows maintenance screen.</p>
                 </div>
                 <label style="display: flex; align-items: center; cursor: pointer;">
-                    <input type="checkbox" style="width: 20px; height: 20px; margin-right: 10px;"> Enable
+                    <input type="checkbox" id="maintenance-toggle"
+                        style="width: 20px; height: 20px; margin-right: 10px;"> Enable
                 </label>
             </div>
 
@@ -49,10 +52,11 @@
                 <h3 style="margin-bottom: 10px;">Global API Throttle Limit</h3>
                 <p style="font-size: 0.9rem; margin-bottom: 10px;">Maximum OpenWeather API
                     calls per minute across all users.</p>
-                <input type="number" value="500">
+                <input type="number" id="throttle-input" value="500">
             </div>
 
-            <button class="btn btn-block" style="margin-top: 30px;">Save System Configuration</button>
+            <button id="save-settings-btn" class="btn btn-block" style="margin-top: 30px;">Save System
+                Configuration</button>
         </div>
     </main>
 </body>
