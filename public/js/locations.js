@@ -78,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(data.message || 'Failed to save location');
 
             addInput.value = '';
+            showToast(data.message || 'Location saved!', 'success');
             loadLocations();
         } catch (error) {
             console.error(error);

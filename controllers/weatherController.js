@@ -188,16 +188,25 @@ exports.saveLocation = async (req, res) => {
             return res.status(400).json({ message: 'Location is required' });
         }
 
+        // Resolve through geocoding to get the canonical display name
+        const apiKey = process.env.OPENWEATHER_API_KEY;
+        const geo = apiKey ? await geocodeLocation(location, apiKey) : null;
+        const canonicalName = geo ? geo.displayName : location.trim();
+
+        if (!geo) {
+            return res.status(404).json({ message: 'Location not found. Please check the spelling.' });
+        }
+
         const [existing] = await db.query(
             'SELECT id FROM saved_locations WHERE user_id = ? AND LOWER(location_name) = LOWER(?)',
-            [userId, location]
+            [userId, canonicalName]
         );
         if (existing.length > 0) {
             return res.status(409).json({ message: 'Location already saved' });
         }
 
-        await db.query('INSERT INTO saved_locations (user_id, location_name) VALUES (?, ?)', [userId, location]);
-        return res.status(201).json({ message: 'Location saved' });
+        await db.query('INSERT INTO saved_locations (user_id, location_name) VALUES (?, ?)', [userId, canonicalName]);
+        return res.status(201).json({ message: 'Location saved', location_name: canonicalName });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Error saving location' });
