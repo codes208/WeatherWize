@@ -117,10 +117,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadAlerts();
             } else {
                 const data = await response.json();
-                alert(data.message || 'Error deleting alert');
+                showToast(data.message || 'Error deleting alert', 'error');
             }
         } catch (e) {
-            alert('Error deleting alert');
+            showToast('Error deleting alert', 'error');
         }
     }
 

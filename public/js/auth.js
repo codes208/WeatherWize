@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (response.ok) {
-                    alert('Registration successful! Please login.');
+                    showToast('Registration successful! Please login.', 'success');
                     window.location.href = '/index.html';
                 } else {
                     errorDiv.textContent = data.message;

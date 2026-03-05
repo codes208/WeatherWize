@@ -152,11 +152,11 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error(error);
                 hourlyReport.classList.add('hidden');
-                alert(error.message || 'Error fetching hourly forecast');
+                showToast(error.message || 'Error fetching hourly forecast', 'error');
             }
         } catch (error) {
             console.error(error);
-            alert(error.message || 'Error fetching weather');
+            showToast(error.message || 'Error fetching weather', 'error');
         }
     }
 

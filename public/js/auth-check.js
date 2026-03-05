@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Role Guard
     const allowedRoles = document.body.dataset.allowedRoles ? document.body.dataset.allowedRoles.split(',') : ['general', 'advanced', 'admin'];
     if (!allowedRoles.includes(user.role)) {
-        alert('Unauthorized access. Redirecting...');
+        showToast('Unauthorized access. Redirecting...', 'warning');
         if (user.role === 'admin') window.location.href = '/admin-dashboard.html';
         else if (user.role === 'advanced') window.location.href = '/advanced-dashboard.html';
         else window.location.href = '/dashboard.html';

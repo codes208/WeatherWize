@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadLocations();
         } catch (error) {
             console.error(error);
-            alert(error.message || 'Failed to remove location');
+            showToast(error.message || 'Failed to remove location', 'error');
         }
     }
 
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadLocations();
         } catch (error) {
             console.error(error);
-            alert(error.message || 'Failed to save location');
+            showToast(error.message || 'Failed to save location', 'error');
         }
     }
 

@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderUsers(users);
         } catch (error) {
             console.error('Error loading users:', error);
-            alert('Failed to load users');
+            showToast('Failed to load users', 'error');
         }
     }
 
@@ -86,13 +86,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                alert('Role updated successfully');
+                showToast('Role updated successfully', 'success');
             } else {
                 const data = await response.json();
-                alert(data.message || 'Error updating role');
+                showToast(data.message || 'Error updating role', 'error');
             }
         } catch (e) {
-            alert('Error updating role');
+            showToast('Error updating role', 'error');
             console.error(e);
         }
     }
@@ -112,10 +112,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadUsers(); // Re-render the list
             } else {
                 const data = await response.json();
-                alert(data.message || 'Error updating status');
+                showToast(data.message || 'Error updating status', 'error');
             }
         } catch (e) {
-            alert('Error updating status');
+            showToast('Error updating status', 'error');
             console.error(e);
         }
     }
