@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = '/index.html';
     });
 
-    const weatherForm = document.getElementById('weather-form');
     const weatherResult = document.getElementById('weather-result');
     const hourlyReport = document.getElementById('hourly-report');
     const hourlyReportList = document.getElementById('hourly-report-list');
@@ -36,114 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveLocationBtn = document.getElementById('save-location-btn');
 
     const savedLocationNames = new Set();
-    const precipMapSection = document.getElementById('precip-map-section');
-    let precipMap = null;
-    let radarFrames = [];
-    let radarLayers = [];
-    let currentFrameIndex = 0;
-    let animationInterval = null;
-    let isPlaying = false;
-
-    async function initOrUpdateMap(lat, lon) {
-        precipMapSection.classList.remove('hidden');
-
-        if (!precipMap) {
-            precipMap = L.map('precip-map').setView([lat, lon], 7);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(precipMap);
-
-            // Custom pane with blur to smooth out radar tile edges
-            precipMap.createPane('radarPane');
-            precipMap.getPane('radarPane').style.filter = 'blur(2px)';
-            precipMap.getPane('radarPane').style.zIndex = 300;
-
-            await loadRadarFrames();
-
-            document.getElementById('radar-play-btn').addEventListener('click', () => {
-                if (isPlaying) stopAnimation();
-                else startAnimation();
-            });
-        } else {
-            precipMap.setView([lat, lon], 7);
-        }
-
-        setTimeout(() => precipMap.invalidateSize(), 100);
-    }
-
-    async function loadRadarFrames() {
-        try {
-            const response = await fetch('https://api.rainviewer.com/public/weather-maps.json');
-            const data = await response.json();
-
-            radarFrames = [
-                ...(data.radar.past || []),
-                ...(data.radar.nowcast || [])
-            ];
-
-            radarLayers.forEach(layer => precipMap.removeLayer(layer));
-            radarLayers = [];
-
-            radarFrames.forEach((frame) => {
-                const layer = L.tileLayer(
-                    `https://tilecache.rainviewer.com${frame.path}/512/{z}/{x}/{y}/6/1_1.png`,
-                    {
-                        opacity: 0,
-                        attribution: '&copy; RainViewer',
-                        tileSize: 512,
-                        zoomOffset: -1,
-                        maxNativeZoom: 8,
-                        maxZoom: 18,
-                        pane: 'radarPane'
-                    }
-                );
-                layer.addTo(precipMap);
-                radarLayers.push(layer);
-            });
-
-            currentFrameIndex = radarFrames.length - 1;
-            showFrame(currentFrameIndex);
-            startAnimation();
-        } catch (err) {
-            console.error('Failed to load radar frames', err);
-        }
-    }
-
-    function showFrame(index) {
-        radarLayers.forEach((layer, i) => layer.setOpacity(i === index ? 0.85 : 0));
-        const frame = radarFrames[index];
-        if (frame) {
-            const date = new Date(frame.time * 1000);
-            const timeStr = date.toLocaleTimeString([], { weekday: 'short', hour: 'numeric', minute: '2-digit' });
-            document.getElementById('radar-timestamp').textContent = timeStr;
-        }
-        document.getElementById('radar-frame-label').textContent =
-            index >= radarFrames.filter(f => !f.nowcast).length ? '(Forecast)' : '';
-    }
-
-    function startAnimation() {
-        if (animationInterval) clearInterval(animationInterval);
-        isPlaying = true;
-        document.getElementById('radar-play-btn').innerHTML = '&#9646;&#9646;';
-        animationInterval = setInterval(() => {
-            currentFrameIndex = (currentFrameIndex + 1) % radarFrames.length;
-            showFrame(currentFrameIndex);
-        }, 600);
-    }
-
-    function stopAnimation() {
-        clearInterval(animationInterval);
-        animationInterval = null;
-        isPlaying = false;
-        document.getElementById('radar-play-btn').textContent = '\u25B6';
-    }
 
     // Close weather card
     document.getElementById('close-weather-btn').addEventListener('click', () => {
         weatherResult.classList.add('hidden');
         hourlyReport.classList.add('hidden');
-        precipMapSection.classList.add('hidden');
     });
 
     // Save Location
@@ -170,13 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Fetch Weather
-    weatherForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const location = weatherForm.location.value;
-        await fetchWeather(location);
-    });
-
     async function fetchWeatherData(location) {
         const response = await fetch(`/api/weather?location=${encodeURIComponent(location)}`, {
             headers: { 'Authorization': `Bearer ${token}` }
@@ -188,28 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         return data;
-    }
-
-    async function fetchWeather(location) {
-        try {
-            const data = await fetchWeatherData(location);
-            displayWeather(data);
-            weatherResult.classList.remove('hidden');
-            if (data.lat != null && data.lon != null) {
-                initOrUpdateMap(data.lat, data.lon);
-            }
-            try {
-                await loadHourlyForecast(location);
-                hourlyReport.classList.remove('hidden');
-            } catch (error) {
-                console.error(error);
-                hourlyReport.classList.add('hidden');
-                showToast(error.message || 'Error fetching hourly forecast', 'error');
-            }
-        } catch (error) {
-            console.error(error);
-            showToast(error.message || 'Error fetching weather', 'error');
-        }
     }
 
     function displayWeather(data) {

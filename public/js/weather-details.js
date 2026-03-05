@@ -11,6 +11,8 @@
  */
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const isAdvanced = user.role === 'advanced' || user.role === 'admin';
 
     document.getElementById('logout-btn').addEventListener('click', () => {
         localStorage.removeItem('token');
@@ -174,7 +176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         weatherResult.classList.remove('hidden');
 
-        if (data.lat != null && data.lon != null) {
+        if (isAdvanced && data.lat != null && data.lon != null) {
             await initMap(data.lat, data.lon);
         }
     } catch (error) {

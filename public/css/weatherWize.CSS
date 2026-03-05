@@ -1140,6 +1140,10 @@ body.dashboard-page {
     color: #1565a8;
 }
 
+.dashboard-page .weather-details > div {
+    font-size: 1.1rem;
+}
+
 .dashboard-page #humidity-value,
 .dashboard-page #wind-value {
     color: #1565a8;
@@ -1158,18 +1162,32 @@ body.dashboard-page {
     color: #030303;
 }
 
+.dashboard-page .weather-condition-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+    margin: 14px 0 20px;
+}
+
+.dashboard-page .weather-condition-row > div {
+    flex: 1;
+    text-align: center;
+}
+
+.dashboard-page .weather-condition-text {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
 .dashboard-page .weather-feels-like {
-    font-size: 0.95rem;
+    font-size: 1.1rem;
     color: #000000;
-    margin-top: 4px;
 }
 
 .dashboard-page .weather-hi-lo {
-    font-size: 0.95rem;
-    color: #2f2554;
-    font-weight: 600;
-    margin-top: 2px;
-    margin-bottom: 12px;
+    font-size: 1.1rem;
+    color: #000000;
 }
 
 .dashboard-page .hi-lo-value {

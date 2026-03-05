@@ -13,8 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     document.getElementById('username-display').textContent = user.username || '';
 
-    const searchInput = document.getElementById('city-search');
-    const searchBtn = document.getElementById('search-btn');
     const weatherResult = document.getElementById('weather-result');
     const hourlyReport = document.getElementById('hourly-report');
     const hourlyReportList = document.getElementById('hourly-report-list');
@@ -148,28 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return data;
     }
 
-    async function fetchWeather(location) {
-        try {
-            const data = await fetchWeatherData(location);
-            displayWeather(data);
-            weatherResult.classList.remove('hidden');
-            if (data.lat != null && data.lon != null) {
-                initOrUpdateMap(data.lat, data.lon);
-            }
-            try {
-                await loadHourlyForecast(location);
-                hourlyReport.classList.remove('hidden');
-            } catch (error) {
-                console.error(error);
-                hourlyReport.classList.add('hidden');
-                showToast(error.message || 'Error fetching hourly forecast', 'error');
-            }
-        } catch (error) {
-            console.error(error);
-            showToast(error.message || 'Error fetching weather', 'error');
-        }
-    }
-
     function displayWeather(data) {
         document.getElementById('location-name').textContent = data.location;
         document.getElementById('temp-value').textContent = Math.round(data.temp);
@@ -258,20 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error(error);
-        }
-    });
-
-    searchBtn.addEventListener('click', async () => {
-        const location = searchInput.value.trim();
-        if (!location) return;
-        await fetchWeather(location);
-    });
-
-    searchInput.addEventListener('keydown', async (e) => {
-        if (e.key === 'Enter') {
-            const location = searchInput.value.trim();
-            if (!location) return;
-            await fetchWeather(location);
         }
     });
 

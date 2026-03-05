@@ -42,18 +42,15 @@
         </div>
     </nav>
     <main class="container dashboard-content">
-        <div class="weather-search">
-            <input type="text" id="city-search" placeholder="Search for a city..." style="flex: 1;">
-            <button id="search-btn" class="btn">Search</button>
-        </div>
-
         <div id="weather-result" class="weather-card hidden">
             <button id="close-weather-btn" class="weather-card-close" aria-label="Close">&times;</button>
             <h2 id="location-name">City Name</h2>
             <div class="weather-temp"><span id="temp-value">--</span>&deg;F</div>
-            <div id="condition-text" style="font-size: 1.2rem;">Sunny</div>
-            <div id="feels-like-text" class="weather-feels-like"></div>
-            <div id="hi-lo-text" class="weather-hi-lo"></div>
+            <div class="weather-condition-row">
+                <div id="hi-lo-text" class="weather-hi-lo"></div>
+                <div id="condition-text" class="weather-condition-text">Sunny</div>
+                <div id="feels-like-text" class="weather-feels-like"></div>
+            </div>
 
             <div class="weather-details">
                 <div>

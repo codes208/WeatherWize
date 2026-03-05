@@ -13,6 +13,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const locationGrid = document.getElementById('locations-list');
     const addInput = document.getElementById('add-location-input');
     const addBtn = document.getElementById('add-location-btn');
+    const locationMsg = document.getElementById('location-msg');
+    let msgTimer = null;
+
+    function showMsg(message, type) {
+        if (msgTimer) clearTimeout(msgTimer);
+        locationMsg.textContent = message;
+        locationMsg.className = `location-msg show msg-${type}`;
+        msgTimer = setTimeout(() => { locationMsg.className = 'location-msg'; }, 3000);
+    }
 
     async function loadLocations() {
         try {
@@ -42,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 removeBtn.className = 'delete-location-btn';
                 removeBtn.textContent = 'Remove';
                 removeBtn.style.marginTop = '0';
-                removeBtn.addEventListener('click', () => deleteLocation(id, location_name));
+                removeBtn.addEventListener('click', () => deleteLocation(id));
 
                 card.appendChild(removeBtn);
                 locationGrid.appendChild(card);
@@ -53,10 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function deleteLocation(id, name) {
-        // Confirmation modal (UC-007)
-        if (!confirm(`Are you sure you want to remove "${name}"?`)) return;
-
+    async function deleteLocation(id) {
         try {
             const response = await fetch(`/api/weather/saved/${id}`, {
                 method: 'DELETE',
@@ -66,11 +72,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             if (!response.ok) throw new Error(data.message || 'Failed to remove location');
 
-            showToast('Location removed', 'success');
+            showMsg('Location removed', 'error');
             loadLocations();
         } catch (error) {
             console.error(error);
-            showToast(error.message || 'Failed to remove location', 'error');
+            showMsg(error.message || 'Failed to remove location', 'error');
         }
     }
 
@@ -92,11 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(data.message || 'Failed to save location');
 
             addInput.value = '';
-            showToast(data.message || 'Location saved!', 'success');
+            showMsg(data.message || 'Location saved!', 'success');
             loadLocations();
         } catch (error) {
             console.error(error);
-            showToast(error.message || 'Failed to save location', 'error');
+            showMsg(error.message || 'Failed to save location', 'error');
         }
     }
 

@@ -7,8 +7,6 @@
     <title>Dashboard - WeatherWize</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/weatherWize.CSS">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="/js/toast.js"></script>
     <script src="/js/dashboard.js" defer></script>
 </head>
@@ -38,20 +36,15 @@
     </nav>
 
     <div class="container dashboard-content">
-        <div class="weather-search">
-            <form id="weather-form" style="width: 100%; display: flex; gap: 10px;">
-                <input type="text" name="location" placeholder="Enter city name..." required>
-                <button type="submit" class="btn">Search</button>
-            </form>
-        </div>
-
         <div id="weather-result" class="weather-card hidden">
             <button id="close-weather-btn" class="weather-card-close" aria-label="Close">&times;</button>
             <h2 id="location-name">City Name</h2>
             <div class="weather-temp"><span id="temp-value">--</span>&deg;F</div>
-            <div id="condition-text" style="font-size: 1.2rem;">Sunny</div>
-            <div id="feels-like-text" class="weather-feels-like"></div>
-            <div id="hi-lo-text" class="weather-hi-lo"></div>
+            <div class="weather-condition-row">
+                <div id="hi-lo-text" class="weather-hi-lo"></div>
+                <div id="condition-text" class="weather-condition-text">Sunny</div>
+                <div id="feels-like-text" class="weather-feels-like"></div>
+            </div>
 
             <div class="weather-details">
                 <div>
@@ -71,17 +64,6 @@
             <div style="margin-top: 20px;">
                 <button id="save-location-btn" class="btn">Save Location</button>
             </div>
-        </div>
-
-        <div id="precip-map-section" class="precip-map-section hidden">
-            <h3>Radar Map</h3>
-            <div class="radar-controls">
-                <button id="radar-play-btn" class="btn radar-btn">&#9646;&#9646;</button>
-                <span class="radar-time-label">Time:</span>
-                <span id="radar-timestamp" class="radar-timestamp">--</span>
-                <span id="radar-frame-label" class="radar-frame-label"></span>
-            </div>
-            <div id="precip-map"></div>
         </div>
 
         <div id="hourly-report" class="hourly-report hidden">
