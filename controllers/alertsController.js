@@ -26,6 +26,15 @@ exports.createAlert = async (req, res) => {
             return res.status(400).json({ message: 'Threshold must be a valid number.' });
         }
 
+        const [existing] = await db.query(
+            'SELECT id FROM alerts WHERE user_id = ? AND location_name = ? AND trigger_type = ? AND threshold_value = ?',
+            [userId, location_name, trigger_type, thresholdNum]
+        );
+
+        if (existing.length > 0) {
+            return res.status(409).json({ message: 'An identical alert already exists for this location.' });
+        }
+
         await db.query(
             'INSERT INTO alerts (user_id, location_name, trigger_type, threshold_value) VALUES (?, ?, ?, ?)',
             [userId, location_name, trigger_type, thresholdNum]

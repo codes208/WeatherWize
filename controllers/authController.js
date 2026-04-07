@@ -189,6 +189,10 @@ exports.updateProfile = async (req, res) => {
             if (!emailRegex.test(email)) {
                 return res.status(400).json({ message: 'Please enter a valid email address.' });
             }
+            const [existing] = await db.query('SELECT id FROM users WHERE email = ? AND id != ?', [email.trim(), userId]);
+            if (existing.length > 0) {
+                return res.status(409).json({ message: 'User email already in use.' });
+            }
             await db.query('UPDATE users SET email = ? WHERE id = ?', [email.trim(), userId]);
         }
 

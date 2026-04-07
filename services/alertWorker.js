@@ -25,7 +25,10 @@ cron.schedule('*/10 * * * *', async () => {
         }
 
         const apiKey = process.env.OPENWEATHER_API_KEY;
-        if (!apiKey || apiKey === 'your_openweather_api_key') return;
+        if (!apiKey || apiKey === 'your_openweather_api_key') {
+            console.warn('[ALERTS WORKER] Missing API Key. Aborting cycle.');
+            return;
+        }
 
         for (const [locationQuery, locAlerts] of Object.entries(groupedAlerts)) {
             try {

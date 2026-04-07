@@ -50,11 +50,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Start background notification poller if token exists
     if (token) {
-        setInterval(async () => {
+        let pollInterval = setInterval(async () => {
             try {
                 const response = await fetch('/api/alerts/notifications', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+                
+                if (response.status === 401) {
+                    clearInterval(pollInterval);
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = '/index.html';
+                    return;
+                }
+                
                 if (!response.ok) return;
                 const notifications = await response.json();
                 

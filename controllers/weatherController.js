@@ -38,30 +38,42 @@ async function geocodeLocation(location, apiKey) {
     return { name, state, country, lat, lon, displayName };
 }
 
+// Reusable coordinates solver for identical queries
+async function resolveCoordinates(req, res) {
+    const location = req.query.location?.trim();
+    if (!location) {
+        res.status(400).json({ message: 'Location is required' });
+        return null;
+    }
+
+    const apiKey = process.env.OPENWEATHER_API_KEY;
+    if (!apiKey || apiKey === 'your_openweather_api_key') {
+        res.status(503).json({
+            message: 'Weather API key is missing or not configured. Set OPENWEATHER_API_KEY in .env.'
+        });
+        return null;
+    }
+
+    let geo;
+    if (req.query.lat && req.query.lon && req.query.lat !== 'undefined' && req.query.lon !== 'undefined') {
+        geo = { displayName: location, lat: req.query.lat, lon: req.query.lon };
+    } else {
+        geo = await geocodeLocation(location, apiKey);
+    }
+
+    if (!geo) {
+        res.status(404).json({ message: 'Location not found' });
+        return null;
+    }
+
+    return { geo, apiKey };
+}
+
 exports.getWeather = async (req, res) => {
     try {
-        const location = req.query.location?.trim();
-        if (!location) {
-            return res.status(400).json({ message: 'Location is required' });
-        }
-
-        const apiKey = process.env.OPENWEATHER_API_KEY;
-        if (!apiKey || apiKey === 'your_openweather_api_key') {
-            return res.status(503).json({
-                message: 'Weather API key is missing or not configured. Set OPENWEATHER_API_KEY in .env.'
-            });
-        }
-
-        let geo;
-        if (req.query.lat && req.query.lon && req.query.lat !== 'undefined' && req.query.lon !== 'undefined') {
-            geo = { displayName: location, lat: req.query.lat, lon: req.query.lon };
-        } else {
-            geo = await geocodeLocation(location, apiKey);
-        }
-
-        if (!geo) {
-            return res.status(404).json({ message: 'Location not found' });
-        }
+        const resolution = await resolveCoordinates(req, res);
+        if (!resolution) return; // Error already sent natively
+        const { geo, apiKey } = resolution;
 
         const url = `${OPENWEATHER_BASE_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}&units=imperial`;
         const [response, aqiResponse] = await Promise.all([
@@ -110,28 +122,9 @@ exports.getWeather = async (req, res) => {
 
 exports.getHourlyForecast = async (req, res) => {
     try {
-        const location = req.query.location?.trim();
-        if (!location) {
-            return res.status(400).json({ message: 'Location is required' });
-        }
-
-        const apiKey = process.env.OPENWEATHER_API_KEY;
-        if (!apiKey || apiKey === 'your_openweather_api_key') {
-            return res.status(503).json({
-                message: 'Weather API key is missing or not configured. Set OPENWEATHER_API_KEY in .env.'
-            });
-        }
-
-        let geo;
-        if (req.query.lat && req.query.lon && req.query.lat !== 'undefined' && req.query.lon !== 'undefined') {
-            geo = { displayName: location, lat: req.query.lat, lon: req.query.lon };
-        } else {
-            geo = await geocodeLocation(location, apiKey);
-        }
-
-        if (!geo) {
-            return res.status(404).json({ message: 'Location not found' });
-        }
+        const resolution = await resolveCoordinates(req, res);
+        if (!resolution) return;
+        const { geo, apiKey } = resolution;
 
         const url = `${OPENWEATHER_FORECAST_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}&units=imperial&cnt=8`;
         const response = await fetch(url);
@@ -167,28 +160,9 @@ exports.getHourlyForecast = async (req, res) => {
 
 exports.getHistoricalWeather = async (req, res) => {
     try {
-        const location = req.query.location?.trim();
-        if (!location) {
-            return res.status(400).json({ message: 'Location is required' });
-        }
-
-        const apiKey = process.env.OPENWEATHER_API_KEY;
-        if (!apiKey || apiKey === 'your_openweather_api_key') {
-            return res.status(503).json({
-                message: 'Weather API key is missing or not configured.'
-            });
-        }
-
-        let geo;
-        if (req.query.lat && req.query.lon && req.query.lat !== 'undefined' && req.query.lon !== 'undefined') {
-            geo = { displayName: location, lat: req.query.lat, lon: req.query.lon };
-        } else {
-            geo = await geocodeLocation(location, apiKey);
-        }
-
-        if (!geo) {
-            return res.status(404).json({ message: 'Location not found' });
-        }
+        const resolution = await resolveCoordinates(req, res);
+        if (!resolution) return;
+        const { geo, apiKey } = resolution;
 
         // Use the 5-day/3-hour forecast endpoint (available on free tier)
         const url = `${OPENWEATHER_FORECAST_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}&units=imperial`;
