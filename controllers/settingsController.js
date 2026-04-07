@@ -1,15 +1,3 @@
-/**
- * @file controllers/settingsController.js
- * @description System settings controller (admin only).
- *
- * Manages key-value settings stored in the system_settings table:
- *  - maintenance_mode  — 'true'/'false', enables site-wide maintenance page
- *  - api_throttle_limit — max API requests per minute
- *
- * Exports:
- *  - getSettings    — Returns all settings as an object.
- *  - updateSettings — Bulk upsert settings from a key-value body.
- */
 const db = require('../config/db');
 
 // Get all system settings

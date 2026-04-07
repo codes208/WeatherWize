@@ -1,19 +1,3 @@
-/**
- * @file public/js/auth.js
- * @description Frontend authentication logic for login and registration forms.
- *
- * Login form:
- *  - Sends credentials to /api/auth/login
- *  - On success: stores JWT + user in localStorage, redirects by role
- *  - On failure: displays error message
- *
- * Register form:
- *  - Validates passwords match
- *  - For advanced role: validates card number (16 digits), CVV (3 digits),
- *    expiry format (MM/YY), and checks card is not expired
- *  - Auto-formats card fields as the user types
- *  - On success: auto-login (stores JWT) and redirects to appropriate dashboard
- */
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
@@ -60,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (registerForm) {
-        // --- Auto-format card fields ---
         const cardNumberInput = document.getElementById('cardNumber');
         const cardExpiryInput = document.getElementById('cardExpiry');
         const cardCvvInput = document.getElementById('cardCvv');
@@ -99,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // --- Card validation (advanced registration only) ---
             if (role === 'advanced') {
                 const rawCard = (cardNumberInput?.value || '').replace(/\s/g, '');
                 const rawExpiry = cardExpiryInput?.value || '';
@@ -123,7 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                // Check card is not expired
                 const [expMonth, expYear] = rawExpiry.split('/').map(Number);
                 const now = new Date();
                 const expFullYear = 2000 + expYear;
@@ -145,7 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Auto-login: store token and redirect to dashboard
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
                     showToast('Registration successful!', 'success');

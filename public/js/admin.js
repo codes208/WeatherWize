@@ -1,23 +1,11 @@
-/**
- * @file public/js/admin.js
- * @description Admin user management table logic.
- *
- * Features:
- *  - Loads all users from /api/auth/users (cached in allUsers array)
- *  - Renders user table with role dropdown, status, save-role, suspend buttons
- *  - Real-time search bar filtering by username or email
- *  - Confirmation dialog before suspending/unsuspending a user
- *  - Updates role via PUT /api/auth/users/:id/role
- *  - Updates status via PUT /api/auth/users/:id/status
- */
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
-    if (!token) return; // auth-check.js handles relocation
+    if (!token) return;
 
     const usersTableBody = document.querySelector('tbody');
-    if (!usersTableBody) return; // Not on the admin-users page
+    if (!usersTableBody) return;
 
-    let allUsers = []; // cached for search filtering
+    let allUsers = [];
 
     async function loadUsers() {
         try {
@@ -26,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                // For the sake of the demo, if the backend route doesn't exist, we just show dummy data
                 throw new Error('Backend route might not exist for getting all users yet.');
             }
 
@@ -70,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
             usersTableBody.appendChild(tr);
         });
 
-        // Add event listeners to the new buttons
         document.querySelectorAll('.save-role-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const id = e.target.dataset.id;
@@ -79,7 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Suspend confirmation (UC-013)
         document.querySelectorAll('.toggle-suspend-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const id = e.target.dataset.id;
@@ -128,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 showToast('User status updated', 'success');
-                loadUsers(); // Re-render the list
+                loadUsers();
             } else {
                 const data = await response.json();
                 showToast(data.message || 'Error updating status', 'error');
@@ -141,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadUsers();
 
-    // UC-012: Search bar filtering
+    // Search bar filtering
     const searchInput = document.getElementById('user-search-input');
     if (searchInput) {
         searchInput.addEventListener('input', () => {

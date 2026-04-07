@@ -1,11 +1,6 @@
-/**
- * @file services/alertWorker.js
- * @description Background worker to poll API for active user alerts and trigger notifications.
- */
 const cron = require('node-cron');
 const db = require('../config/db');
 
-// Run every 10 minutes
 cron.schedule('*/10 * * * *', async () => {
     try {
         const [alerts] = await db.query(
@@ -14,7 +9,6 @@ cron.schedule('*/10 * * * *', async () => {
 
         if (alerts.length === 0) return;
 
-        // Group by location to minimize API calls
         const groupedAlerts = {};
         for (const alert of alerts) {
             const loc = alert.location_name.toLowerCase();
@@ -32,7 +26,6 @@ cron.schedule('*/10 * * * *', async () => {
 
         for (const [locationQuery, locAlerts] of Object.entries(groupedAlerts)) {
             try {
-                // 1. Geocode Location to get exact lat/lon
                 const geoUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(locationQuery)}&limit=1&appid=${apiKey}`;
                 const geoRes = await fetch(geoUrl);
                 const geoData = await geoRes.json();
@@ -40,7 +33,6 @@ cron.schedule('*/10 * * * *', async () => {
 
                 const { lat, lon } = geoData[0];
 
-                // 2. Fetch Weather
                 const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
                 const weatherRes = await fetch(url);
                 const weatherData = await weatherRes.json();
@@ -51,7 +43,11 @@ cron.schedule('*/10 * * * *', async () => {
                 const windSpeed = weatherData.wind?.speed;
                 const humidity = weatherData.main?.humidity;
 
-                // 3. Evaluate Alerts
+                if (temp === undefined || windSpeed === undefined || humidity === undefined) {
+                    console.error(`[ALERTS] Incomplete weather payload fetched for ${locationQuery}. Aborting evaluate.`);
+                    continue;
+                }
+
                 for (const alert of locAlerts) {
                     let triggered = false;
                     let message = '';
@@ -65,7 +61,6 @@ cron.schedule('*/10 * * * *', async () => {
                             if (temp > th) { triggered = true; message = `Alert: Temp in ${alert.location_name} rose to ${temp}°F (above ${th}°F)`; }
                             break;
                         case 'Precipitation chance exceeds':
-                            // using humidity proxy
                             if (humidity > th) { triggered = true; message = `Alert: Humidity in ${alert.location_name} is ${humidity}% (above ${th}%)`; }
                             break;
                         case 'Wind speed exceeds':

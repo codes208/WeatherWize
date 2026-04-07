@@ -1,14 +1,3 @@
-/**
- * @file public/js/weather-details.js
- * @description Detailed weather view for a specific city.
- *
- * Features:
- *  - Reads city name from URL query parameter (?city=...)
- *  - Fetches current weather from /api/weather
- *  - Displays temperature, conditions, wind, humidity, pressure, UV, AQI
- *  - Fetches and renders hourly forecast from /api/weather/hourly
- *  - "View on Map" button to open radar map for the city
- */
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -144,7 +133,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Load current weather
     try {
         let qs = `location=${encodeURIComponent(location)}`;
         if (lat && lon) qs += `&lat=${lat}&lon=${lon}`;
@@ -189,7 +177,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // Load hourly forecast
     try {
         let qs = `location=${encodeURIComponent(location)}`;
         if (lat && lon) qs += `&lat=${lat}&lon=${lon}`;

@@ -1,7 +1,3 @@
-/**
- * @file middleware/validationMiddleware.js
- * @description Express-validator mappings and error handler bridge for frontend UI compatibility.
- */
 const { body, validationResult } = require('express-validator');
 
 // Validation execution bridge

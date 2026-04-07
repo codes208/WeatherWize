@@ -1,14 +1,3 @@
-/**
- * @file config/db.js
- * @description MySQL connection pool using mysql2/promise.
- *
- * Creates a reusable pool with a max of 10 connections.
- * Connection credentials are loaded from environment variables
- * with sensible defaults for local development.
- *
- * Usage: const db = require('./config/db');
- *        const [rows] = await db.query('SELECT ...');
- */
 const mysql = require('mysql2');
 require('dotenv').config();
 

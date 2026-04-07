@@ -1,19 +1,9 @@
-/**
- * @file routes/weather.js
- * @description Weather data and saved location routes.
- *
- * Auth:     GET / (current weather), GET /hourly, POST /save, GET /saved, DELETE /saved/:id
- * Advanced: GET /history
- * Public:   GET /tiles/:layer/:z/:x/:y (map tile proxy)
- */
 const express = require('express');
 const router = express.Router();
 const weatherController = require('../controllers/weatherController');
 const authMiddleware = require('../middleware/authMiddleware');
 
-// Public route (maybe? or protected? Let's make it protected for now as per requirements usually)
-// Actually, weather searching might be public, but saving is definitely protected.
-// Let's protect everything for now to match the "Dashboard" feel.
+// Protected Weather Endpoints
 router.get('/', authMiddleware, weatherController.getWeather);
 router.get('/hourly', authMiddleware, weatherController.getHourlyForecast);
 router.get('/history', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), weatherController.getHistoricalWeather);

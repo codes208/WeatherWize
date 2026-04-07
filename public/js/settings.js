@@ -1,12 +1,3 @@
-/**
- * @file public/js/settings.js
- * @description Admin system settings page logic.
- *
- * Features:
- *  - Loads current settings from GET /api/settings
- *  - Displays maintenance mode toggle and API throttle limit input
- *  - Saves updated settings via PUT /api/settings
- */
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     if (!token) return;
@@ -16,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveBtn = document.getElementById('save-settings-btn');
     const msgDiv = document.getElementById('settings-message');
 
-    // Load current settings
     async function loadSettings() {
         try {
             const response = await fetch('/api/settings', {
@@ -36,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Save settings
     if (saveBtn) {
         saveBtn.addEventListener('click', async () => {
             try {

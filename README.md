@@ -137,8 +137,8 @@ WeatherWize/
 │
 ├── controllers/
 │   ├── authController.js      # Registration, login, profile, user management, admin stats
-│   ├── weatherController.js   # Weather search, hourly forecast, save/delete locations, map tiles
-│   ├── alertsController.js    # Create, list, delete weather alerts
+│   ├── weatherController.js   # Weather search, coordinate resolution helper, map tiles
+│   ├── alertsController.js    # Create, list, delete weather alerts, get notifications
 │   └── settingsController.js  # Get/update system settings (maintenance mode, API limits)
 │
 ├── routes/
@@ -168,12 +168,10 @@ WeatherWize/
     ├── css/
     │   ├── style.css              # Core design system (layout, components, animations)
     │   └── weatherWize.CSS        # Page-specific weather styles
-    │
     ├── js/
     │   ├── auth.js                # Login/register form logic, card validation, auto-login
-    │   ├── auth-check.js          # JWT guard, role-based redirects, logout, nav brand fix
-    │   ├── dashboard.js           # General dashboard: weather search, hourly, saved locations
-    │   ├── advanced-dashboard.js  # Advanced dashboard: same as general + advanced features
+    │   ├── auth-check.js          # JWT guard, role-based redirects, notification polling
+    │   ├── weather-dashboard.js   # Unified dashboard logic: maps, locations, hourly reports
     │   ├── admin-dashboard.js     # Admin dashboard: fetch and display platform analytics
     │   ├── admin.js               # Admin user table: load, render, search, role change, suspend
     │   ├── locations.js           # Manage locations: list, add, delete with confirmation
@@ -217,13 +215,15 @@ WeatherWize/
 | GET | `/saved` | JWT | List saved locations |
 | DELETE | `/saved/:id` | JWT | Delete a saved location |
 
-### Alerts (`/api/alerts`)
+### Alerts & Notifications (`/api/alerts`)
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | POST | `/` | Advanced | Create a weather alert |
 | GET | `/` | Advanced | List user's alerts |
 | DELETE | `/:id` | Advanced | Delete an alert |
+| GET | `/notifications` | Advanced | Fetch unread notifications |
+| POST | `/notifications/read` | Advanced | Mark notifications loaded |
 
 ### Settings (`/api/settings`)
 

@@ -1,19 +1,3 @@
-/**
- * @file controllers/authController.js
- * @description Authentication and user management controller.
- *
- * Exports:
- *  - register        — Create a new user (general/advanced). Validates password
- *                      strength (min 6 chars), enforces username + email uniqueness,
- *                      hashes password with bcrypt, returns JWT for auto-login.
- *  - login           — Authenticates user, blocks suspended accounts (403), returns JWT.
- *  - forgotPassword  — Stub for password-reset email flow.
- *  - updateProfile   — Lets authenticated user update their email/password.
- *  - getAllUsers      — (Admin) Lists all users for the management table.
- *  - getDashboardStats — (Admin) Returns aggregate counts for the admin dashboard.
- *  - updateUserRole   — (Admin) Change a user's role. Prevents admin self-demotion.
- *  - updateUserStatus — (Admin) Suspend or unsuspend a user account.
- */
 const db = require('../config/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -36,7 +20,6 @@ exports.register = async (req, res) => {
             return res.status(400).json({ message: 'Email address is required' });
         }
 
-        // Password strength validation
         if (password.length < 6) {
             return res.status(400).json({ message: 'Password must be at least 6 characters.' });
         }
@@ -45,7 +28,6 @@ exports.register = async (req, res) => {
             return res.status(400).json({ message: 'Role must be general or advanced for self-registration' });
         }
 
-        // Check both username and email uniqueness
         const [existingUsers] = await db.query(
             'SELECT id FROM users WHERE username = ? OR email = ?',
             [username, email]
@@ -61,7 +43,6 @@ exports.register = async (req, res) => {
             [username, hashedPassword, email, requestedRole]
         );
 
-        // Auto-login: generate token so frontend can start a session immediately
         const newUser = { id: result.insertId, username, email, role: requestedRole };
         const token = jwt.sign(
             { id: newUser.id, username: newUser.username, role: newUser.role },
@@ -95,7 +76,6 @@ exports.login = async (req, res) => {
 
         const user = users[0];
 
-        // Block suspended accounts
         if (user.status === 'suspended') {
             return res.status(403).json({ message: 'This account has been suspended by an administrator.' });
         }
@@ -174,7 +154,7 @@ exports.getAllUsers = async (req, res) => {
     }
 };
 
-// UC-015: Update own profile (email and/or password)
+// Update own profile (email and/or password)
 exports.updateProfile = async (req, res) => {
     try {
         const userId = req.user.id;
@@ -204,7 +184,6 @@ exports.updateProfile = async (req, res) => {
             await db.query('UPDATE users SET password = ? WHERE id = ?', [hashed, userId]);
         }
 
-        // Fetch updated user to return
         const [rows] = await db.query('SELECT id, username, email, role FROM users WHERE id = ?', [userId]);
         res.json({ message: 'Profile updated successfully.', user: rows[0] });
     } catch (error) {
@@ -213,7 +192,7 @@ exports.updateProfile = async (req, res) => {
     }
 };
 
-// UC-004: Forgot password (stub — logs token, returns generic message)
+// Forgot password logic
 exports.forgotPassword = async (req, res) => {
     try {
         const username = req.body.username?.trim();
@@ -221,7 +200,6 @@ exports.forgotPassword = async (req, res) => {
             return res.status(400).json({ message: 'Username is required.' });
         }
 
-        // Always return same message to prevent enumeration
         const [users] = await db.query('SELECT id, email FROM users WHERE username = ?', [username]);
         if (users.length > 0) {
             const resetToken = require('crypto').randomBytes(32).toString('hex');
@@ -235,7 +213,7 @@ exports.forgotPassword = async (req, res) => {
     }
 };
 
-// UC-011: Admin dashboard stats
+// Admin dashboard stats
 exports.getDashboardStats = async (req, res) => {
     try {
         const [[{ totalUsers }]] = await db.query('SELECT COUNT(*) AS totalUsers FROM users WHERE status = "active"');

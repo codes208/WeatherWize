@@ -1,13 +1,3 @@
-/**
- * @file public/js/admin-dashboard.js
- * @description Admin dashboard logic — fetches and displays platform analytics.
- *
- * Calls /api/auth/stats to populate:
- *  - Total active users
- *  - Premium (advanced) subscribers
- *  - Total saved locations
- *  - Suspended users count
- */
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     if (!token) return;

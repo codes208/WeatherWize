@@ -5,7 +5,6 @@
 (function () {
     let container = null;
 
-    // Inject styles immediately (head is available)
     const style = document.createElement('style');
     style.textContent = `
         #toast-container {
@@ -99,7 +98,6 @@
             <span class="toast-body">${message}</span>
         `;
 
-        // Click to dismiss
         toast.addEventListener('click', () => dismiss(toast));
 
         c.appendChild(toast);

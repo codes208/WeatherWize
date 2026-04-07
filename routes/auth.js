@@ -1,11 +1,3 @@
-/**
- * @file routes/auth.js
- * @description Authentication and admin user management routes.
- *
- * Public:  POST /register, POST /login, POST /forgot-password
- * Auth:    PUT  /profile
- * Admin:   GET  /users, GET  /stats, PUT /users/:id/role, PUT /users/:id/status
- */
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');

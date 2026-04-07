@@ -1,16 +1,3 @@
-/**
- * @file server.js
- * @description Express application entry point for WeatherWize.
- *
- * Responsibilities:
- *  - Loads environment variables from .env
- *  - Configures Express middleware (CORS, JSON parsing)
- *  - Implements global maintenance-mode middleware (UC-014) that blocks
- *    non-admin requests when maintenance_mode is enabled in system_settings
- *  - Serves the static frontend from /public
- *  - Mounts API route handlers for auth, weather, alerts, and settings
- *  - Starts the HTTP server on the configured PORT
- */
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -24,7 +11,6 @@ const db = require('./config/db');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Add new feature dependencies
 const rateLimit = require('express-rate-limit');
 const globalState = require('./config/state');
 require('./services/alertWorker');
@@ -33,7 +19,6 @@ require('./services/alertWorker');
 app.use(cors());
 app.use(express.json());
 
-// API Rate Limiting (UC-014 fix)
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     limit: async () => globalState.apiThrottleLimit,
@@ -41,9 +26,8 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// Maintenance-mode middleware (UC-014): blocks non-admin users when enabled
+// Maintenance Mode (Blocks non-admins when active)
 app.use(async (req, res, next) => {
-    // Skip for API settings route (so admin can toggle it off) and static assets
     if (req.path.startsWith('/api/settings') || req.path.startsWith('/api/auth/login')) {
         return next();
     }
@@ -51,20 +35,21 @@ app.use(async (req, res, next) => {
     try {
         const [rows] = await db.query("SELECT setting_value FROM system_settings WHERE setting_key = 'maintenance_mode'");
         if (rows.length > 0 && rows[0].setting_value === 'true') {
-            // Check if user is admin via JWT (if token present)
             const jwt = require('jsonwebtoken');
             const token = req.header('Authorization')?.replace('Bearer ', '');
             if (token) {
                 try {
                     const decoded = jwt.verify(token, process.env.JWT_SECRET);
                     if (decoded.role === 'admin') return next();
-                } catch (e) { /* token invalid, block */ }
+                } catch (e) {
+                    if (req.path.startsWith('/api/')) {
+                        return res.status(401).json({ message: 'Token expired. Please re-authenticate.' });
+                    }
+                }
             }
-            // For API requests, return JSON
             if (req.path.startsWith('/api/')) {
-                return res.status(503).json({ message: 'System is currently under maintenance. Please check back later.' });
-            }
-            // For HTML page requests, return maintenance page
+            return res.status(503).json({ message: 'System is currently under maintenance. Please check back later.' });
+        }
             return res.status(503).send(`
                 <!DOCTYPE html>
                 <html><head><title>Maintenance - WeatherWize</title>
@@ -73,9 +58,7 @@ app.use(async (req, res, next) => {
                 <body><div class="box"><h1>🔧 Down for Maintenance</h1><p>WeatherWize is temporarily offline. Please check back later.</p></div></body></html>
             `);
         }
-    } catch (e) {
-        // If system_settings table doesn't exist yet, skip maintenance check
-    }
+    } catch (e) {}
     next();
 });
 

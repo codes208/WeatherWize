@@ -1,12 +1,3 @@
-/**
- * @file public/js/alerts-manager.js
- * @description Weather alerts manager page logic (advanced/admin only).
- *
- * Features:
- *  - Lists active alerts from /api/alerts
- *  - Create new alert: pick location, trigger type (temp/wind/humidity), threshold
- *  - Delete alert with confirmation
- */
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     if (!token) return;
@@ -18,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const alertsList = document.getElementById('alerts-list');
     const alertMessage = document.getElementById('alert-message');
 
-    // Load saved locations into dropdown
     async function loadLocations() {
         try {
             const response = await fetch('/api/weather/saved', {
@@ -47,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Load existing alerts
+    // Existing alerts
     async function loadAlerts() {
         try {
             const response = await fetch('/api/alerts', {
@@ -81,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Save new alert
+    // Save alert
     saveBtn.addEventListener('click', async () => {
         const location_name = locationSelect.value;
         const trigger_type = triggerSelect.value;

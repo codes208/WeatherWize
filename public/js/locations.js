@@ -1,13 +1,3 @@
-/**
- * @file public/js/locations.js
- * @description Manage saved locations page logic.
- *
- * Features:
- *  - Lists saved locations from /api/weather/saved
- *  - Add new location (geocoded by backend to prevent duplicates)
- *  - Delete with confirmation dialog showing the location name
- *  - Duplicate location toast feedback
- */
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     const locationGrid = document.getElementById('locations-list');

@@ -1,11 +1,3 @@
-/**
- * @file public/js/weather-dashboard.js
- * @description Unified dashboard logic for all user tiers.
- *
- * Features:
- *  - Saved locations loading and rendering
- *  - Geocoding and API weather bypass
- */
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -97,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error(error);
             if (savedLocationsContainer) {
-                 savedLocationsContainer.innerHTML = '<p class="empty-state">Unable to load saved locations.</p>';
+                savedLocationsContainer.innerHTML = '<p class="empty-state">Unable to load saved locations.</p>';
             }
         }
     }
@@ -106,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadSavedLocations();
     }
 
-    // Advanced features guard
+    // Advanced features
     if (user.role === 'advanced' || user.role === 'admin') {
         const precipMapSection = document.getElementById('precip-map-section');
         if (precipMapSection && document.getElementById('precip-map')) {
@@ -117,7 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
             let animationInterval = null;
             let isPlaying = false;
 
-            // Simple map bootstrapper
             async function initMap(lat, lon) {
                 precipMapSection.classList.remove('hidden');
                 if (!precipMap) {
@@ -125,17 +116,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         attribution: '&copy; OpenStreetMap contributors'
                     }).addTo(precipMap);
-                    // OpenWeather layers can be mapped safely via backend. For now default to basic views.
                 } else {
                     precipMap.setView([lat, lon], 7);
                 }
                 setTimeout(() => precipMap.invalidateSize(), 100);
             }
 
-            // Bind the lastMapLocation directly on boot if possible
             const locToLoad = localStorage.getItem('lastMapLocation');
             if (locToLoad) {
-                // Future expansion: auto-load map natively from cached lat/lon here!
             }
         }
     }
