@@ -451,7 +451,7 @@ body {
     width: min(100%, 420px);
     padding: 30px 26px;
     border-radius: 22px;
-    background: var(--card-bg);
+    background: white;
     box-shadow: 0 14px 36px rgba(30, 12, 72, 0.28);
     backdrop-filter: blur(6px);
 }
@@ -983,10 +983,25 @@ body.dashboard-page {
     color: rgba(255, 255, 255, 0.88);
 }
 
+.dashboard-page .dashboard-content h2,
+.dashboard-page .dashboard-content h3,
 .dashboard-page .hourly-report h3,
 .dashboard-page .saved-locations h3,
 .dashboard-page .precip-map-section h3 {
     color: #ffffff;
+}
+
+.dashboard-page .dashboard-content .auth-card h3 {
+    color: #1b75be;
+}
+
+.dashboard-page .dashboard-content .auth-card p,
+.dashboard-page .location-card p {
+    color: #000000;
+}
+
+.alert-title {
+    color: var(--danger);
 }
 
 .dashboard-page .precip-map-section {
@@ -1038,6 +1053,43 @@ body.dashboard-page {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.dashboard-page .navbar .nav-content {
+    justify-content: space-between;
+}
+
+.dashboard-page .navbar .nav-links {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.dashboard-page .navbar .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dashboard-page .navbar .btn {
+    background-color: transparent;
+    color: #5b3ea5;
+    box-shadow: none;
+}
+
+.dashboard-page .navbar .btn:hover {
+    background-color: rgba(91, 62, 165, 0.12);
+    color: #3a2674;
+}
+
+.dashboard-page .navbar #logout-btn {
+    background-color: #1b75be;
+    color: #ffffff;
+}
+
+.dashboard-page .navbar #logout-btn:hover {
+    background-color: #1565a8;
+}
+
 .dashboard-page .dashboard-content {
     position: relative;
     z-index: 1;
@@ -1045,7 +1097,8 @@ body.dashboard-page {
 
 .dashboard-page .weather-card,
 .dashboard-page .hourly-card,
-.dashboard-page .location-card {
+.dashboard-page .location-card,
+.dashboard-page .auth-card {
     background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(6px);
     color: #2f2554;
@@ -1087,6 +1140,10 @@ body.dashboard-page {
     color: #1565a8;
 }
 
+.dashboard-page .weather-details > div {
+    font-size: 1.1rem;
+}
+
 .dashboard-page #humidity-value,
 .dashboard-page #wind-value {
     color: #1565a8;
@@ -1105,18 +1162,32 @@ body.dashboard-page {
     color: #030303;
 }
 
+.dashboard-page .weather-condition-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+    margin: 14px 0 20px;
+}
+
+.dashboard-page .weather-condition-row > div {
+    flex: 1;
+    text-align: center;
+}
+
+.dashboard-page .weather-condition-text {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
 .dashboard-page .weather-feels-like {
-    font-size: 0.95rem;
+    font-size: 1.1rem;
     color: #000000;
-    margin-top: 4px;
 }
 
 .dashboard-page .weather-hi-lo {
-    font-size: 0.95rem;
-    color: #2f2554;
-    font-weight: 600;
-    margin-top: 2px;
-    margin-bottom: 12px;
+    font-size: 1.1rem;
+    color: #000000;
 }
 
 .dashboard-page .hi-lo-value {

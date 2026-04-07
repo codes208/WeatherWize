@@ -4,15 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - WeatherWize</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/weatherWize.CSS">
-    <script src="/js/toast.js"></script>
-    <script src="/js/auth-check.js" defer></script>
-    <script src="/js/weather-dashboard.js" defer></script>
+    <title>Weather Details - WeatherWize</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/weatherWize.CSS">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="./js/auth-check.js" defer></script>
+    <script src="./js/weather-details.js" defer></script>
 </head>
 
-<body class="dashboard-page">
+<body data-allowed-roles="general,advanced,admin" class="dashboard-page">
     <div class="sky-wrap" aria-hidden="true">
         <div class="cloud cloud-1"></div>
         <div class="cloud cloud-2"></div>
@@ -25,25 +26,20 @@
                     style="display:inline-block; vertical-align:middle;">
                 WeatherWize
             </a>
-            <div class="nav-links">
-                <button class="btn btn-text" onclick="window.location.href='locations.html'">Manage Locations</button>
-                <button class="btn btn-text" onclick="window.location.href='profile.html'">Profile</button>
-            </div>
             <div class="nav-right">
-                <span id="username-display" style="font-weight: bold;"></span>
+                <button class="btn btn-text" onclick="window.history.back()">Back</button>
                 <button id="logout-btn" class="btn">Logout</button>
             </div>
         </div>
     </nav>
+    <main class="container dashboard-content">
 
-    <div class="container dashboard-content">
         <div id="weather-result" class="weather-card hidden">
-            <button id="close-weather-btn" class="weather-card-close" aria-label="Close">&times;</button>
             <h2 id="location-name">City Name</h2>
             <div class="weather-temp"><span id="temp-value">--</span>&deg;F</div>
             <div class="weather-condition-row">
                 <div id="hi-lo-text" class="weather-hi-lo"></div>
-                <div id="condition-text" class="weather-condition-text">Sunny</div>
+                <div id="condition-text" class="weather-condition-text">--</div>
                 <div id="feels-like-text" class="weather-feels-like"></div>
             </div>
 
@@ -61,10 +57,17 @@
                     <div id="aqi-value">--</div>
                 </div>
             </div>
+        </div>
 
-            <div style="margin-top: 20px;">
-                <button id="save-location-btn" class="btn">Save Location</button>
+        <div id="precip-map-section" class="precip-map-section hidden">
+            <h3>Radar Map</h3>
+            <div class="radar-controls">
+                <button id="radar-play-btn" class="btn radar-btn">&#9646;&#9646;</button>
+                <span class="radar-time-label">Time:</span>
+                <span id="radar-timestamp" class="radar-timestamp">--</span>
+                <span id="radar-frame-label" class="radar-frame-label"></span>
             </div>
+            <div id="precip-map"></div>
         </div>
 
         <div id="hourly-report" class="hourly-report hidden">
@@ -72,15 +75,11 @@
             <div id="hourly-report-list" class="hourly-grid"></div>
         </div>
 
-        <div class="saved-locations">
-            <h3>Your Saved Locations</h3>
-            <div id="saved-locations-list" class="location-grid">
-                <!-- Location cards will be injected here -->
-            </div>
+        <div id="error-message" class="hidden" style="text-align:center; margin-top: 40px;">
+            <p>Unable to load weather data for this location.</p>
         </div>
 
-
-    </div>
+    </main>
 </body>
 
 </html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerts Manager - WeatherWize</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/weatherWize.CSS">
+    <script src="./js/toast.js"></script>
+    <script src="./js/auth-check.js" defer></script>
+    <script src="./js/alerts-manager.js" defer></script>
+</head>
+
+<body data-allowed-roles="advanced,admin" class="dashboard-page">
+    <div class="sky-wrap" aria-hidden="true">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+    </div>
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="dashboard.html" class="nav-brand">
+                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo"
+                    style="display:inline-block; vertical-align:middle;">
+                WeatherWize
+            </a>
+            <div class="nav-right">
+                <button class="btn btn-text" onclick="window.history.back()">Back</button>
+                <button id="logout-btn" class="btn" onclick="window.location.href='index.html'">Logout</button>
+            </div>
+        </div>
+    </nav>
+    <main class="container dashboard-content">
+        <h2 style="text-align:center;">Severe Weather Alerts</h2>
+        <div class="auth-card" style="max-width: 600px; margin: 20px auto 0;">
+            <div id="alert-message" class="text-center" style="margin-bottom: 15px; display: none;"></div>
+            <div class="form-group">
+                <label>Location</label>
+                <select id="alert-location">
+                    <option disabled selected>Loading locations...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Alert Trigger Type</label>
+                <select id="alert-trigger">
+                    <option value="Temperature drops below">Temperature drops below</option>
+                    <option value="Temperature goes above">Temperature goes above</option>
+                    <option value="Precipitation chance exceeds">Precipitation chance exceeds</option>
+                    <option value="Wind speed exceeds">Wind speed exceeds</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Threshold Value</label>
+                <input type="number" id="alert-threshold" placeholder="e.g. 32">
+            </div>
+            <button id="save-alert-btn" class="btn btn-block">Save Alert</button>
+        </div>
+
+        <h3 style="margin-top: 40px;">Active Alerts</h3>
+        <div id="alerts-list"></div>
+    </main>
+</body>
+
+</html>

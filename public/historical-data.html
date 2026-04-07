@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historical Data - WeatherWize</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/weatherWize.CSS">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="./js/auth-check.js" defer></script>
+    <script src="./js/historical-data.js" defer></script>
+</head>
+
+<body data-allowed-roles="advanced,admin" class="dashboard-page">
+    <div class="sky-wrap" aria-hidden="true">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+    </div>
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="dashboard.html" class="nav-brand">
+                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo"
+                    style="display:inline-block; vertical-align:middle;">
+                WeatherWize
+            </a>
+            <div class="nav-right">
+                <button class="btn btn-text" onclick="window.history.back()">Back</button>
+                <button id="logout-btn" class="btn" onclick="window.location.href='index.html'">Logout</button>
+            </div>
+        </div>
+    </nav>
+    <main class="container dashboard-content" style="display:flex; flex-direction:column; align-items:center;">
+        <h2 style="text-align:center;">Historical Weather Query</h2>
+        <div class="auth-card" style="max-width: 800px; width:100%; margin-top: 20px;">
+            <div id="history-message" class="text-center" style="margin-bottom: 15px; display: none;"></div>
+            <div class="form-group">
+                <label>Select Location</label>
+                <select id="history-location">
+                    <option disabled selected>Loading locations...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Start Date</label>
+                <input type="date" id="history-start-date">
+            </div>
+            <div class="form-group">
+                <label>End Date</label>
+                <input type="date" id="history-end-date">
+            </div>
+            <button id="fetch-history-btn" class="btn">Fetch History</button>
+
+            <div id="chart-container" style="margin-top: 30px;">
+                <p
+                    style="text-align: center; color: var(--text-secondary); border: 1px dashed var(--border); padding: 40px;">
+                    Select a location and date range, then click "Fetch History" to view chart.
+                </p>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

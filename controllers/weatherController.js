@@ -18,24 +18,42 @@ async function geocodeLocation(location, apiKey) {
     return { name, state, country, lat, lon, displayName };
 }
 
+// Reusable coordinates solver for identical queries
+async function resolveCoordinates(req, res) {
+    const location = req.query.location?.trim();
+    if (!location) {
+        res.status(400).json({ message: 'Location is required' });
+        return null;
+    }
+
+    const apiKey = process.env.OPENWEATHER_API_KEY;
+    if (!apiKey || apiKey === 'your_openweather_api_key') {
+        res.status(503).json({
+            message: 'Weather API key is missing or not configured. Set OPENWEATHER_API_KEY in .env.'
+        });
+        return null;
+    }
+
+    let geo;
+    if (req.query.lat && req.query.lon && req.query.lat !== 'undefined' && req.query.lon !== 'undefined') {
+        geo = { displayName: location, lat: req.query.lat, lon: req.query.lon };
+    } else {
+        geo = await geocodeLocation(location, apiKey);
+    }
+
+    if (!geo) {
+        res.status(404).json({ message: 'Location not found' });
+        return null;
+    }
+
+    return { geo, apiKey };
+}
+
 exports.getWeather = async (req, res) => {
     try {
-        const location = req.query.location?.trim();
-        if (!location) {
-            return res.status(400).json({ message: 'Location is required' });
-        }
-
-        const apiKey = process.env.OPENWEATHER_API_KEY;
-        if (!apiKey || apiKey === 'your_openweather_api_key') {
-            return res.status(503).json({
-                message: 'Weather API key is missing or not configured. Set OPENWEATHER_API_KEY in .env.'
-            });
-        }
-
-        const geo = await geocodeLocation(location, apiKey);
-        if (!geo) {
-            return res.status(404).json({ message: 'Location not found' });
-        }
+        const resolution = await resolveCoordinates(req, res);
+        if (!resolution) return; // Error already sent natively
+        const { geo, apiKey } = resolution;
 
         const url = `${OPENWEATHER_BASE_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}&units=imperial`;
         const [response, aqiResponse] = await Promise.all([
@@ -84,22 +102,9 @@ exports.getWeather = async (req, res) => {
 
 exports.getHourlyForecast = async (req, res) => {
     try {
-        const location = req.query.location?.trim();
-        if (!location) {
-            return res.status(400).json({ message: 'Location is required' });
-        }
-
-        const apiKey = process.env.OPENWEATHER_API_KEY;
-        if (!apiKey || apiKey === 'your_openweather_api_key') {
-            return res.status(503).json({
-                message: 'Weather API key is missing or not configured. Set OPENWEATHER_API_KEY in .env.'
-            });
-        }
-
-        const geo = await geocodeLocation(location, apiKey);
-        if (!geo) {
-            return res.status(404).json({ message: 'Location not found' });
-        }
+        const resolution = await resolveCoordinates(req, res);
+        if (!resolution) return;
+        const { geo, apiKey } = resolution;
 
         const url = `${OPENWEATHER_FORECAST_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}&units=imperial&cnt=8`;
         const response = await fetch(url);
@@ -133,6 +138,39 @@ exports.getHourlyForecast = async (req, res) => {
     }
 };
 
+exports.getHistoricalWeather = async (req, res) => {
+    try {
+        const resolution = await resolveCoordinates(req, res);
+        if (!resolution) return;
+        const { geo, apiKey } = resolution;
+
+        // Use the 5-day/3-hour forecast endpoint (available on free tier)
+        const url = `${OPENWEATHER_FORECAST_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}&units=imperial`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!response.ok) {
+            return res.status(response.status).json({ message: data?.message || 'Error fetching forecast data' });
+        }
+
+        const intervals = (data.list || []).map((entry) => ({
+            time: entry.dt_txt,
+            temp: entry.main?.temp,
+            humidity: entry.main?.humidity,
+            condition: entry.weather?.[0]?.main || 'Unknown',
+            windSpeed: entry.wind?.speed
+        }));
+
+        return res.json({
+            location: geo.displayName,
+            intervals
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Error fetching historical data' });
+    }
+};
+
 exports.saveLocation = async (req, res) => {
     try {
         const { location } = req.body;
@@ -142,16 +180,25 @@ exports.saveLocation = async (req, res) => {
             return res.status(400).json({ message: 'Location is required' });
         }
 
+        // Resolve through geocoding to get the canonical display name
+        const apiKey = process.env.OPENWEATHER_API_KEY;
+        const geo = apiKey ? await geocodeLocation(location, apiKey) : null;
+        const canonicalName = geo ? geo.displayName : location.trim();
+
+        if (!geo) {
+            return res.status(404).json({ message: 'Location not found. Please check the spelling.' });
+        }
+
         const [existing] = await db.query(
             'SELECT id FROM saved_locations WHERE user_id = ? AND LOWER(location_name) = LOWER(?)',
-            [userId, location]
+            [userId, canonicalName]
         );
         if (existing.length > 0) {
             return res.status(409).json({ message: 'Location already saved' });
         }
 
-        await db.query('INSERT INTO saved_locations (user_id, location_name) VALUES (?, ?)', [userId, location]);
-        return res.status(201).json({ message: 'Location saved' });
+        await db.query('INSERT INTO saved_locations (user_id, location_name, lat, lon) VALUES (?, ?, ?, ?)', [userId, canonicalName, geo.lat, geo.lon]);
+        return res.status(201).json({ message: 'Location saved', location_name: canonicalName });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Error saving location' });

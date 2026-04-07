@@ -3,11 +3,10 @@ const router = express.Router();
 const weatherController = require('../controllers/weatherController');
 const authMiddleware = require('../middleware/authMiddleware');
 
-// Public route (maybe? or protected? Let's make it protected for now as per requirements usually)
-// Actually, weather searching might be public, but saving is definitely protected.
-// Let's protect everything for now to match the "Dashboard" feel.
+// Protected Weather Endpoints
 router.get('/', authMiddleware, weatherController.getWeather);
 router.get('/hourly', authMiddleware, weatherController.getHourlyForecast);
+router.get('/history', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), weatherController.getHistoricalWeather);
 router.get('/tiles/:layer/:z/:x/:y', weatherController.getMapTile);
 router.post('/save', authMiddleware, weatherController.saveLocation);
 router.get('/saved', authMiddleware, weatherController.getSavedLocations);

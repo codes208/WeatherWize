@@ -7,6 +7,7 @@
     <title>Create Advanced User Account - WeatherWize</title>
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/weatherWize.CSS">
+    <script src="./js/toast.js"></script>
     <script src="./js/auth.js" defer></script>
 </head>
 
@@ -32,6 +33,10 @@
                     <input type="text" id="username" name="username" required>
                 </div>
                 <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" required>
                 </div>
@@ -42,16 +47,19 @@
                 <div class="payment-divider">Payment Information</div>
                 <div class="form-group">
                     <label for="cardNumber">Card Number</label>
-                    <input type="text" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                    <input type="text" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456"
+                        maxlength="19" inputmode="numeric" required>
                 </div>
                 <div class="payment-row">
                     <div class="form-group">
                         <label for="cardExpiry">Expiry Date</label>
-                        <input type="text" id="cardExpiry" name="cardExpiry" placeholder="MM/YY" maxlength="5" required>
+                        <input type="text" id="cardExpiry" name="cardExpiry" placeholder="MM/YY" maxlength="5"
+                            inputmode="numeric" required>
                     </div>
                     <div class="form-group">
                         <label for="cardCvv">CVV</label>
-                        <input type="text" id="cardCvv" name="cardCvv" placeholder="123" maxlength="4" required>
+                        <input type="text" id="cardCvv" name="cardCvv" placeholder="123" maxlength="3"
+                            inputmode="numeric" required>
                     </div>
                 </div>
                 <button type="submit" class="btn btn-block">Create Advanced Account</button>

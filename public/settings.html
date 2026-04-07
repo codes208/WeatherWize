@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Settings - WeatherWize Admin</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/weatherWize.CSS">
+    <script src="./js/auth-check.js" defer></script>
+    <script src="./js/settings.js" defer></script>
+</head>
+
+<body data-allowed-roles="admin" class="dashboard-page">
+    <div class="sky-wrap" aria-hidden="true">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+    </div>
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="dashboard.html" class="nav-brand">
+                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo"
+                    style="display:inline-block; vertical-align:middle;">
+                WeatherWize
+            </a>
+            <div class="nav-right">
+                <button class="btn btn-text" onclick="window.history.back()">Back</button>
+                <button id="logout-btn" class="btn" onclick="window.location.href='index.html'">Logout</button>
+            </div>
+        </div>
+    </nav>
+    <main class="container dashboard-content" style="display:flex; flex-direction:column; align-items:center;">
+        <h2 style="text-align:center;">Global System Settings</h2>
+
+        <div class="auth-card" style="max-width: 800px; width:100%; margin-top: 30px;">
+            <div id="settings-message" class="text-center" style="margin-bottom: 15px; display: none;"></div>
+            <div class="form-group"
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 20px;">
+                <div>
+                    <h3 style="margin-bottom: 5px;">Maintenance Mode</h3>
+                    <p style="font-size: 0.9rem;">Disconnects all non-admin users and
+                        shows maintenance screen.</p>
+                </div>
+                <label style="display: flex; align-items: center; cursor: pointer;">
+                    <input type="checkbox" id="maintenance-toggle"
+                        style="width: 20px; height: 20px; margin-right: 10px;"> Enable
+                </label>
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <h3 style="margin-bottom: 10px;">Global API Throttle Limit</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 10px;">Maximum OpenWeather API
+                    calls per minute across all users.</p>
+                <input type="number" id="throttle-input" value="500">
+            </div>
+
+            <button id="save-settings-btn" class="btn btn-block" style="margin-top: 30px;">Save System
+                Configuration</button>
+        </div>
+    </main>
+</body>
+
+</html>

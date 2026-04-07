@@ -1,5 +1,9 @@
 const jwt = require('jsonwebtoken');
 
+/**
+ * Verifies JWT from Authorization header and attaches decoded user to req.user.
+ * Returns 401 if token is missing or invalid.
+ */
 const authenticate = (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
 
