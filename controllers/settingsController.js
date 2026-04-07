@@ -49,6 +49,8 @@ exports.updateSettings = async (req, res) => {
                 'INSERT INTO system_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = ?',
                 ['api_throttle_limit', String(num), String(num)]
             );
+            const globalState = require('../config/state');
+            globalState.apiThrottleLimit = num;
         }
 
         res.json({ message: 'System configuration saved successfully.' });

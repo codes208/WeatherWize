@@ -78,3 +78,43 @@ exports.deleteAlert = async (req, res) => {
         res.status(500).json({ message: 'Server error while deleting alert' });
     }
 };
+
+// Fetch unread notifications for the user
+exports.getNotifications = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const [notifications] = await db.query(
+            'SELECT * FROM notifications WHERE user_id = ? AND is_read = FALSE ORDER BY created_at ASC',
+            [userId]
+        );
+        res.json(notifications);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error fetching notifications' });
+    }
+};
+
+// Mark notifications as read
+exports.markNotificationsRead = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { notificationIds } = req.body;
+        
+        if (!Array.isArray(notificationIds) || notificationIds.length === 0) {
+            return res.status(400).json({ message: 'No notification IDs provided' });
+        }
+
+        const ids = notificationIds.filter(id => Number.isInteger(Number(id)));
+        if (ids.length === 0) return res.json({ message: 'No valid IDs' });
+
+        await db.query(
+            'UPDATE notifications SET is_read = TRUE WHERE user_id = ? AND id IN (?)',
+            [userId, ids]
+        );
+
+        res.json({ message: 'Notifications marked as read' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error marking read' });
+    }
+};

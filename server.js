@@ -24,9 +24,22 @@ const db = require('./config/db');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Add new feature dependencies
+const rateLimit = require('express-rate-limit');
+const globalState = require('./config/state');
+require('./services/alertWorker');
+
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// API Rate Limiting (UC-014 fix)
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: async () => globalState.apiThrottleLimit,
+    message: { message: "Too many requests from this IP, please try again later." }
+});
+app.use('/api', limiter);
 
 // Maintenance-mode middleware (UC-014): blocks non-admin users when enabled
 app.use(async (req, res, next) => {
@@ -79,7 +92,15 @@ app.get('/', (req, res) => {
 });
 
 // Start Server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+    try {
+        const [rows] = await db.query("SELECT setting_value FROM system_settings WHERE setting_key = 'api_throttle_limit'");
+        if (rows.length > 0) {
+            globalState.apiThrottleLimit = parseInt(rows[0].setting_value, 10) || 500;
+        }
+    } catch (e) {
+        console.log('Could not load api_throttle_limit from DB, using default.');
+    }
     console.log(`Server running on http://localhost:${PORT}`);
 });
 

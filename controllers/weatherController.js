@@ -52,7 +52,13 @@ exports.getWeather = async (req, res) => {
             });
         }
 
-        const geo = await geocodeLocation(location, apiKey);
+        let geo;
+        if (req.query.lat && req.query.lon && req.query.lat !== 'undefined' && req.query.lon !== 'undefined') {
+            geo = { displayName: location, lat: req.query.lat, lon: req.query.lon };
+        } else {
+            geo = await geocodeLocation(location, apiKey);
+        }
+
         if (!geo) {
             return res.status(404).json({ message: 'Location not found' });
         }
@@ -116,7 +122,13 @@ exports.getHourlyForecast = async (req, res) => {
             });
         }
 
-        const geo = await geocodeLocation(location, apiKey);
+        let geo;
+        if (req.query.lat && req.query.lon && req.query.lat !== 'undefined' && req.query.lon !== 'undefined') {
+            geo = { displayName: location, lat: req.query.lat, lon: req.query.lon };
+        } else {
+            geo = await geocodeLocation(location, apiKey);
+        }
+
         if (!geo) {
             return res.status(404).json({ message: 'Location not found' });
         }
@@ -167,7 +179,13 @@ exports.getHistoricalWeather = async (req, res) => {
             });
         }
 
-        const geo = await geocodeLocation(location, apiKey);
+        let geo;
+        if (req.query.lat && req.query.lon && req.query.lat !== 'undefined' && req.query.lon !== 'undefined') {
+            geo = { displayName: location, lat: req.query.lat, lon: req.query.lon };
+        } else {
+            geo = await geocodeLocation(location, apiKey);
+        }
+
         if (!geo) {
             return res.status(404).json({ message: 'Location not found' });
         }
@@ -225,7 +243,7 @@ exports.saveLocation = async (req, res) => {
             return res.status(409).json({ message: 'Location already saved' });
         }
 
-        await db.query('INSERT INTO saved_locations (user_id, location_name) VALUES (?, ?)', [userId, canonicalName]);
+        await db.query('INSERT INTO saved_locations (user_id, location_name, lat, lon) VALUES (?, ?, ?, ?)', [userId, canonicalName, geo.lat, geo.lon]);
         return res.status(201).json({ message: 'Location saved', location_name: canonicalName });
     } catch (error) {
         console.error(error);

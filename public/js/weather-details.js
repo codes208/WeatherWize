@@ -22,6 +22,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const params = new URLSearchParams(window.location.search);
     const location = params.get('location');
+    const lat = params.get('lat');
+    const lon = params.get('lon');
 
     if (!location) {
         window.history.back();
@@ -144,7 +146,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load current weather
     try {
-        const response = await fetch(`/api/weather?location=${encodeURIComponent(location)}`, {
+        let qs = `location=${encodeURIComponent(location)}`;
+        if (lat && lon) qs += `&lat=${lat}&lon=${lon}`;
+        const response = await fetch(`/api/weather?${qs}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
@@ -187,7 +191,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load hourly forecast
     try {
-        const response = await fetch(`/api/weather/hourly?location=${encodeURIComponent(location)}`, {
+        let qs = `location=${encodeURIComponent(location)}`;
+        if (lat && lon) qs += `&lat=${lat}&lon=${lon}`;
+        const response = await fetch(`/api/weather/hourly?${qs}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();

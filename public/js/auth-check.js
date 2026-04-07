@@ -47,4 +47,40 @@ document.addEventListener('DOMContentLoaded', () => {
             else window.location.href = '/dashboard.html';
         });
     });
+
+    // Start background notification poller if token exists
+    if (token) {
+        setInterval(async () => {
+            try {
+                const response = await fetch('/api/alerts/notifications', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) return;
+                const notifications = await response.json();
+                
+                if (notifications && notifications.length > 0) {
+                    const idsToMark = [];
+                    notifications.forEach(notification => {
+                        if (window.showToast) {
+                            // Display as a red box, non-dismissing unless clicked (duration 0)
+                            window.showToast(notification.message, 'error', 0);
+                        }
+                        idsToMark.push(notification.id);
+                    });
+
+                    // Mark as read
+                    await fetch('/api/alerts/notifications/read', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ notificationIds: idsToMark })
+                    });
+                }
+            } catch (err) {
+                // Silently ignore polling errors
+            }
+        }, 15000); // Check every 15s instead of 30 for faster demo
+    }
 });

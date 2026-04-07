@@ -66,8 +66,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    async function fetchWeatherData(location) {
-        const response = await fetch(`/api/weather?location=${encodeURIComponent(location)}`, {
+    async function fetchWeatherData(location, lat, lon) {
+        let url = `/api/weather?location=${encodeURIComponent(location)}`;
+        if (lat && lon) {
+            url += `&lat=${lat}&lon=${lon}`;
+        }
+        const response = await fetch(url, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -166,19 +170,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const weatherTiles = await Promise.all(
                 locations.map(async (loc) => {
                     try {
-                        const weather = await fetchWeatherData(loc.location_name);
-                        return { id: loc.id, location: loc.location_name, weather };
+                        const weather = await fetchWeatherData(loc.location_name, loc.lat, loc.lon);
+                        return { id: loc.id, location: loc.location_name, lat: loc.lat, lon: loc.lon, weather };
                     } catch (error) {
-                        return { id: loc.id, location: loc.location_name, weather: null };
+                        return { id: loc.id, location: loc.location_name, lat: loc.lat, lon: loc.lon, weather: null };
                     }
                 })
             );
 
-            weatherTiles.forEach(({ location, weather }) => {
+            weatherTiles.forEach(({ location, lat, lon, weather }) => {
                 const card = document.createElement('article');
                 card.className = 'location-card weather-location-card';
                 card.addEventListener('click', () => {
-                    window.location.href = `weather-details.html?location=${encodeURIComponent(location)}`;
+                    let navUrl = `weather-details.html?location=${encodeURIComponent(location)}`;
+                    if (lat && lon) navUrl += `&lat=${lat}&lon=${lon}`;
+                    window.location.href = navUrl;
                 });
 
                 if (weather) {

@@ -1,0 +1,92 @@
+/**
+ * @file services/alertWorker.js
+ * @description Background worker to poll API for active user alerts and trigger notifications.
+ */
+const cron = require('node-cron');
+const db = require('../config/db');
+
+// Run every 10 minutes
+cron.schedule('*/10 * * * *', async () => {
+    try {
+        const [alerts] = await db.query(
+            "SELECT * FROM alerts WHERE is_active = TRUE AND (last_triggered_at IS NULL OR last_triggered_at < DATE_SUB(NOW(), INTERVAL 1 HOUR))"
+        );
+
+        if (alerts.length === 0) return;
+
+        // Group by location to minimize API calls
+        const groupedAlerts = {};
+        for (const alert of alerts) {
+            const loc = alert.location_name.toLowerCase();
+            if (!groupedAlerts[loc]) {
+                groupedAlerts[loc] = [];
+            }
+            groupedAlerts[loc].push(alert);
+        }
+
+        const apiKey = process.env.OPENWEATHER_API_KEY;
+        if (!apiKey || apiKey === 'your_openweather_api_key') return;
+
+        for (const [locationQuery, locAlerts] of Object.entries(groupedAlerts)) {
+            try {
+                // 1. Geocode Location to get exact lat/lon
+                const geoUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(locationQuery)}&limit=1&appid=${apiKey}`;
+                const geoRes = await fetch(geoUrl);
+                const geoData = await geoRes.json();
+                if (!geoData || !geoData.length) continue;
+
+                const { lat, lon } = geoData[0];
+
+                // 2. Fetch Weather
+                const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
+                const weatherRes = await fetch(url);
+                const weatherData = await weatherRes.json();
+
+                if (!weatherRes.ok) continue;
+
+                const temp = weatherData.main?.temp;
+                const windSpeed = weatherData.wind?.speed;
+                const humidity = weatherData.main?.humidity;
+
+                // 3. Evaluate Alerts
+                for (const alert of locAlerts) {
+                    let triggered = false;
+                    let message = '';
+                    const th = Number(alert.threshold_value);
+
+                    switch (alert.trigger_type) {
+                        case 'Temperature drops below':
+                            if (temp < th) { triggered = true; message = `Alert: Temp in ${alert.location_name} dropped to ${temp}°F (below ${th}°F)`; }
+                            break;
+                        case 'Temperature goes above':
+                            if (temp > th) { triggered = true; message = `Alert: Temp in ${alert.location_name} rose to ${temp}°F (above ${th}°F)`; }
+                            break;
+                        case 'Precipitation chance exceeds':
+                            // using humidity proxy
+                            if (humidity > th) { triggered = true; message = `Alert: Humidity in ${alert.location_name} is ${humidity}% (above ${th}%)`; }
+                            break;
+                        case 'Wind speed exceeds':
+                            if (windSpeed > th) { triggered = true; message = `Alert: Wind in ${alert.location_name} is ${windSpeed}mph (exceeds ${th}mph)`; }
+                            break;
+                    }
+
+                    if (triggered) {
+                        await db.query(
+                            'INSERT INTO notifications (user_id, message) VALUES (?, ?)',
+                            [alert.user_id, message]
+                        );
+                        await db.query(
+                            'UPDATE alerts SET last_triggered_at = NOW() WHERE id = ?',
+                            [alert.id]
+                        );
+                        console.log(`[ALERTS] Triggered notification for user ${alert.user_id}: ${message}`);
+                    }
+                }
+            } catch (err) {
+                console.error(`[ALERTS] Error processing location ${locationQuery}:`, err);
+            }
+        }
+    } catch (error) {
+        console.error('[ALERTS] Worker error:', error);
+    }
+});
