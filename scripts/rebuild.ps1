@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    WeatherWize — Full rebuild and run script for Windows PowerShell.
+    WeatherWize - Full rebuild and run script for Windows PowerShell.
 
 .DESCRIPTION
     Checks prerequisites (Node.js >= 18, npm, MySQL reachability),
@@ -47,7 +47,7 @@ function Write-Info {
 # ─────────────────────────────────────────────────────────────
 Write-Host ""
 Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkCyan
-Write-Host "  WeatherWize — Rebuild & Run                     " -ForegroundColor Cyan
+Write-Host "  WeatherWize - Rebuild and Run                   " -ForegroundColor Cyan
 Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkCyan
 Write-Host ""
 
@@ -96,7 +96,7 @@ if (Test-Path $envFile) {
     }
     Write-Ok ".env loaded (DB_HOST=$dbHost, PORT=$serverPort)"
 } else {
-    Write-Host "   ⚠️  No .env file found — using defaults (localhost:3000)" -ForegroundColor Yellow
+    Write-Host "   ⚠️  No .env file found - using defaults (localhost:3000)" -ForegroundColor Yellow
 }
 
 # ─────────────────────────────────────────────────────────────
@@ -148,7 +148,7 @@ try {
 Write-Info "Initializing database (node init-db.js)..."
 Push-Location $ProjectRoot
 try {
-    $dbOutput = & node init-db.js 2>&1
+    $dbOutput = & node --no-deprecation init-db.js 2>$null
     if ($LASTEXITCODE -ne 0) {
         Write-Fail "Database initialization failed."
         Write-Host $dbOutput -ForegroundColor Red
@@ -176,7 +176,7 @@ try {
 } catch { }
 
 if ($existingPid -and $existingPid -ne '0') {
-    Write-Host "   ⚠️  Port $serverPort is in use by PID $existingPid — killing it..." -ForegroundColor Yellow
+    Write-Host "   ⚠️  Port $serverPort is in use by PID $existingPid - killing it..." -ForegroundColor Yellow
     try {
         Stop-Process -Id ([int]$existingPid) -Force -ErrorAction SilentlyContinue
         Start-Sleep -Milliseconds 500
