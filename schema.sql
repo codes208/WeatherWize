@@ -62,5 +62,5 @@ CREATE TABLE IF NOT EXISTS system_settings (
 -- Seed default system settings
 INSERT IGNORE INTO system_settings (setting_key, setting_value) VALUES
   ('maintenance_mode', 'false'),
-  ('api_throttle_limit', '500');
+  ('api_throttle_limit', '1000');
 

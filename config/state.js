@@ -1,5 +1,5 @@
 const state = {
-    apiThrottleLimit: 500 // default value
+    apiThrottleLimit: 1000 // default value
 };
 
 module.exports = state;
