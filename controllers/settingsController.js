@@ -1,12 +1,11 @@
-const db = require('../config/db');
+const { Setting } = require('../models');
 
-// Get all system settings
 exports.getSettings = async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM system_settings');
+        const rows = await Setting.findAll();
         const settings = {};
         rows.forEach(row => {
-            settings[row.setting_key] = row.setting_value;
+            settings[row.settingKey] = row.settingValue;
         });
         res.json(settings);
     } catch (error) {
@@ -15,17 +14,13 @@ exports.getSettings = async (req, res) => {
     }
 };
 
-// Update system settings
 exports.updateSettings = async (req, res) => {
     try {
         const { maintenance_mode, api_throttle_limit } = req.body;
 
         if (maintenance_mode !== undefined) {
             const val = maintenance_mode === true || maintenance_mode === 'true' ? 'true' : 'false';
-            await db.query(
-                'INSERT INTO system_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = ?',
-                ['maintenance_mode', val, val]
-            );
+            await Setting.upsert({ settingKey: 'maintenance_mode', settingValue: val });
         }
 
         if (api_throttle_limit !== undefined) {
@@ -33,10 +28,7 @@ exports.updateSettings = async (req, res) => {
             if (isNaN(num) || num < 1) {
                 return res.status(400).json({ message: 'API throttle limit must be a positive number.' });
             }
-            await db.query(
-                'INSERT INTO system_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = ?',
-                ['api_throttle_limit', String(num), String(num)]
-            );
+            await Setting.upsert({ settingKey: 'api_throttle_limit', settingValue: String(num) });
             const globalState = require('../config/state');
             globalState.apiThrottleLimit = num;
         }

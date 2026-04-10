@@ -1,9 +1,10 @@
-const db = require('../config/db');
+const { Op, fn, col, where } = require('sequelize');
+const { Location } = require('../models');
 
-const OPENWEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
+const OPENWEATHER_BASE_URL     = 'https://api.openweathermap.org/data/2.5/weather';
 const OPENWEATHER_FORECAST_URL = 'https://api.openweathermap.org/data/2.5/forecast';
-const OPENWEATHER_GEO_URL = 'http://api.openweathermap.org/geo/1.0/direct';
-const OPENWEATHER_AQI_URL = 'http://api.openweathermap.org/data/2.5/air_pollution';
+const OPENWEATHER_GEO_URL      = 'http://api.openweathermap.org/geo/1.0/direct';
+const OPENWEATHER_AQI_URL      = 'http://api.openweathermap.org/data/2.5/air_pollution';
 
 const AQI_LABELS = { 1: 'Good', 2: 'Fair', 3: 'Moderate', 4: 'Poor', 5: 'Very Poor' };
 
@@ -18,7 +19,6 @@ async function geocodeLocation(location, apiKey) {
     return { name, state, country, lat, lon, displayName };
 }
 
-// Reusable coordinates solver for identical queries
 async function resolveCoordinates(req, res) {
     const location = req.query.location?.trim();
     if (!location) {
@@ -29,7 +29,7 @@ async function resolveCoordinates(req, res) {
     const apiKey = process.env.OPENWEATHER_API_KEY;
     if (!apiKey || apiKey === 'your_openweather_api_key') {
         res.status(503).json({
-            message: 'Weather API key is missing or not configured. Set OPENWEATHER_API_KEY in .env.'
+            message: 'Weather API key is missing or not configured. Set OPENWEATHER_API_KEY in .env.',
         });
         return null;
     }
@@ -52,13 +52,13 @@ async function resolveCoordinates(req, res) {
 exports.getWeather = async (req, res) => {
     try {
         const resolution = await resolveCoordinates(req, res);
-        if (!resolution) return; // Error already sent natively
+        if (!resolution) return;
         const { geo, apiKey } = resolution;
 
         const url = `${OPENWEATHER_BASE_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}&units=imperial`;
         const [response, aqiResponse] = await Promise.all([
             fetch(url),
-            fetch(`${OPENWEATHER_AQI_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}`)
+            fetch(`${OPENWEATHER_AQI_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}`),
         ]);
         const data = await response.json();
 
@@ -66,7 +66,7 @@ exports.getWeather = async (req, res) => {
             const apiMessage = data?.message || 'Error fetching weather data';
             if (response.status === 401) {
                 return res.status(502).json({
-                    message: 'OpenWeather API key rejected (401). Verify key value and activation status.'
+                    message: 'OpenWeather API key rejected (401). Verify key value and activation status.',
                 });
             }
             return res.status(response.status).json({ message: apiMessage });
@@ -79,21 +79,19 @@ exports.getWeather = async (req, res) => {
             if (aqiIndex) airQuality = { index: aqiIndex, label: AQI_LABELS[aqiIndex] || 'Unknown' };
         }
 
-        const weatherData = {
-            location: geo.displayName,
-            temp: data.main?.temp,
-            feelsLike: data.main?.feels_like,
-            tempHigh: data.main?.temp_max,
-            tempLow: data.main?.temp_min,
-            condition: data.weather?.[0]?.main || 'Unknown',
-            humidity: data.main?.humidity,
-            windSpeed: data.wind?.speed,
+        return res.json({
+            location:   geo.displayName,
+            temp:       data.main?.temp,
+            feelsLike:  data.main?.feels_like,
+            tempHigh:   data.main?.temp_max,
+            tempLow:    data.main?.temp_min,
+            condition:  data.weather?.[0]?.main || 'Unknown',
+            humidity:   data.main?.humidity,
+            windSpeed:  data.wind?.speed,
             airQuality,
             lat: geo.lat,
-            lon: geo.lon
-        };
-
-        return res.json(weatherData);
+            lon: geo.lon,
+        });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Error fetching weather data' });
@@ -114,27 +112,90 @@ exports.getHourlyForecast = async (req, res) => {
             const apiMessage = data?.message || 'Error fetching hourly forecast';
             if (response.status === 401) {
                 return res.status(502).json({
-                    message: 'OpenWeather API key rejected (401). Verify key value and activation status.'
+                    message: 'OpenWeather API key rejected (401). Verify key value and activation status.',
                 });
             }
             return res.status(response.status).json({ message: apiMessage });
         }
 
         const hourly = (data.list || []).map((entry) => ({
-            time: entry.dt_txt,
-            temp: entry.main?.temp,
+            time:      entry.dt_txt,
+            temp:      entry.main?.temp,
             condition: entry.weather?.[0]?.main || 'Unknown',
-            humidity: entry.main?.humidity,
-            windSpeed: entry.wind?.speed
+            humidity:  entry.main?.humidity,
+            windSpeed: entry.wind?.speed,
         }));
 
         return res.json({
-            location: geo.displayName,
-            intervals: hourly
+            location:         geo.displayName,
+            timezoneOffsetSec: data.city?.timezone ?? 0,
+            intervals:        hourly,
         });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Error fetching hourly forecast' });
+    }
+};
+
+exports.getDailyForecast = async (req, res) => {
+    try {
+        const resolution = await resolveCoordinates(req, res);
+        if (!resolution) return;
+        const { geo, apiKey } = resolution;
+
+        const url = `${OPENWEATHER_FORECAST_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}&units=imperial`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                return res.status(502).json({
+                    message: 'OpenWeather API key rejected (401). Verify key value and activation status.',
+                });
+            }
+            return res.status(response.status).json({ message: data?.message || 'Error fetching forecast data' });
+        }
+
+        const timezoneOffsetSec = data.city?.timezone ?? 0;
+
+        // Group 3-hour intervals into per-day buckets using the location's local date
+        const dayMap = {};
+        for (const entry of (data.list || [])) {
+            const utcMs = new Date(entry.dt_txt.replace(' ', 'T') + 'Z').getTime();
+            const localDate = new Date(utcMs + timezoneOffsetSec * 1000);
+            const dayKey = localDate.toISOString().slice(0, 10); // "YYYY-MM-DD" in location time
+
+            if (!dayMap[dayKey]) {
+                dayMap[dayKey] = { temps: [], humidities: [], conditions: [] };
+            }
+            dayMap[dayKey].temps.push(entry.main?.temp);
+            dayMap[dayKey].humidities.push(entry.main?.humidity);
+            dayMap[dayKey].conditions.push(entry.weather?.[0]?.main || 'Unknown');
+        }
+
+        const days = Object.entries(dayMap).slice(0, 5).map(([date, vals]) => {
+            // Most frequent condition for the day
+            const conditionCounts = vals.conditions.reduce((acc, c) => {
+                acc[c] = (acc[c] || 0) + 1;
+                return acc;
+            }, {});
+            const dominantCondition = Object.keys(conditionCounts).reduce((a, b) =>
+                conditionCounts[a] >= conditionCounts[b] ? a : b
+            );
+
+            return {
+                date,
+                high:      Math.max(...vals.temps),
+                low:       Math.min(...vals.temps),
+                humidity:  Math.round(vals.humidities.reduce((a, b) => a + b, 0) / vals.humidities.length),
+                condition: dominantCondition,
+            };
+        });
+
+        return res.json({ location: geo.displayName, timezoneOffsetSec, days });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Error fetching 5-day forecast' });
     }
 };
 
@@ -144,7 +205,6 @@ exports.getHistoricalWeather = async (req, res) => {
         if (!resolution) return;
         const { geo, apiKey } = resolution;
 
-        // Use the 5-day/3-hour forecast endpoint (available on free tier)
         const url = `${OPENWEATHER_FORECAST_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}&units=imperial`;
         const response = await fetch(url);
         const data = await response.json();
@@ -154,17 +214,14 @@ exports.getHistoricalWeather = async (req, res) => {
         }
 
         const intervals = (data.list || []).map((entry) => ({
-            time: entry.dt_txt,
-            temp: entry.main?.temp,
-            humidity: entry.main?.humidity,
+            time:      entry.dt_txt,
+            temp:      entry.main?.temp,
+            humidity:  entry.main?.humidity,
             condition: entry.weather?.[0]?.main || 'Unknown',
-            windSpeed: entry.wind?.speed
+            windSpeed: entry.wind?.speed,
         }));
 
-        return res.json({
-            location: geo.displayName,
-            intervals
-        });
+        return res.json({ location: geo.displayName, intervals });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Error fetching historical data' });
@@ -180,24 +237,26 @@ exports.saveLocation = async (req, res) => {
             return res.status(400).json({ message: 'Location is required' });
         }
 
-        // Resolve through geocoding to get the canonical display name
         const apiKey = process.env.OPENWEATHER_API_KEY;
         const geo = apiKey ? await geocodeLocation(location, apiKey) : null;
-        const canonicalName = geo ? geo.displayName : location.trim();
 
         if (!geo) {
             return res.status(404).json({ message: 'Location not found. Please check the spelling.' });
         }
 
-        const [existing] = await db.query(
-            'SELECT id FROM saved_locations WHERE user_id = ? AND LOWER(location_name) = LOWER(?)',
-            [userId, canonicalName]
-        );
-        if (existing.length > 0) {
+        const canonicalName = geo.displayName;
+
+        const existing = await Location.findOne({
+            where: {
+                userId,
+                [Op.and]: where(fn('LOWER', col('location_name')), canonicalName.toLowerCase()),
+            },
+        });
+        if (existing) {
             return res.status(409).json({ message: 'Location already saved' });
         }
 
-        await db.query('INSERT INTO saved_locations (user_id, location_name, lat, lon) VALUES (?, ?, ?, ?)', [userId, canonicalName, geo.lat, geo.lon]);
+        await Location.create({ userId, locationName: canonicalName, lat: geo.lat, lon: geo.lon });
         return res.status(201).json({ message: 'Location saved', location_name: canonicalName });
     } catch (error) {
         console.error(error);
@@ -208,8 +267,15 @@ exports.saveLocation = async (req, res) => {
 exports.getSavedLocations = async (req, res) => {
     try {
         const userId = req.user.id;
-        const [locations] = await db.query('SELECT * FROM saved_locations WHERE user_id = ?', [userId]);
-        return res.json(locations);
+        const locations = await Location.findAll({ where: { userId } });
+        return res.json(locations.map(loc => ({
+            id:            loc.id,
+            user_id:       loc.userId,
+            location_name: loc.locationName,
+            lat:           loc.lat,
+            lon:           loc.lon,
+            created_at:    loc.created_at,
+        })));
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Error fetching saved locations' });
@@ -225,12 +291,9 @@ exports.deleteSavedLocation = async (req, res) => {
             return res.status(400).json({ message: 'Invalid location id' });
         }
 
-        const [result] = await db.query(
-            'DELETE FROM saved_locations WHERE id = ? AND user_id = ?',
-            [locationId, userId]
-        );
+        const deleted = await Location.destroy({ where: { id: locationId, userId } });
 
-        if (result.affectedRows === 0) {
+        if (deleted === 0) {
             return res.status(404).json({ message: 'Saved location not found' });
         }
 
@@ -242,7 +305,7 @@ exports.deleteSavedLocation = async (req, res) => {
 };
 
 const ALLOWED_MAP_LAYERS = new Set([
-    'precipitation_new', 'clouds_new', 'temp_new', 'wind_new', 'pressure_new'
+    'precipitation_new', 'clouds_new', 'temp_new', 'wind_new', 'pressure_new',
 ]);
 
 exports.getMapTile = async (req, res) => {

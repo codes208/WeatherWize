@@ -18,7 +18,8 @@
     "express-validator": "^7.3.2",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.9.2",
-    "node-cron": "^4.2.1"
+    "node-cron": "^4.2.1",
+    "sequelize": "^6.37.8"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"

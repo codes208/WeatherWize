@@ -1,20 +1,27 @@
 const cron = require('node-cron');
-const db = require('../config/db');
+const { Op } = require('sequelize');
+const { Alert, Notification } = require('../models');
 
 cron.schedule('*/10 * * * *', async () => {
     try {
-        const [alerts] = await db.query(
-            "SELECT * FROM alerts WHERE is_active = TRUE AND (last_triggered_at IS NULL OR last_triggered_at < DATE_SUB(NOW(), INTERVAL 1 HOUR))"
-        );
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+
+        const alerts = await Alert.findAll({
+            where: {
+                isActive: true,
+                [Op.or]: [
+                    { lastTriggeredAt: null },
+                    { lastTriggeredAt: { [Op.lt]: oneHourAgo } },
+                ],
+            },
+        });
 
         if (alerts.length === 0) return;
 
         const groupedAlerts = {};
         for (const alert of alerts) {
-            const loc = alert.location_name.toLowerCase();
-            if (!groupedAlerts[loc]) {
-                groupedAlerts[loc] = [];
-            }
+            const loc = alert.locationName.toLowerCase();
+            if (!groupedAlerts[loc]) groupedAlerts[loc] = [];
             groupedAlerts[loc].push(alert);
         }
 
@@ -39,45 +46,39 @@ cron.schedule('*/10 * * * *', async () => {
 
                 if (!weatherRes.ok) continue;
 
-                const temp = weatherData.main?.temp;
+                const temp      = weatherData.main?.temp;
                 const windSpeed = weatherData.wind?.speed;
-                const humidity = weatherData.main?.humidity;
+                const humidity  = weatherData.main?.humidity;
 
                 if (temp === undefined || windSpeed === undefined || humidity === undefined) {
-                    console.error(`[ALERTS] Incomplete weather payload fetched for ${locationQuery}. Aborting evaluate.`);
+                    console.error(`[ALERTS] Incomplete weather payload for ${locationQuery}. Aborting evaluate.`);
                     continue;
                 }
 
                 for (const alert of locAlerts) {
                     let triggered = false;
                     let message = '';
-                    const th = Number(alert.threshold_value);
+                    const th = Number(alert.thresholdValue);
 
-                    switch (alert.trigger_type) {
+                    switch (alert.triggerType) {
                         case 'Temperature drops below':
-                            if (temp < th) { triggered = true; message = `Alert: Temp in ${alert.location_name} dropped to ${temp}°F (below ${th}°F)`; }
+                            if (temp < th) { triggered = true; message = `Alert: Temp in ${alert.locationName} dropped to ${temp}°F (below ${th}°F)`; }
                             break;
                         case 'Temperature goes above':
-                            if (temp > th) { triggered = true; message = `Alert: Temp in ${alert.location_name} rose to ${temp}°F (above ${th}°F)`; }
+                            if (temp > th) { triggered = true; message = `Alert: Temp in ${alert.locationName} rose to ${temp}°F (above ${th}°F)`; }
                             break;
                         case 'Precipitation chance exceeds':
-                            if (humidity > th) { triggered = true; message = `Alert: Humidity in ${alert.location_name} is ${humidity}% (above ${th}%)`; }
+                            if (humidity > th) { triggered = true; message = `Alert: Humidity in ${alert.locationName} is ${humidity}% (above ${th}%)`; }
                             break;
                         case 'Wind speed exceeds':
-                            if (windSpeed > th) { triggered = true; message = `Alert: Wind in ${alert.location_name} is ${windSpeed}mph (exceeds ${th}mph)`; }
+                            if (windSpeed > th) { triggered = true; message = `Alert: Wind in ${alert.locationName} is ${windSpeed}mph (exceeds ${th}mph)`; }
                             break;
                     }
 
                     if (triggered) {
-                        await db.query(
-                            'INSERT INTO notifications (user_id, message) VALUES (?, ?)',
-                            [alert.user_id, message]
-                        );
-                        await db.query(
-                            'UPDATE alerts SET last_triggered_at = NOW() WHERE id = ?',
-                            [alert.id]
-                        );
-                        console.log(`[ALERTS] Triggered notification for user ${alert.user_id}: ${message}`);
+                        await Notification.create({ userId: alert.userId, message });
+                        await alert.update({ lastTriggeredAt: new Date() });
+                        console.log(`[ALERTS] Triggered notification for user ${alert.userId}: ${message}`);
                     }
                 }
             } catch (err) {

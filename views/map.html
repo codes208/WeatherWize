@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radar Map - WeatherWize</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/weatherWize.CSS">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="./js/auth-check.js" defer></script>
+    <script src="./js/map.js" defer></script>
+    <style>
+        #full-map {
+            width: 100%;
+            height: calc(100vh - 160px);
+            border-radius: 12px;
+        }
+        #radar-controls-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body data-allowed-roles="advanced,admin" class="dashboard-page">
+    <div class="sky-wrap" aria-hidden="true">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+    </div>
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="advanced-dashboard.html" class="nav-brand">
+                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo"
+                    style="display:inline-block; vertical-align:middle;">
+                WeatherWize
+            </a>
+            <div class="nav-right">
+                <button class="btn btn-text" onclick="window.history.back()">Back</button>
+                <button id="logout-btn" class="btn">Logout</button>
+            </div>
+        </div>
+    </nav>
+    <main class="container dashboard-content">
+        <div id="map-location-label" style="font-size:1.1rem; font-weight:bold; margin-bottom:10px;"></div>
+        <div id="full-map"></div>
+        <div id="radar-controls-bar">
+            <button id="radar-play-btn" class="btn radar-btn">&#9646;&#9646;</button>
+            <span class="radar-time-label">Time:</span>
+            <span id="radar-timestamp" class="radar-timestamp">--</span>
+            <span id="radar-frame-label" class="radar-frame-label"></span>
+        </div>
+    </main>
+</body>
+
+</html>

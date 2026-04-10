@@ -123,16 +123,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('radar-play-btn').textContent = '\u25B6';
     }
 
-    function formatForecastTime(dtText) {
-        const date = new Date(dtText.replace(' ', 'T'));
-        if (Number.isNaN(date.getTime())) return dtText;
-        return date.toLocaleString([], {
+    function formatForecastTime(dtText, timezoneOffsetSec) {
+        // dt_txt from OpenWeatherMap is UTC — parse it as such, then shift to
+        // the location's local offset so times reflect where the weather is.
+        const utcMs = new Date(dtText.replace(' ', 'T') + 'Z').getTime();
+        if (Number.isNaN(utcMs)) return dtText;
+        const localDate = new Date(utcMs + timezoneOffsetSec * 1000);
+        return localDate.toLocaleString([], {
             weekday: 'short',
-            hour: 'numeric',
-            minute: '2-digit'
+            hour:    'numeric',
+            minute:  '2-digit',
+            timeZone: 'UTC', // offset already applied manually above
         });
-    }
-
+    } 
     try {
         let qs = `location=${encodeURIComponent(location)}`;
         if (lat && lon) qs += `&lat=${lat}&lon=${lon}`;
@@ -177,31 +180,78 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    try {
-        let qs = `location=${encodeURIComponent(location)}`;
-        if (lat && lon) qs += `&lat=${lat}&lon=${lon}`;
-        const response = await fetch(`/api/weather/hourly?${qs}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || 'Error fetching hourly forecast');
+    await loadHourlyForecast();
+    await loadDailyForecast();
 
-        hourlyReportList.innerHTML = '';
-        data.intervals.forEach((slot) => {
-            const card = document.createElement('article');
-            card.className = 'hourly-card';
-            card.innerHTML = `
-                <div class="hourly-time">${formatForecastTime(slot.time)}</div>
-                <div class="hourly-temp">${Math.round(slot.temp)}&deg;F</div>
-                <div class="hourly-condition">${slot.condition}</div>
-                <div class="hourly-meta">Humidity <span class="meta-value">${slot.humidity}%</span></div>
-                <div class="hourly-meta">Wind <span class="meta-value">${slot.windSpeed} mph</span></div>
-            `;
-            hourlyReportList.appendChild(card);
-        });
+    async function loadHourlyForecast() {
+        try {
+            let qs = `location=${encodeURIComponent(location)}`;
+            if (lat && lon) qs += `&lat=${lat}&lon=${lon}`;
+            const response = await fetch(`/api/weather/hourly?${qs}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || 'Error fetching hourly forecast');
 
-        hourlyReport.classList.remove('hidden');
-    } catch (error) {
-        console.error(error);
+            hourlyReportList.innerHTML = '';
+            data.intervals.forEach((slot) => {
+                const card = document.createElement('article');
+                card.className = 'hourly-card';
+                card.innerHTML = `
+                    <div class="hourly-time">${formatForecastTime(slot.time, data.timezoneOffsetSec)}</div>
+                    <div class="hourly-temp">${Math.round(slot.temp)}&deg;F</div>
+                    <div class="hourly-condition">${slot.condition}</div>
+                    <div class="hourly-meta">Humidity <span class="meta-value">${slot.humidity}%</span></div>
+                    <div class="hourly-meta">Wind <span class="meta-value">${slot.windSpeed} mph</span></div>
+                `;
+                hourlyReportList.appendChild(card);
+            });
+
+            hourlyReport.classList.remove('hidden');
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function loadDailyForecast() {
+        try {
+            let qs = `location=${encodeURIComponent(location)}`;
+            if (lat && lon) qs += `&lat=${lat}&lon=${lon}`;
+            const response = await fetch(`/api/weather/daily?${qs}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || 'Error fetching 5-day forecast');
+
+            const dailyForecast     = document.getElementById('daily-forecast');
+            const dailyForecastList = document.getElementById('daily-forecast-list');
+
+            dailyForecastList.innerHTML = '';
+            data.days.forEach((day) => {
+                const utcMs    = new Date(day.date + 'T12:00:00Z').getTime();
+                const localDay = new Date(utcMs + data.timezoneOffsetSec * 1000);
+                const label    = localDay.toLocaleDateString([], {
+                    weekday:  'short',
+                    month:    'short',
+                    day:      'numeric',
+                    timeZone: 'UTC',
+                });
+
+                const card = document.createElement('article');
+                card.className = 'hourly-card';
+                card.innerHTML = `
+                    <div class="hourly-time">${label}</div>
+                    <div class="hourly-temp">${Math.round(day.high)}&deg;F</div>
+                    <div class="hourly-condition">${day.condition}</div>
+                    <div class="hourly-meta">Lo: <span class="meta-value">${Math.round(day.low)}&deg;F</span></div>
+                    <div class="hourly-meta">Humidity <span class="meta-value">${day.humidity}%</span></div>
+                `;
+                dailyForecastList.appendChild(card);
+            });
+
+            dailyForecast.classList.remove('hidden');
+        } catch (error) {
+            console.error(error);
+        }
     }
 });

@@ -2,39 +2,40 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const authRoutes = require('./routes/auth');
-const weatherRoutes = require('./routes/weather');
-const alertsRoutes = require('./routes/alerts');
+const rateLimit = require('express-rate-limit');
+
+const authRoutes     = require('./routes/auth');
+const weatherRoutes  = require('./routes/weather');
+const alertsRoutes   = require('./routes/alerts');
 const settingsRoutes = require('./routes/settings');
-const db = require('./config/db');
+
+const { Setting } = require('./models');
+const globalState = require('./config/state');
+require('./services/alertWorker');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-const rateLimit = require('express-rate-limit');
-const globalState = require('./config/state');
-require('./services/alertWorker');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
+    windowMs: 15 * 60 * 1000,
     limit: async () => globalState.apiThrottleLimit,
-    message: { message: "Too many requests from this IP, please try again later." }
+    message: { message: 'Too many requests from this IP, please try again later.' },
 });
 app.use('/api', limiter);
 
-// Maintenance Mode (Blocks non-admins when active)
+// Maintenance Mode (blocks non-admins when active)
 app.use(async (req, res, next) => {
     if (req.path.startsWith('/api/settings') || req.path.startsWith('/api/auth/login')) {
         return next();
     }
 
     try {
-        const [rows] = await db.query("SELECT setting_value FROM system_settings WHERE setting_key = 'maintenance_mode'");
-        if (rows.length > 0 && rows[0].setting_value === 'true') {
+        const setting = await Setting.findOne({ where: { settingKey: 'maintenance_mode' } });
+        if (setting && setting.settingValue === 'true') {
             const jwt = require('jsonwebtoken');
             const token = req.header('Authorization')?.replace('Bearer ', '');
             if (token) {
@@ -48,8 +49,8 @@ app.use(async (req, res, next) => {
                 }
             }
             if (req.path.startsWith('/api/')) {
-            return res.status(503).json({ message: 'System is currently under maintenance. Please check back later.' });
-        }
+                return res.status(503).json({ message: 'System is currently under maintenance. Please check back later.' });
+            }
             return res.status(503).send(`
                 <!DOCTYPE html>
                 <html><head><title>Maintenance - WeatherWize</title>
@@ -62,28 +63,32 @@ app.use(async (req, res, next) => {
     next();
 });
 
+// Static assets (CSS, JS, images)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/weather', weatherRoutes);
-app.use('/api/alerts', alertsRoutes);
+// Views (HTML pages)
+app.use(express.static(path.join(__dirname, 'views')));
+
+// API Routes
+app.use('/api/auth',     authRoutes);
+app.use('/api/weather',  weatherRoutes);
+app.use('/api/alerts',   alertsRoutes);
 app.use('/api/settings', settingsRoutes);
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// Root → login page
+app.get('/', (_req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
 // Start Server
 app.listen(PORT, async () => {
     try {
-        const [rows] = await db.query("SELECT setting_value FROM system_settings WHERE setting_key = 'api_throttle_limit'");
-        if (rows.length > 0) {
-            globalState.apiThrottleLimit = parseInt(rows[0].setting_value, 10) || 500;
+        const setting = await Setting.findOne({ where: { settingKey: 'api_throttle_limit' } });
+        if (setting) {
+            globalState.apiThrottleLimit = parseInt(setting.settingValue, 10) || 500;
         }
     } catch (e) {
         console.log('Could not load api_throttle_limit from DB, using default.');
     }
     console.log(`Server running on http://localhost:${PORT}`);
 });
-
