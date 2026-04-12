@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # ──────────────────────────────────────────────────────────────
-# WeatherWize — Full rebuild and run script (Bash)
+# WeatherWize — Full rebuild and run script (Bash / Linux / macOS)
+#
+# Checks prerequisites, installs npm dependencies (including
+# Sequelize + EJS), initializes the MySQL database, and starts
+# the Express server.
 #
 # Usage:
 #   bash scripts/rebuild.sh          # Production mode
@@ -74,9 +78,10 @@ DB_PORT=3306
 SERVER_PORT=3000
 
 if [ -f "$ENV_FILE" ]; then
-    # Export .env values (skip comments and empty lines)
+    # Export .env values — guard against grep returning non-zero when
+    # all lines are filtered out (which would trip set -e / pipefail)
     set -a
-    source <(grep -v '^\s*#' "$ENV_FILE" | grep -v '^\s*$')
+    source <(grep -v '^\s*#' "$ENV_FILE" | grep -v '^\s*$' || true)
     set +a
     DB_HOST="${DB_HOST:-localhost}"
     SERVER_PORT="${PORT:-3000}"
@@ -127,7 +132,7 @@ fi
 # ─── Step 6: Initialize database ────────────────────────────
 info "Initializing database (node init-db.js)..."
 
-DB_OUTPUT=$(node init-db.js 2>&1) || {
+DB_OUTPUT=$(node --no-deprecation init-db.js 2>&1) || {
     fail "Database initialization failed."
     echo -e "${RED}$DB_OUTPUT${NC}"
     exit 1
@@ -167,10 +172,10 @@ if [ "$DEV_MODE" = true ]; then
     info "Starting server in DEV mode (nodemon)..."
     echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
-    npx nodemon server.js
+    NODE_OPTIONS="--no-deprecation" npx nodemon server.js
 else
     info "Starting server..."
     echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
-    node server.js
+    node --no-deprecation server.js
 fi

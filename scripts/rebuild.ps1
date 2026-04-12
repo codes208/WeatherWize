@@ -4,7 +4,13 @@
 
 .DESCRIPTION
     Checks prerequisites (Node.js >= 18, npm, MySQL reachability),
-    installs dependencies, initializes the database, and starts the server.
+    installs dependencies (including Sequelize and EJS), initializes
+    the database, and starts the Express server.
+
+    The app uses:
+      - Sequelize ORM with MySQL for all database access (models/)
+      - EJS as the view engine for server-rendered pages (views/)
+      - Express REST API for all weather, auth, alerts, and settings routes
 
 .PARAMETER Dev
     If specified, starts the server with nodemon for auto-reload during development.
@@ -40,6 +46,11 @@ function Write-Ok {
 function Write-Info {
     param([string]$Message)
     Write-Step "⚙️" $Message "Cyan"
+}
+
+function Write-Warn {
+    param([string]$Message)
+    Write-Step "⚠️" $Message "Yellow"
 }
 
 # ─────────────────────────────────────────────────────────────
@@ -82,7 +93,7 @@ try {
 }
 
 # ─────────────────────────────────────────────────────────────
-# Step 3: Parse .env for DB_HOST
+# Step 3: Parse .env
 # ─────────────────────────────────────────────────────────────
 $envFile = Join-Path $ProjectRoot ".env"
 $dbHost = "localhost"
@@ -91,12 +102,12 @@ $serverPort = 3000
 
 if (Test-Path $envFile) {
     Get-Content $envFile | ForEach-Object {
-        if ($_ -match '^\s*DB_HOST\s*=\s*(.+)$') { $dbHost = $Matches[1].Trim() }
-        if ($_ -match '^\s*PORT\s*=\s*(\d+)') { $serverPort = [int]$Matches[1] }
+        if ($_ -match '^\s*DB_HOST\s*=\s*(.+)$') { $script:dbHost = $Matches[1].Trim() }
+        if ($_ -match '^\s*PORT\s*=\s*(\d+)')    { $script:serverPort = [int]$Matches[1] }
     }
     Write-Ok ".env loaded (DB_HOST=$dbHost, PORT=$serverPort)"
 } else {
-    Write-Host "   ⚠️  No .env file found - using defaults (localhost:3000)" -ForegroundColor Yellow
+    Write-Warn "No .env file found - using defaults (localhost:3000)"
 }
 
 # ─────────────────────────────────────────────────────────────
@@ -148,7 +159,7 @@ try {
 Write-Info "Initializing database (node init-db.js)..."
 Push-Location $ProjectRoot
 try {
-    $dbOutput = & node --no-deprecation init-db.js 2>$null
+    $dbOutput = & node --no-deprecation init-db.js 2>&1
     if ($LASTEXITCODE -ne 0) {
         Write-Fail "Database initialization failed."
         Write-Host $dbOutput -ForegroundColor Red
@@ -176,7 +187,7 @@ try {
 } catch { }
 
 if ($existingPid -and $existingPid -ne '0') {
-    Write-Host "   ⚠️  Port $serverPort is in use by PID $existingPid - killing it..." -ForegroundColor Yellow
+    Write-Warn "Port $serverPort is in use by PID $existingPid - killing it..."
     try {
         Stop-Process -Id ([int]$existingPid) -Force -ErrorAction SilentlyContinue
         Start-Sleep -Milliseconds 500
@@ -195,18 +206,17 @@ if ($existingPid -and $existingPid -ne '0') {
 Write-Host ""
 Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkCyan
 
+Push-Location $ProjectRoot
 if ($Dev) {
     Write-Info "Starting server in DEV mode (nodemon)..."
     Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkCyan
     Write-Host ""
-    Push-Location $ProjectRoot
+    $env:NODE_OPTIONS = "--no-deprecation"
     & npx nodemon server.js
-    Pop-Location
 } else {
     Write-Info "Starting server..."
     Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkCyan
     Write-Host ""
-    Push-Location $ProjectRoot
-    & node server.js
-    Pop-Location
+    & node --no-deprecation server.js
 }
+Pop-Location
