@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!allowedRoles.includes(user.role)) {
         showToast('Unauthorized access. Redirecting...', 'warning');
         if (user.role === 'admin') window.location.href = '/admin-dashboard.html';
-        else if (user.role === 'advanced') window.location.href = '/advanced-dashboard.html';
-        else window.location.href = '/dashboard.html';
+        else if (user.role === 'advanced') window.location.href = '/dashboard';
+        else window.location.href = '/dashboard';
         return;
     }
 
@@ -30,8 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
         brand.addEventListener('click', (e) => {
             e.preventDefault();
             if (user.role === 'admin') window.location.href = '/admin-dashboard.html';
-            else if (user.role === 'advanced') window.location.href = '/advanced-dashboard.html';
-            else window.location.href = '/dashboard.html';
+            else if (user.role === 'advanced') window.location.href = '/dashboard';
+            else window.location.href = '/dashboard';
         });
     });
 

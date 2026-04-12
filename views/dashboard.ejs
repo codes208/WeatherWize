@@ -4,43 +4,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Dashboard - WeatherWize</title>
-    <link rel="stylesheet" href="./css/style.css">
-    <link rel="stylesheet" href="./css/weatherWize.CSS">
+    <title>Dashboard - WeatherWize</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/weatherWize.CSS">
+    <% if (role === 'advanced') { %>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="./js/toast.js"></script>
-    <script src="./js/auth-check.js" defer></script>
-    <script src="./js/weather-dashboard.js" defer></script>
+    <% } %>
+    <script src="/js/toast.js"></script>
+    <script src="/js/auth-check.js" defer></script>
+    <script src="/js/weather-dashboard.js" defer></script>
 </head>
 
-<body data-allowed-roles="advanced,admin" class="dashboard-page">
+<body data-allowed-roles="general,advanced,admin" class="dashboard-page">
     <div class="sky-wrap" aria-hidden="true">
         <div class="cloud cloud-1"></div>
         <div class="cloud cloud-2"></div>
         <div class="cloud cloud-3"></div>
     </div>
+
     <nav class="navbar">
         <div class="container nav-content">
-            <a href="dashboard.html" class="nav-brand">
-                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo"
+            <a href="/dashboard" class="nav-brand">
+                <img src="/images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo"
                     style="display:inline-block; vertical-align:middle;">
                 WeatherWize
             </a>
             <div class="nav-links">
-                <button class="btn btn-text" onclick="window.location.href='historical-data.html'">Historical
-                    Data</button>
+                <% if (role === 'advanced') { %>
+                <button class="btn btn-text" onclick="window.location.href='historical-data.html'">Historical Data</button>
                 <button class="btn btn-text" onclick="window.location.href='alerts-manager.html'">Manage Alerts</button>
-                <button class="btn btn-text" onclick="window.location.href='locations.html'">Manage Locations</button>
                 <button class="btn btn-text" onclick="window.location.href='map.html'">Map</button>
+                <% } %>
+                <button class="btn btn-text" onclick="window.location.href='locations.html'">Manage Locations</button>
                 <button class="btn btn-text" onclick="window.location.href='profile.html'">Profile</button>
             </div>
             <div class="nav-right">
                 <span id="username-display" style="font-weight: bold;"></span>
-                <button id="logout-btn" class="btn" onclick="window.location.href='index.html'">Logout</button>
+                <button id="logout-btn" class="btn">Logout</button>
             </div>
         </div>
     </nav>
+
     <main class="container dashboard-content">
         <div id="weather-result" class="weather-card hidden">
             <button id="close-weather-btn" class="weather-card-close" aria-label="Close">&times;</button>
@@ -72,6 +77,7 @@
             </div>
         </div>
 
+        <% if (role === 'advanced') { %>
         <div id="precip-map-section" class="precip-map-section hidden">
             <h3>Radar Map</h3>
             <div class="radar-controls">
@@ -82,6 +88,7 @@
             </div>
             <div id="precip-map"></div>
         </div>
+        <% } %>
 
         <div id="hourly-report" class="hourly-report hidden">
             <h3>Hourly Report (3-hour intervals)</h3>
@@ -89,7 +96,7 @@
         </div>
 
         <div class="saved-locations">
-            <h3>Your Prioritized Locations</h3>
+            <h3><%= role === 'advanced' ? 'Your Prioritized Locations' : 'Your Saved Locations' %></h3>
             <div id="saved-locations-list" class="location-grid"></div>
         </div>
     </main>

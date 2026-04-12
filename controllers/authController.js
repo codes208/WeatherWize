@@ -45,6 +45,7 @@ exports.register = async (req, res) => {
             { expiresIn: '1h' }
         );
 
+        res.cookie('token', token, { httpOnly: false, sameSite: 'strict', maxAge: 60 * 60 * 1000 });
         res.status(201).json({
             message: 'User registered successfully',
             token,
@@ -85,6 +86,7 @@ exports.login = async (req, res) => {
             { expiresIn: '1h' }
         );
 
+        res.cookie('token', token, { httpOnly: false, sameSite: 'strict', maxAge: 60 * 60 * 1000 });
         res.json({
             token,
             user: { id: user.id, username: user.username, email: user.email, role: user.role },

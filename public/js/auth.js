@@ -27,9 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (data.user.role === 'admin') {
                         window.location.href = '/admin-dashboard.html';
                     } else if (data.user.role === 'advanced') {
-                        window.location.href = '/advanced-dashboard.html';
+                        window.location.href = '/dashboard';
                     } else {
-                        window.location.href = '/dashboard.html';
+                        window.location.href = '/dashboard';
                     }
                 } else {
                     errorDiv.textContent = data.message;
@@ -133,9 +133,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (data.user.role === 'admin') {
                         window.location.href = '/admin-dashboard.html';
                     } else if (data.user.role === 'advanced') {
-                        window.location.href = '/advanced-dashboard.html';
+                        window.location.href = '/dashboard';
                     } else {
-                        window.location.href = '/dashboard.html';
+                        window.location.href = '/dashboard';
                     }
                 } else {
                     errorDiv.textContent = data.message;

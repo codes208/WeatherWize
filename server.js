@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 
 const authRoutes     = require('./routes/auth');
 const weatherRoutes  = require('./routes/weather');
@@ -16,9 +18,14 @@ require('./services/alertWorker');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// View engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -36,8 +43,7 @@ app.use(async (req, res, next) => {
     try {
         const setting = await Setting.findOne({ where: { settingKey: 'maintenance_mode' } });
         if (setting && setting.settingValue === 'true') {
-            const jwt = require('jsonwebtoken');
-            const token = req.header('Authorization')?.replace('Bearer ', '');
+            const token = req.header('Authorization')?.replace('Bearer ', '') || req.cookies?.token;
             if (token) {
                 try {
                     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -66,9 +72,6 @@ app.use(async (req, res, next) => {
 // Static assets (CSS, JS, images)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Views (HTML pages)
-app.use(express.static(path.join(__dirname, 'views')));
-
 // API Routes
 app.use('/api/auth',     authRoutes);
 app.use('/api/weather',  weatherRoutes);
@@ -79,6 +82,27 @@ app.use('/api/settings', settingsRoutes);
 app.get('/', (_req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
+
+// Dashboard — rendered by EJS based on role from JWT cookie
+app.get('/dashboard', (req, res) => {
+    const token = req.cookies?.token;
+    if (!token) return res.redirect('/');
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const role = decoded.role;
+
+        if (role === 'admin') return res.redirect('/admin-dashboard.html');
+
+        res.render('dashboard', { role });
+    } catch (e) {
+        res.clearCookie('token');
+        res.redirect('/');
+    }
+});
+
+// Static HTML views (non-EJS pages)
+app.use(express.static(path.join(__dirname, 'views')));
 
 // Start Server
 app.listen(PORT, async () => {
