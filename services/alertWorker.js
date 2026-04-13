@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const { Op } = require('sequelize');
-const { Alert, Notification } = require('../models');
+const { Alert, Notification, User } = require('../models');
+const { sendAlertEmail } = require('./emailService');
 
 cron.schedule('*/10 * * * *', async () => {
     try {
@@ -79,6 +80,11 @@ cron.schedule('*/10 * * * *', async () => {
                         await Notification.create({ userId: alert.userId, message });
                         await alert.update({ lastTriggeredAt: new Date() });
                         console.log(`[ALERTS] Triggered notification for user ${alert.userId}: ${message}`);
+
+                        const user = await User.findByPk(alert.userId, { attributes: ['email', 'username'] });
+                        if (user) {
+                            await sendAlertEmail(user.email, user.username, message);
+                        }
                     }
                 }
             } catch (err) {

@@ -21,6 +21,7 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.9.2",
     "node-cron": "^4.2.1",
+    "resend": "^6.11.0",
     "sequelize": "^6.37.8"
   },
   "devDependencies": {
