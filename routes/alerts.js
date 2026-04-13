@@ -8,6 +8,7 @@ const { validateAlert } = require('../middleware/validationMiddleware');
 router.post('/', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), validateAlert, alertsController.createAlert);
 router.get('/', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), alertsController.getAlerts);
 router.delete('/:id', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), alertsController.deleteAlert);
+router.patch('/:id/enable', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), alertsController.enableAlert);
 
 // Notification endpoints for background alerts
 router.get('/notifications', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), alertsController.getNotifications);

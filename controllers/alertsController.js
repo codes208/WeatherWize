@@ -43,10 +43,41 @@ exports.getAlerts = async (req, res) => {
             where: { userId },
             order: [['created_at', 'DESC']],
         });
-        res.json(alerts);
+        res.json(alerts.map(a => ({
+            id:              a.id,
+            user_id:         a.userId,
+            location_name:   a.locationName,
+            trigger_type:    a.triggerType,
+            threshold_value: a.thresholdValue,
+            is_active:       a.isActive,
+            created_at:      a.createdAt,
+        })));
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error while fetching alerts' });
+    }
+};
+
+exports.enableAlert = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const alertId = Number(req.params.id);
+
+        if (!Number.isInteger(alertId) || alertId <= 0) {
+            return res.status(400).json({ message: 'Invalid alert id' });
+        }
+
+        const alert = await Alert.findOne({ where: { id: alertId, userId } });
+        if (!alert) {
+            return res.status(404).json({ message: 'Alert not found' });
+        }
+
+        await alert.update({ isActive: true, lastTriggeredAt: null });
+        res.json({ message: 'Alert re-enabled successfully.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error while enabling alert' });
     }
 };
 

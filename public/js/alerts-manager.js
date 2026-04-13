@@ -54,19 +54,25 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderAlerts(alerts) {
         alertsList.innerHTML = '';
         if (alerts.length === 0) {
-            alertsList.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">No active alerts configured.</p>';
+            alertsList.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">No alerts configured.</p>';
             return;
         }
         alerts.forEach(alert => {
+            const isActive = alert.is_active;
             const card = document.createElement('div');
             card.className = 'location-card';
-            card.style.cssText = 'margin-top: 15px; border-left: 4px solid var(--danger);';
+            card.style.cssText = `margin-top: 15px; border-left: 4px solid ${isActive ? 'var(--danger)' : 'var(--border)'}; opacity: ${isActive ? '1' : '0.6'};`;
             card.innerHTML = `
-                <h4>${alert.location_name}</h4>
+                <h4>${alert.location_name} ${isActive ? '' : '<span style="font-size:0.75rem; color:var(--text-secondary);">(triggered — inactive)</span>'}</h4>
                 <p style="color: var(--text-secondary);">Alert me if: ${alert.trigger_type} ${alert.threshold_value}°F</p>
-                <button class="delete-location-btn" data-id="${alert.id}">Delete</button>
+                <div style="display:flex; gap:8px; margin-top:8px;">
+                    ${!isActive ? `<button class="btn" style="font-size:0.82rem; padding:6px 12px;" data-id="${alert.id}" data-action="enable">Re-enable</button>` : ''}
+                    <button class="delete-location-btn" data-id="${alert.id}" data-action="delete">Delete</button>
+                </div>
             `;
-            card.querySelector('.delete-location-btn').addEventListener('click', () => deleteAlert(alert.id));
+            card.querySelector('[data-action="delete"]').addEventListener('click', () => deleteAlert(alert.id));
+            const enableBtn = card.querySelector('[data-action="enable"]');
+            if (enableBtn) enableBtn.addEventListener('click', () => enableAlert(alert.id));
             alertsList.appendChild(card);
         });
     }
@@ -104,6 +110,23 @@ document.addEventListener('DOMContentLoaded', () => {
             showMsg('Error saving alert.', 'error');
         }
     });
+
+    async function enableAlert(id) {
+        try {
+            const response = await fetch(`/api/alerts/${id}/enable`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+            if (response.ok) {
+                loadAlerts();
+            } else {
+                const data = await response.json();
+                showMsg(data.message || 'Error re-enabling alert', 'error');
+            }
+        } catch (e) {
+            showMsg('Error re-enabling alert', 'error');
+        }
+    }
 
     async function deleteAlert(id) {
         if (!confirm('Are you sure you want to delete this alert?')) return;

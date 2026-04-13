@@ -4,13 +4,15 @@
 
 .DESCRIPTION
     Checks prerequisites (Node.js >= 18, npm, MySQL reachability),
-    installs dependencies (including Sequelize and EJS), initializes
-    the database, and starts the Express server.
+    installs dependencies (including Sequelize, EJS, and Resend),
+    initializes the database, and starts the Express server.
 
     The app uses:
       - Sequelize ORM with MySQL for all database access (models/)
       - EJS as the view engine for server-rendered pages (views/)
       - Express REST API for all weather, auth, alerts, and settings routes
+      - Resend SDK for email alert notifications (requires RESEND_API_KEY in .env)
+      - Alerts fire once then go inactive — user must re-enable from Alerts Manager
 
 .PARAMETER Dev
     If specified, starts the server with nodemon for auto-reload during development.
@@ -106,6 +108,17 @@ if (Test-Path $envFile) {
         if ($_ -match '^\s*PORT\s*=\s*(\d+)')    { $script:serverPort = [int]$Matches[1] }
     }
     Write-Ok ".env loaded (DB_HOST=$dbHost, PORT=$serverPort)"
+
+    $resendKey = ""
+    Get-Content $envFile | ForEach-Object {
+        if ($_ -match '^\s*RESEND_API_KEY\s*=\s*(.+)$') { $resendKey = $Matches[1].Trim() }
+    }
+    if (-not $resendKey -or $resendKey -eq "your_resend_api_key_here") {
+        Write-Warn "RESEND_API_KEY is not configured - email alerts will be skipped."
+        Write-Host "       Set RESEND_API_KEY in .env to enable email notifications." -ForegroundColor Yellow
+    } else {
+        Write-Ok "RESEND_API_KEY is set"
+    }
 } else {
     Write-Warn "No .env file found - using defaults (localhost:3000)"
 }

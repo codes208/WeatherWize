@@ -78,7 +78,7 @@ cron.schedule('*/10 * * * *', async () => {
 
                     if (triggered) {
                         await Notification.create({ userId: alert.userId, message });
-                        await alert.update({ lastTriggeredAt: new Date() });
+                        await alert.update({ isActive: false, lastTriggeredAt: new Date() });
                         console.log(`[ALERTS] Triggered notification for user ${alert.userId}: ${message}`);
 
                         const user = await User.findByPk(alert.userId, { attributes: ['email', 'username'] });

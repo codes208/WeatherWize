@@ -3,8 +3,11 @@
 # WeatherWize — Full rebuild and run script (Bash / Linux / macOS)
 #
 # Checks prerequisites, installs npm dependencies (including
-# Sequelize + EJS), initializes the MySQL database, and starts
-# the Express server.
+# Sequelize, EJS, and Resend), initializes the MySQL database,
+# and starts the Express server.
+#
+# Alert behavior: alerts fire once, then go inactive until manually
+# re-enabled by the user from the Alerts Manager page.
 #
 # Usage:
 #   bash scripts/rebuild.sh          # Production mode
@@ -86,6 +89,14 @@ if [ -f "$ENV_FILE" ]; then
     DB_HOST="${DB_HOST:-localhost}"
     SERVER_PORT="${PORT:-3000}"
     ok ".env loaded (DB_HOST=$DB_HOST, PORT=$SERVER_PORT)"
+
+    RESEND_KEY="${RESEND_API_KEY:-}"
+    if [ -z "$RESEND_KEY" ] || [ "$RESEND_KEY" = "your_resend_api_key_here" ]; then
+        warn "RESEND_API_KEY is not configured — email alerts will be skipped."
+        echo -e "       ${YELLOW}Set RESEND_API_KEY in .env to enable email notifications.${NC}"
+    else
+        ok "RESEND_API_KEY is set"
+    fi
 else
     warn "No .env file found — using defaults (localhost:3000)"
 fi
