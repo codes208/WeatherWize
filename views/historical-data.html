@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/weatherWize.CSS">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="./js/toast.js"></script>
     <script src="./js/auth-check.js" defer></script>
     <script src="./js/historical-data.js" defer></script>
 </head>
@@ -27,34 +28,102 @@
             </a>
             <div class="nav-right">
                 <button class="btn btn-text" onclick="window.history.back()">Back</button>
-                <button id="logout-btn" class="btn" onclick="window.location.href='index.html'">Logout</button>
+                <button id="logout-btn" class="btn">Logout</button>
             </div>
         </div>
     </nav>
-    <main class="container dashboard-content" style="display:flex; flex-direction:column; align-items:center;">
-        <h2 style="text-align:center;">Historical Weather Query</h2>
-        <div class="auth-card" style="max-width: 800px; width:100%; margin-top: 20px;">
-            <div id="history-message" class="text-center" style="margin-bottom: 15px; display: none;"></div>
-            <div class="form-group">
-                <label>Select Location</label>
-                <select id="history-location">
-                    <option disabled selected>Loading locations...</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Start Date</label>
-                <input type="date" id="history-start-date">
-            </div>
-            <div class="form-group">
-                <label>End Date</label>
-                <input type="date" id="history-end-date">
-            </div>
-            <button id="fetch-history-btn" class="btn">Fetch History</button>
 
-            <div id="chart-container" style="margin-top: 30px;">
-                <p
-                    style="text-align: center; color: var(--text-secondary); border: 1px dashed var(--border); padding: 40px;">
-                    Select a location and date range, then click "Fetch History" to view chart.
+    <main class="container dashboard-content" style="display:flex; flex-direction:column; align-items:center;">
+        <h2 style="text-align:center;">Historical Weather Trends</h2>
+
+        <div class="auth-card" style="max-width: 900px; width:100%; margin-top: 20px;">
+
+            <!-- Location & Date Range -->
+            <div class="history-controls">
+                <div class="form-group">
+                    <label>Location</label>
+                    <select id="history-location">
+                        <option disabled selected>Loading locations...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" id="history-start-date">
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" id="history-end-date">
+                </div>
+            </div>
+
+            <!-- Trend Selectors -->
+            <div class="form-group" style="margin-top: 8px;">
+                <label style="margin-bottom: 10px; display:block;">Select Trends to Display</label>
+                <div class="trend-grid">
+                    <label class="trend-checkbox">
+                        <input type="checkbox" name="trend" value="temperature" checked>
+                        Temperature (High / Low °F)
+                    </label>
+                    <label class="trend-checkbox">
+                        <input type="checkbox" name="trend" value="feelsLike">
+                        Feels Like (High / Low °F)
+                    </label>
+                    <label class="trend-checkbox">
+                        <input type="checkbox" name="trend" value="precipitation">
+                        Total Precipitation (in)
+                    </label>
+                    <label class="trend-checkbox">
+                        <input type="checkbox" name="trend" value="rain">
+                        Rainfall (in)
+                    </label>
+                    <label class="trend-checkbox">
+                        <input type="checkbox" name="trend" value="snowfall">
+                        Snowfall (in)
+                    </label>
+                    <label class="trend-checkbox">
+                        <input type="checkbox" name="trend" value="wind">
+                        Max Wind Speed (mph)
+                    </label>
+                    <label class="trend-checkbox">
+                        <input type="checkbox" name="trend" value="gusts">
+                        Wind Gusts (mph)
+                    </label>
+                    <label class="trend-checkbox">
+                        <input type="checkbox" name="trend" value="sunshine">
+                        Sunshine Duration (min)
+                    </label>
+                    <label class="trend-checkbox">
+                        <input type="checkbox" name="trend" value="aqi">
+                        Air Quality Index (US AQI)
+                    </label>
+                    <label class="trend-checkbox">
+                        <input type="checkbox" name="trend" value="pm25">
+                        PM2.5 (μg/m³)
+                    </label>
+                    <label class="trend-checkbox">
+                        <input type="checkbox" name="trend" value="pm10">
+                        PM10 (μg/m³)
+                    </label>
+                    <label class="trend-checkbox">
+                        <input type="checkbox" name="trend" value="ozone">
+                        Ozone (μg/m³)
+                    </label>
+                    <label class="trend-checkbox">
+                        <input type="checkbox" name="trend" value="no2">
+                        Nitrogen Dioxide (μg/m³)
+                    </label>
+                </div>
+            </div>
+
+            <button id="fetch-history-btn" class="btn" style="margin-top: 16px; width: 100%;">
+                Fetch Historical Data
+            </button>
+
+            <!-- Chart -->
+            <div id="chart-container" style="margin-top: 30px; position: relative; min-height: 80px;">
+                <p class="chart-placeholder">
+                    Select a location, date range, and trends — then click "Fetch Historical Data".
+                    <br><small style="opacity:0.6;">Air quality data available from 2013 onwards. All other weather data available from 1940.</small>
                 </p>
             </div>
         </div>

@@ -397,5 +397,50 @@ select:focus {
     transition: opacity 0.3s;
 }
 .location-msg.show { opacity: 1; }
+
+/* ── Historical Data Trend Selectors ─────────────────────── */
+.trend-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+}
+
+.trend-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    transition: background 0.2s;
+}
+
+.trend-checkbox:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.trend-checkbox input[type="checkbox"] {
+    accent-color: var(--accent);
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.history-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+}
+
+.chart-placeholder {
+    text-align: center;
+    color: var(--text-secondary);
+    border: 1px dashed var(--border);
+    padding: 40px;
+    border-radius: 8px;
+}
 .location-msg.msg-error { background: rgba(239,68,68,.92); }
 .location-msg.msg-success { background: rgba(16,185,129,.92); }

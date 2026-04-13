@@ -203,25 +203,116 @@ exports.getHistoricalWeather = async (req, res) => {
     try {
         const resolution = await resolveCoordinates(req, res);
         if (!resolution) return;
-        const { geo, apiKey } = resolution;
+        const { geo } = resolution;
 
-        const url = `${OPENWEATHER_FORECAST_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}&units=imperial`;
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (!response.ok) {
-            return res.status(response.status).json({ message: data?.message || 'Error fetching forecast data' });
+        const { start, end } = req.query;
+        if (!start || !end) {
+            return res.status(400).json({ message: 'start and end date parameters are required (YYYY-MM-DD).' });
         }
 
-        const intervals = (data.list || []).map((entry) => ({
-            time:      entry.dt_txt,
-            temp:      entry.main?.temp,
-            humidity:  entry.main?.humidity,
-            condition: entry.weather?.[0]?.main || 'Unknown',
-            windSpeed: entry.wind?.speed,
+        if (new Date(end) < new Date(start)) {
+            return res.status(400).json({ message: 'End date must be after start date.' });
+        }
+
+        const maxRange = 365;
+        const diffDays = (new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24);
+        if (diffDays > maxRange) {
+            return res.status(400).json({ message: 'Date range cannot exceed 365 days.' });
+        }
+
+        // Daily variables from Open-Meteo historical archive
+        const dailyVars = [
+            'temperature_2m_max',
+            'temperature_2m_min',
+            'apparent_temperature_max',
+            'apparent_temperature_min',
+            'precipitation_sum',
+            'rain_sum',
+            'snowfall_sum',
+            'wind_speed_10m_max',
+            'wind_gusts_10m_max',
+            'wind_direction_10m_dominant',
+            'weather_code',
+            'sunshine_duration',
+        ].join(',');
+
+        const archiveUrl = `https://archive-api.open-meteo.com/v1/archive` +
+            `?latitude=${geo.lat}&longitude=${geo.lon}` +
+            `&start_date=${start}&end_date=${end}` +
+            `&daily=${dailyVars}` +
+            `&temperature_unit=fahrenheit` +
+            `&wind_speed_unit=mph` +
+            `&precipitation_unit=inch` +
+            `&timezone=auto`;
+
+        // Air quality — historical available back to 2013
+        const aqStartDate = start >= '2013-01-01' ? start : '2013-01-01';
+        const aqUrl = `https://air-quality-api.open-meteo.com/v1/air-quality` +
+            `?latitude=${geo.lat}&longitude=${geo.lon}` +
+            `&start_date=${aqStartDate}&end_date=${end}` +
+            `&hourly=us_aqi,pm2_5,pm10,ozone,nitrogen_dioxide` +
+            `&timezone=auto`;
+
+        const [archiveRes, aqRes] = await Promise.all([fetch(archiveUrl), fetch(aqUrl)]);
+        const archiveData = await archiveRes.json();
+
+        if (!archiveRes.ok) {
+            return res.status(502).json({ message: archiveData?.reason || 'Error fetching historical weather data.' });
+        }
+
+        // Build daily rows
+        const times = archiveData.daily?.time || [];
+        const daily = times.map((date, i) => ({
+            date,
+            tempHigh:        archiveData.daily.temperature_2m_max?.[i],
+            tempLow:         archiveData.daily.temperature_2m_min?.[i],
+            feelsLikeHigh:   archiveData.daily.apparent_temperature_max?.[i],
+            feelsLikeLow:    archiveData.daily.apparent_temperature_min?.[i],
+            precipitation:   archiveData.daily.precipitation_sum?.[i],
+            rain:            archiveData.daily.rain_sum?.[i],
+            snowfall:        archiveData.daily.snowfall_sum?.[i],
+            windSpeedMax:    archiveData.daily.wind_speed_10m_max?.[i],
+            windGustMax:     archiveData.daily.wind_gusts_10m_max?.[i],
+            windDirection:   archiveData.daily.wind_direction_10m_dominant?.[i],
+            sunshineMins:    archiveData.daily.sunshine_duration?.[i] != null
+                ? Math.round(archiveData.daily.sunshine_duration[i] / 60)
+                : null,
         }));
 
-        return res.json({ location: geo.displayName, intervals });
+        // Average AQI per day from hourly air quality data
+        let aqByDay = {};
+        if (aqRes.ok) {
+            const aqData = await aqRes.json();
+            const aqTimes  = aqData.hourly?.time        || [];
+            const aqValues = aqData.hourly?.us_aqi      || [];
+            const pm25     = aqData.hourly?.pm2_5       || [];
+            const pm10     = aqData.hourly?.pm10        || [];
+            const ozone    = aqData.hourly?.ozone       || [];
+            const no2      = aqData.hourly?.nitrogen_dioxide || [];
+
+            aqTimes.forEach((ts, i) => {
+                const day = ts.slice(0, 10);
+                if (!aqByDay[day]) aqByDay[day] = { aqi: [], pm25: [], pm10: [], ozone: [], no2: [] };
+                if (aqValues[i] != null) aqByDay[day].aqi.push(aqValues[i]);
+                if (pm25[i]     != null) aqByDay[day].pm25.push(pm25[i]);
+                if (pm10[i]     != null) aqByDay[day].pm10.push(pm10[i]);
+                if (ozone[i]    != null) aqByDay[day].ozone.push(ozone[i]);
+                if (no2[i]      != null) aqByDay[day].no2.push(no2[i]);
+            });
+        }
+
+        const avg = arr => arr.length ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : null;
+
+        daily.forEach(row => {
+            const aq = aqByDay[row.date];
+            row.airQualityIndex   = aq ? avg(aq.aqi)   : null;
+            row.pm25              = aq ? avg(aq.pm25)   : null;
+            row.pm10              = aq ? avg(aq.pm10)   : null;
+            row.ozone             = aq ? avg(aq.ozone)  : null;
+            row.nitrogenDioxide   = aq ? avg(aq.no2)    : null;
+        });
+
+        return res.json({ location: geo.displayName, daily });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Error fetching historical data' });
