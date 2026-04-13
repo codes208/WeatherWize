@@ -688,14 +688,14 @@ body.register-page {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 241, 255, 0.96));
 }
 
-.role-input:checked + .role-tile {
+.role-input:checked+.role-tile {
     border-color: #3905d4;
     box-shadow: 0 0 0 3px rgba(57, 5, 212, 0.16), 0 14px 28px rgba(32, 16, 77, 0.2);
     transform: translateY(-1px);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 241, 255, 0.96));
 }
 
-.role-input:focus-visible + .role-tile {
+.role-input:focus-visible+.role-tile {
     border-color: #5f3bb3;
     box-shadow: 0 0 0 3px rgba(95, 59, 179, 0.22);
 }
@@ -726,8 +726,13 @@ body.register-page {
     background: rgba(122, 111, 176, 0.35);
 }
 
-.payment-divider::before { left: 0; }
-.payment-divider::after  { right: 0; }
+.payment-divider::before {
+    left: 0;
+}
+
+.payment-divider::after {
+    right: 0;
+}
 
 .payment-row {
     display: grid;
@@ -1034,7 +1039,7 @@ body.dashboard-page {
 }
 
 .dashboard-page .radar-timestamp {
-    color: #1565a8;
+    color: #ffffff;
     font-weight: 600;
     font-size: 0.9rem;
 }
@@ -1140,7 +1145,7 @@ body.dashboard-page {
     color: #1565a8;
 }
 
-.dashboard-page .weather-details > div {
+.dashboard-page .weather-details>div {
     font-size: 1.1rem;
 }
 
@@ -1170,7 +1175,7 @@ body.dashboard-page {
     margin: 14px 0 20px;
 }
 
-.dashboard-page .weather-condition-row > div {
+.dashboard-page .weather-condition-row>div {
     flex: 1;
     text-align: center;
 }
@@ -1195,11 +1200,31 @@ body.dashboard-page {
 }
 
 /* AQI color coding */
-.dashboard-page #aqi-value[data-aqi="1"] { color: #2e7d32; }  /* Good - green */
-.dashboard-page #aqi-value[data-aqi="2"] { color: #f9a825; }  /* Fair - yellow */
-.dashboard-page #aqi-value[data-aqi="3"] { color: #e65100; }  /* Moderate - orange */
-.dashboard-page #aqi-value[data-aqi="4"] { color: #b71c1c; }  /* Poor - red */
-.dashboard-page #aqi-value[data-aqi="5"] { color: #4a148c; }  /* Very Poor - dark purple */
+.dashboard-page #aqi-value[data-aqi="1"] {
+    color: #2e7d32;
+}
+
+/* Good - green */
+.dashboard-page #aqi-value[data-aqi="2"] {
+    color: #f9a825;
+}
+
+/* Fair - yellow */
+.dashboard-page #aqi-value[data-aqi="3"] {
+    color: #e65100;
+}
+
+/* Moderate - orange */
+.dashboard-page #aqi-value[data-aqi="4"] {
+    color: #b71c1c;
+}
+
+/* Poor - red */
+.dashboard-page #aqi-value[data-aqi="5"] {
+    color: #4a148c;
+}
+
+/* Very Poor - dark purple */
 
 .dashboard-page .delete-location-btn {
     border-color: rgba(95, 59, 179, 0.3);
