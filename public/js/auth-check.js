@@ -35,6 +35,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Re-show any toasts that were pending before a page reload
+    const pendingToasts = sessionStorage.getItem('pendingToasts');
+    if (pendingToasts) {
+        sessionStorage.removeItem('pendingToasts');
+        JSON.parse(pendingToasts).forEach(msg => {
+            if (window.showToast) window.showToast(msg, 'error', 0);
+        });
+    }
+
     // Start background notification poller
     if (token) {
         let pollInterval = setInterval(async () => {
@@ -71,6 +80,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         body: JSON.stringify({ notificationIds: idsToMark })
                     });
+
+                    if (window.location.pathname === '/alerts-manager') {
+                        sessionStorage.setItem('pendingToasts', JSON.stringify(idsToMark.map((_, i) => notifications[i].message)));
+                        window.location.reload();
+                        return;
+                    }
                 }
             } catch (err) {
                 // Silently ignore polling errors

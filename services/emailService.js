@@ -34,14 +34,14 @@ async function sendAlertEmail(toEmail, username, message) {
                 </div>
                 <p style="font-size: 0.85rem; color: #aaa; margin-top: 28px;">
                     You can manage your alerts from your
-                    <a href="${process.env.APP_URL || 'http://localhost:3000'}/alerts-manager.html" style="color: #4fc3f7;">WeatherWize dashboard</a>.
+                    <a href="${process.env.APP_URL || 'http://localhost:3000'}/alerts-manager" style="color: #4fc3f7;">WeatherWize dashboard</a>.
                 </p>
                 <p style="font-size: 0.75rem; color: #666; margin-top: 8px;">
                     This is an automated notification from WeatherWize. Please do not reply to this email.
                 </p>
             </div>
         `,
-        text: `WeatherWize Alert\n\nHi ${username},\n\n${message}\n\nManage your alerts at ${process.env.APP_URL || 'http://localhost:3000'}/alerts-manager.html`,
+        text: `WeatherWize Alert\n\nHi ${username},\n\n${message}\n\nManage your alerts at ${process.env.APP_URL || 'http://localhost:3000'}/alerts-manager`,
     });
 
     if (error) {

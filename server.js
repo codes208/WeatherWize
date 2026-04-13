@@ -11,7 +11,7 @@ const weatherRoutes  = require('./routes/weather');
 const alertsRoutes   = require('./routes/alerts');
 const settingsRoutes = require('./routes/settings');
 
-const { Setting } = require('./models');
+const { Setting, Alert } = require('./models');
 const globalState = require('./config/state');
 require('./services/alertWorker');
 
@@ -95,6 +95,35 @@ app.get('/dashboard', (req, res) => {
         if (role === 'admin') return res.redirect('/admin-dashboard.html');
 
         res.render('dashboard', { role });
+    } catch (e) {
+        res.clearCookie('token');
+        res.redirect('/');
+    }
+});
+
+// Alerts Manager — server-rendered EJS with current alert states
+app.get('/alerts-manager', async (req, res) => {
+    const token = req.cookies?.token;
+    if (!token) return res.redirect('/');
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (!['advanced', 'admin'].includes(decoded.role)) return res.redirect('/dashboard');
+
+        const alerts = await Alert.findAll({
+            where: { userId: decoded.id },
+            order: [['created_at', 'DESC']],
+        });
+
+        res.render('alerts-manager', {
+            alerts: alerts.map(a => ({
+                id:              a.id,
+                location_name:   a.locationName,
+                trigger_type:    a.triggerType,
+                threshold_value: a.thresholdValue,
+                is_active:       a.isActive,
+            })),
+        });
     } catch (e) {
         res.clearCookie('token');
         res.redirect('/');

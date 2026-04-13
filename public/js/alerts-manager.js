@@ -3,16 +3,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!token) return;
 
     const locationSelect = document.getElementById('alert-location');
-    const triggerSelect = document.getElementById('alert-trigger');
+    const triggerSelect  = document.getElementById('alert-trigger');
     const thresholdInput = document.getElementById('alert-threshold');
-    const saveBtn = document.getElementById('save-alert-btn');
-    const alertsList = document.getElementById('alerts-list');
-    const alertMessage = document.getElementById('alert-message');
+    const saveBtn        = document.getElementById('save-alert-btn');
+    const alertsList     = document.getElementById('alerts-list');
+    const alertMessage   = document.getElementById('alert-message');
 
+    // ── Load saved locations into dropdown ─────────────────────
     async function loadLocations() {
         try {
             const response = await fetch('/api/weather/saved', {
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: { 'Authorization': `Bearer ${token}` },
             });
             if (!response.ok) return;
             const locations = await response.json();
@@ -37,51 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Existing alerts
-    async function loadAlerts() {
-        try {
-            const response = await fetch('/api/alerts', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (!response.ok) return;
-            const alerts = await response.json();
-            renderAlerts(alerts);
-        } catch (e) {
-            console.error('Error loading alerts:', e);
-        }
-    }
-
-    function renderAlerts(alerts) {
-        alertsList.innerHTML = '';
-        if (alerts.length === 0) {
-            alertsList.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">No alerts configured.</p>';
-            return;
-        }
-        alerts.forEach(alert => {
-            const isActive = alert.is_active;
-            const card = document.createElement('div');
-            card.className = 'location-card';
-            card.style.cssText = `margin-top: 15px; border-left: 4px solid ${isActive ? 'var(--danger)' : 'var(--border)'}; opacity: ${isActive ? '1' : '0.6'};`;
-            card.innerHTML = `
-                <h4>${alert.location_name} ${isActive ? '' : '<span style="font-size:0.75rem; color:var(--text-secondary);">(triggered — inactive)</span>'}</h4>
-                <p style="color: var(--text-secondary);">Alert me if: ${alert.trigger_type} ${alert.threshold_value}°F</p>
-                <div style="display:flex; gap:8px; margin-top:8px;">
-                    ${!isActive ? `<button class="btn" style="font-size:0.82rem; padding:6px 12px;" data-id="${alert.id}" data-action="enable">Re-enable</button>` : ''}
-                    <button class="delete-location-btn" data-id="${alert.id}" data-action="delete">Delete</button>
-                </div>
-            `;
-            card.querySelector('[data-action="delete"]').addEventListener('click', () => deleteAlert(alert.id));
-            const enableBtn = card.querySelector('[data-action="enable"]');
-            if (enableBtn) enableBtn.addEventListener('click', () => enableAlert(alert.id));
-            alertsList.appendChild(card);
-        });
-    }
-
-    // Save alert
+    // ── Save alert ─────────────────────────────────────────────
     saveBtn.addEventListener('click', async () => {
         const location_name = locationSelect.value;
-        const trigger_type = triggerSelect.value;
-        const threshold = thresholdInput.value.trim();
+        const trigger_type  = triggerSelect.value;
+        const threshold     = thresholdInput.value.trim();
 
         if (!threshold) {
             showMsg('Please enter a threshold value.', 'error');
@@ -93,16 +54,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({ location_name, trigger_type, threshold })
+                body: JSON.stringify({ location_name, trigger_type, threshold }),
             });
 
             const data = await response.json();
             if (response.ok) {
-                showMsg(data.message, 'success');
-                thresholdInput.value = '';
-                loadAlerts();
+                window.location.reload();
             } else {
                 showMsg(data.message, 'error');
             }
@@ -111,6 +70,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ── Event delegation for server-rendered alert buttons ─────
+    alertsList.addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        const id     = btn.dataset.id;
+        const action = btn.dataset.action;
+        if (action === 'delete') await deleteAlert(id);
+        if (action === 'enable') await enableAlert(id);
+    });
+
+    async function deleteAlert(id) {
+        if (!confirm('Are you sure you want to delete this alert?')) return;
+        try {
+            const response = await fetch(`/api/alerts/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                const data = await response.json();
+                showMsg(data.message || 'Error deleting alert', 'error');
+            }
+        } catch (e) {
+            showMsg('Error deleting alert', 'error');
+        }
+    }
+
     async function enableAlert(id) {
         try {
             const response = await fetch(`/api/alerts/${id}/enable`, {
@@ -118,31 +105,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Authorization': `Bearer ${token}` },
             });
             if (response.ok) {
-                loadAlerts();
+                window.location.reload();
             } else {
                 const data = await response.json();
                 showMsg(data.message || 'Error re-enabling alert', 'error');
             }
         } catch (e) {
             showMsg('Error re-enabling alert', 'error');
-        }
-    }
-
-    async function deleteAlert(id) {
-        if (!confirm('Are you sure you want to delete this alert?')) return;
-        try {
-            const response = await fetch(`/api/alerts/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (response.ok) {
-                loadAlerts();
-            } else {
-                const data = await response.json();
-                showToast(data.message || 'Error deleting alert', 'error');
-            }
-        } catch (e) {
-            showToast('Error deleting alert', 'error');
         }
     }
 
@@ -155,5 +124,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     loadLocations();
-    loadAlerts();
 });

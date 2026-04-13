@@ -58,7 +58,29 @@
         </div>
 
         <h3 style="margin-top: 40px;">Active Alerts</h3>
-        <div id="alerts-list"></div>
+        <div id="alerts-list">
+            <% if (alerts.length === 0) { %>
+                <p style="color: var(--text-secondary); text-align: center;">No alerts configured.</p>
+            <% } else { %>
+                <% alerts.forEach(alert => { %>
+                    <div class="location-card" style="margin-top: 15px; border-left: 4px solid <%= alert.is_active ? 'var(--danger)' : 'var(--border)' %>; opacity: <%= alert.is_active ? '1' : '0.6' %>;">
+                        <h4>
+                            <%= alert.location_name %>
+                            <% if (!alert.is_active) { %>
+                                <span style="font-size:0.75rem; color:var(--text-secondary);">(triggered — inactive)</span>
+                            <% } %>
+                        </h4>
+                        <p style="color: var(--text-secondary);">Alert me if: <%= alert.trigger_type %> <%= alert.threshold_value %>°F</p>
+                        <div style="display:flex; gap:8px; margin-top:8px;">
+                            <% if (!alert.is_active) { %>
+                                <button class="btn" style="font-size:0.82rem; padding:6px 12px;" data-id="<%= alert.id %>" data-action="enable">Re-enable</button>
+                            <% } %>
+                            <button class="delete-location-btn" data-id="<%= alert.id %>" data-action="delete">Delete</button>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+        </div>
     </main>
 </body>
 
