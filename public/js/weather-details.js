@@ -198,11 +198,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const card = document.createElement('article');
                 card.className = 'hourly-card';
                 card.innerHTML = `
-                    <div class="hourly-time">${formatForecastTime(slot.time, data.timezoneOffsetSec)}</div>
-                    <div class="hourly-temp">${Math.round(slot.temp)}&deg;F</div>
-                    <div class="hourly-condition">${slot.condition}</div>
-                    <div class="hourly-meta">Humidity <span class="meta-value">${slot.humidity}%</span></div>
-                    <div class="hourly-meta">Wind <span class="meta-value">${slot.windSpeed} mph</span></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div class="hourly-time">${formatForecastTime(slot.time, data.timezoneOffsetSec)}</div>
+                            <div class="hourly-temp">${Math.round(slot.temp)}&deg;F</div>
+                            <div class="hourly-meta">Humidity <span class="meta-value">${slot.humidity}%</span></div>
+                            <div class="hourly-meta">Wind <span class="meta-value">${slot.windSpeed} mph</span></div>
+                        </div>
+                        ${conditionIcon(slot.condition)}
+                    </div>
                 `;
                 hourlyReportList.appendChild(card);
             });
@@ -240,11 +244,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const card = document.createElement('article');
                 card.className = 'hourly-card';
                 card.innerHTML = `
-                    <div class="hourly-time">${label}</div>
-                    <div class="hourly-temp">${Math.round(day.high)}&deg;F</div>
-                    <div class="hourly-condition">${day.condition}</div>
-                    <div class="hourly-meta">Lo: <span class="meta-value">${Math.round(day.low)}&deg;F</span></div>
-                    <div class="hourly-meta">Humidity <span class="meta-value">${day.humidity}%</span></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div class="hourly-time">${label}</div>
+                            <div class="hourly-temp">${Math.round(day.high)}&deg;F</div>
+                            <div class="hourly-meta">Lo: <span class="meta-value">${Math.round(day.low)}&deg;F</span></div>
+                            <div class="hourly-meta">Humidity <span class="meta-value">${day.humidity}%</span></div>
+                        </div>
+                        ${conditionIcon(day.condition)}
+                    </div>
                 `;
                 dailyForecastList.appendChild(card);
             });

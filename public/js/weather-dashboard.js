@@ -69,12 +69,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (weather) {
                     card.innerHTML = `
-                        <h4 class="location-title">${weather.location}</h4>
-                        <div class="location-temp">${Math.round(weather.temp)}&deg;F</div>
-                        <div class="location-condition">${weather.condition}</div>
-                        <div class="location-meta">
-                            <span>Humidity: <span class="meta-value">${weather.humidity}%</span></span>
-                            <span>Wind: <span class="meta-value">${weather.windSpeed} mph</span></span>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <h4 class="location-title">${weather.location}</h4>
+                                <div class="location-temp">${Math.round(weather.temp)}&deg;F</div>
+                                <div class="location-meta">
+                                    <span>Humidity: <span class="meta-value">${weather.humidity}%</span></span>
+                                    <span>Wind: <span class="meta-value">${weather.windSpeed} mph</span></span>
+                                </div>
+                            </div>
+                            ${conditionIcon(weather.condition)}
                         </div>
                     `;
                 } else {
