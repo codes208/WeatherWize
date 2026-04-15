@@ -21,37 +21,32 @@
     <nav class="navbar">
         <div class="container nav-content">
             <a href="/dashboard" class="nav-brand">
-                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo"
-                    style="display:inline-block; vertical-align:middle;">
+                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo">
                 WeatherWize
             </a>
             <div class="nav-right">
-                <a href="profile.html" id="username-display" style="font-weight: bold; text-decoration: none;"></a>
+                <a href="profile.html" id="username-display"></a>
                 <button id="logout-btn" class="btn" onclick="window.location.href='index.html'">Logout</button>
             </div>
         </div>
     </nav>
-    <main class="container dashboard-content" style="display:flex; flex-direction:column; align-items:center;">
-        <h2 style="text-align:center;">Global System Settings</h2>
+    <main class="container dashboard-content page-centered">
+        <h2 class="text-center">Global System Settings</h2>
 
-        <div class="auth-card" style="max-width: 800px; width:100%; margin-top: 30px;">
-            <div id="settings-message" class="text-center" style="margin-bottom: 15px; display: none;"></div>
-            <div class="form-group"
-                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 20px;">
+        <div class="auth-card auth-card-md">
+            <div id="settings-message" class="text-center"></div>
+            <div class="form-group settings-toggle-row">
                 <div>
-                    <h3 style="margin-bottom: 5px;">Maintenance Mode</h3>
-                    <p style="font-size: 0.9rem;">Disconnects all non-admin users and
+                    <h3 class="settings-section-title">Maintenance Mode</h3>
+                    <p class="settings-section-desc">Disconnects all non-admin users and
                         shows maintenance screen.</p>
                 </div>
-                <label style="display: flex; align-items: center; cursor: pointer;">
-                    <input type="checkbox" id="maintenance-toggle"
-                        style="width: 20px; height: 20px; margin-right: 10px;"> Enable
+                <label class="settings-toggle-label">
+                    <input type="checkbox" id="maintenance-toggle"> Enable
                 </label>
             </div>
 
-
-            <button id="save-settings-btn" class="btn btn-block" style="margin-top: 30px;">Save System
-                Configuration</button>
+            <button id="save-settings-btn" class="btn btn-block">Save System Configuration</button>
         </div>
     </main>
 </body>

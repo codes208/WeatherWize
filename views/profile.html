@@ -21,21 +21,20 @@
     <nav class="navbar">
         <div class="container nav-content">
             <a href="/dashboard" class="nav-brand">
-                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo"
-                    style="display:inline-block; vertical-align:middle;">
+                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo">
                 WeatherWize
             </a>
             <div class="nav-right">
-                <a href="profile.html" id="username-display" style="font-weight: bold; text-decoration: none;"></a>
+                <a href="profile.html" id="username-display"></a>
                 <button id="logout-btn" class="btn" onclick="window.location.href='index.html'">Logout</button>
             </div>
         </div>
     </nav>
-    <main class="auth-container" style="min-height: calc(100vh - 80px);">
+    <main class="auth-container auth-container--full">
         <div class="auth-card">
             <h2 class="auth-title">Your Profile</h2>
             <form id="profile-form">
-                <div id="profile-message" class="text-center" style="margin-bottom: 15px; display: none;"></div>
+                <div id="profile-message" class="text-center"></div>
                 <div class="form-group">
                     <label>Username</label>
                     <input type="text" id="username-input" disabled>
@@ -52,7 +51,7 @@
             </form>
 
             <div id="danger-zone" class="danger-zone">
-                <h3 style="margin-bottom: 15px;">Danger Zone</h3>
+                <h3>Danger Zone</h3>
                 <button id="delete-account-btn" class="btn btn-block btn-outline-danger">Delete Account</button>
             </div>
         </div>

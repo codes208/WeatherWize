@@ -22,12 +22,11 @@
     <nav class="navbar">
         <div class="container nav-content">
             <a href="/dashboard" class="nav-brand">
-                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo"
-                    style="display:inline-block; vertical-align:middle;">
+                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo">
                 WeatherWize
             </a>
             <div class="nav-right">
-                <a href="profile.html" id="username-display" style="font-weight: bold; text-decoration: none;"></a>
+                <a href="profile.html" id="username-display"></a>
                 <button id="logout-btn" class="btn" onclick="window.location.href='index.html'">Logout</button>
             </div>
         </div>
@@ -35,13 +34,13 @@
     <main class="container dashboard-content">
         <h2>Manage Saved Locations</h2>
 
-        <div class="weather-search" style="margin-top: 20px;">
+        <div class="weather-search location-search">
             <input type="text" id="add-location-input" placeholder="e.g. Seattle, Washington">
             <button id="add-location-btn" class="btn">Add</button>
         </div>
         <span id="location-msg" class="location-msg"></span>
 
-        <div id="locations-list" class="location-grid" style="grid-template-columns: 1fr; margin-top: 20px;"></div>
+        <div id="locations-list" class="location-grid"></div>
     </main>
 </body>
 

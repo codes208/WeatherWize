@@ -22,21 +22,20 @@
     <nav class="navbar">
         <div class="container nav-content">
             <a href="/dashboard" class="nav-brand">
-                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo"
-                    style="display:inline-block; vertical-align:middle;">
+                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo">
                 WeatherWize
             </a>
             <div class="nav-right">
-                <a href="profile.html" id="username-display" style="font-weight: bold; text-decoration: none;"></a>
+                <a href="profile.html" id="username-display"></a>
                 <button id="logout-btn" class="btn">Logout</button>
             </div>
         </div>
     </nav>
 
-    <main class="container dashboard-content" style="display:flex; flex-direction:column; align-items:center;">
-        <h2 style="text-align:center;">Historical Weather Trends</h2>
+    <main class="container dashboard-content page-centered">
+        <h2 class="text-center">Historical Weather Trends</h2>
 
-        <div class="auth-card" style="max-width: 900px; width:100%; margin-top: 20px;">
+        <div class="auth-card auth-card-lg">
 
             <!-- Location & Date Range -->
             <div class="history-controls">
@@ -57,8 +56,8 @@
             </div>
 
             <!-- Trend Selectors -->
-            <div class="form-group" style="margin-top: 8px;">
-                <label style="margin-bottom: 10px; display:block;">Select Trends to Display</label>
+            <div class="form-group trend-section">
+                <label>Select Trends to Display</label>
                 <div class="trend-grid">
                     <label class="trend-checkbox">
                         <input type="checkbox" name="trend" value="temperature" checked>
@@ -115,15 +114,15 @@
                 </div>
             </div>
 
-            <button id="fetch-history-btn" class="btn" style="margin-top: 16px; width: 100%;">
+            <button id="fetch-history-btn" class="btn btn-block">
                 Fetch Historical Data
             </button>
 
             <!-- Chart -->
-            <div id="chart-container" style="margin-top: 30px; position: relative; min-height: 80px;">
+            <div id="chart-container">
                 <p class="chart-placeholder">
                     Select a location, date range, and trends — then click "Fetch Historical Data".
-                    <br><small style="opacity:0.6;">Air quality data available from 2013 onwards. All other weather data available from 1940.</small>
+                    <br><small class="chart-note">Air quality data available from 2013 onwards. All other weather data available from 1940.</small>
                 </p>
             </div>
         </div>

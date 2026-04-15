@@ -7,25 +7,6 @@
     <title>Manage Users - WeatherWize Admin</title>
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/weatherWize.CSS">
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th,
-        td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        th {
-            background-color: #1565a8;
-            color: white;
-        }
-    </style>
     <script src="./js/toast.js"></script>
     <script src="./js/auth-check.js" defer></script>
     <script src="./js/admin.js" defer></script>
@@ -40,12 +21,11 @@
     <nav class="navbar">
         <div class="container nav-content">
             <a href="/dashboard" class="nav-brand">
-                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo"
-                    style="display:inline-block; vertical-align:middle;">
+                <img src="./images/weatherewize_logo.png" alt="WeatherWize Logo" class="nav-logo">
                 WeatherWize
             </a>
             <div class="nav-right">
-                <a href="profile.html" id="username-display" style="font-weight: bold; text-decoration: none;"></a>
+                <a href="profile.html" id="username-display"></a>
                 <button id="logout-btn" class="btn" onclick="window.location.href='index.html'">Logout</button>
             </div>
         </div>
@@ -53,11 +33,11 @@
     <main class="container dashboard-content">
         <h2>User Management</h2>
 
-        <div class="weather-search" style="margin-bottom: 10px;">
+        <div class="weather-search user-search-bar">
             <input type="text" id="user-search-input" placeholder="Search users by username or email...">
         </div>
 
-        <table style="background-color: white;">
+        <table class="admin-table">
             <thead>
                 <tr>
                     <th>Username</th>
