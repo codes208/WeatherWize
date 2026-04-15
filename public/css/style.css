@@ -479,18 +479,12 @@ select:focus {
 }
 
 /* Auth card size variants */
-.auth-card-sm {
+.auth-card.auth-card-sm {
     max-width: 600px;
     margin: 20px auto 0;
 }
 
-.auth-card-md {
-    max-width: 800px;
-    width: 100%;
-    margin-top: 30px;
-}
-
-.auth-card-lg {
+.auth-card.auth-card-lg {
     max-width: 900px;
     width: 100%;
     margin-top: 20px;
