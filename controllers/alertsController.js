@@ -4,19 +4,23 @@ const { Alert, Notification } = require('../models');
 exports.createAlert = async (req, res) => {
     try {
         const userId = req.user.id;
-        const { location_name, trigger_type, threshold } = req.body;
+        const { location_name, trigger_type, threshold_min, threshold_max } = req.body;
 
-        if (!location_name || !trigger_type || threshold === undefined || threshold === '') {
-            return res.status(400).json({ message: 'Please fill in all fields (location, trigger type, and threshold value).' });
+        if (!location_name || !trigger_type || threshold_min === undefined || threshold_min === '' || threshold_max === undefined || threshold_max === '') {
+            return res.status(400).json({ message: 'Please fill in all fields (location, metric, min, and max).' });
         }
 
-        const thresholdNum = Number(threshold);
-        if (isNaN(thresholdNum)) {
-            return res.status(400).json({ message: 'Threshold must be a valid number.' });
+        const min = Number(threshold_min);
+        const max = Number(threshold_max);
+        if (isNaN(min) || isNaN(max)) {
+            return res.status(400).json({ message: 'Min and max must be valid numbers.' });
+        }
+        if (min >= max) {
+            return res.status(400).json({ message: 'Min value must be less than max value.' });
         }
 
         const existing = await Alert.findOne({
-            where: { userId, locationName: location_name, triggerType: trigger_type, thresholdValue: thresholdNum },
+            where: { userId, locationName: location_name, triggerType: trigger_type, thresholdValue: min, thresholdMax: max },
         });
         if (existing) {
             return res.status(409).json({ message: 'An identical alert already exists for this location.' });
@@ -26,7 +30,8 @@ exports.createAlert = async (req, res) => {
             userId,
             locationName:   location_name,
             triggerType:    trigger_type,
-            thresholdValue: thresholdNum,
+            thresholdValue: min,
+            thresholdMax:   max,
         });
 
         res.status(201).json({ message: 'Alert saved successfully.' });
@@ -48,7 +53,8 @@ exports.getAlerts = async (req, res) => {
             user_id:         a.userId,
             location_name:   a.locationName,
             trigger_type:    a.triggerType,
-            threshold_value: a.thresholdValue,
+            threshold_value: Number(a.thresholdValue),
+            threshold_max:   Number(a.thresholdMax),
             is_active:       a.isActive,
             created_at:      a.createdAt,
         })));
@@ -138,5 +144,32 @@ exports.markNotificationsRead = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error marking read' });
+    }
+};
+
+exports.getSystemRecentAlerts = async (req, res) => {
+    try {
+        const { User } = require('../models');
+        const alerts = await Alert.findAll({
+            where: {
+                isActive: false,
+                lastTriggeredAt: { [Op.ne]: null },
+            },
+            order: [['lastTriggeredAt', 'DESC']],
+            limit: 10,
+            include: [{ model: User, attributes: ['username'] }],
+        });
+
+        res.json(alerts.map(a => ({
+            id:                a.id,
+            location_name:     a.locationName,
+            trigger_type:      a.triggerType,
+            threshold_value:   Number(a.thresholdValue),
+            last_triggered_at: a.lastTriggeredAt,
+            username:          a.User?.username || 'Unknown',
+        })));
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error fetching system alerts' });
     }
 };

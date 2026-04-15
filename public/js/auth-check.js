@@ -7,6 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // Populate username in navbar on every authenticated page
+    const usernameEl = document.getElementById('username-display');
+    if (usernameEl) usernameEl.textContent = user.username || '';
+
     const allowedRoles = document.body.dataset.allowedRoles ? document.body.dataset.allowedRoles.split(',') : ['general', 'advanced', 'admin'];
     if (!allowedRoles.includes(user.role)) {
         showToast('Unauthorized access. Redirecting...', 'warning');

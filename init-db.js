@@ -32,6 +32,19 @@ async function initDatabase() {
 
         console.log('✅ Database and tables created successfully!');
 
+        // Migrations — idempotent column additions for existing databases
+        await connection.query('USE weatherwize');
+        try {
+            await connection.query('ALTER TABLE alerts ADD COLUMN threshold_max DECIMAL(10,2) NOT NULL DEFAULT 0 AFTER threshold_value');
+            console.log('✅ Migration: added threshold_max column to alerts');
+        } catch (e) {
+            if (e.code === 'ER_DUP_FIELDNAME') {
+                console.log('ℹ️  Migration: threshold_max column already exists');
+            } else {
+                throw e;
+            }
+        }
+
         // 4. Create default admin user
         const bcrypt = require('bcrypt');
 

@@ -120,7 +120,8 @@ app.get('/alerts-manager', async (req, res) => {
                 id:              a.id,
                 location_name:   a.locationName,
                 trigger_type:    a.triggerType,
-                threshold_value: a.thresholdValue,
+                threshold_value: Number(a.thresholdValue),
+                threshold_max:   Number(a.thresholdMax),
                 is_active:       a.isActive,
             })),
         });

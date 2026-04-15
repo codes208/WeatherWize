@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS alerts (
   location_name VARCHAR(255) NOT NULL,
   trigger_type VARCHAR(100) NOT NULL,
   threshold_value DECIMAL(10, 2) NOT NULL,
+  threshold_max DECIMAL(10, 2) NOT NULL,
   is_active BOOLEAN DEFAULT TRUE,
   last_triggered_at TIMESTAMP NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

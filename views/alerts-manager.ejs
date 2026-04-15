@@ -26,7 +26,7 @@
                 WeatherWize
             </a>
             <div class="nav-right">
-                <button class="btn btn-text" onclick="window.history.back()">Back</button>
+                <a href="profile.html" id="username-display" style="font-weight: bold; color: inherit; text-decoration: none;"></a>
                 <button id="logout-btn" class="btn" onclick="window.location.href='index.html'">Logout</button>
             </div>
         </div>
@@ -42,18 +42,24 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Alert Trigger Type</label>
+                <label>Metric</label>
                 <select id="alert-trigger">
-                    <option value="Temperature drops below">Temperature drops below</option>
-                    <option value="Temperature goes above">Temperature goes above</option>
-                    <option value="Precipitation chance exceeds">Precipitation chance exceeds</option>
-                    <option value="Wind speed exceeds">Wind speed exceeds</option>
+                    <option value="Temperature">Temperature (°F)</option>
+                    <option value="Humidity">Humidity (%)</option>
+                    <option value="Wind Speed">Wind Speed (mph)</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>Threshold Value</label>
-                <input type="number" id="alert-threshold" placeholder="e.g. 32">
+            <div style="display: flex; gap: 12px;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Min</label>
+                    <input type="number" id="alert-threshold-min" placeholder="e.g. 32">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Max</label>
+                    <input type="number" id="alert-threshold-max" placeholder="e.g. 90">
+                </div>
             </div>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: -5px;">You'll be alerted when the value goes outside this range.</p>
             <button id="save-alert-btn" class="btn btn-block">Save Alert</button>
         </div>
 
@@ -70,7 +76,7 @@
                                 <span style="font-size:0.75rem; color:var(--text-secondary);">(triggered — inactive)</span>
                             <% } %>
                         </h4>
-                        <p style="color: var(--text-secondary);">Alert me if: <%= alert.trigger_type %> <%= alert.threshold_value %>°F</p>
+                        <p style="color: var(--text-secondary);">Alert when: <%= alert.trigger_type %> is outside <%= alert.threshold_value %> – <%= alert.threshold_max %></p>
                         <div style="display:flex; gap:8px; margin-top:8px;">
                             <% if (!alert.is_active) { %>
                                 <button class="btn" style="font-size:0.82rem; padding:6px 12px;" data-id="<%= alert.id %>" data-action="enable">Re-enable</button>

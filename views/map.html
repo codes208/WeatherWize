@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="./css/weatherWize.CSS">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="./js/toast.js"></script>
     <script src="./js/auth-check.js" defer></script>
     <script src="./js/map.js" defer></script>
     <style>
@@ -40,7 +41,7 @@
                 WeatherWize
             </a>
             <div class="nav-right">
-                <button class="btn btn-text" onclick="window.history.back()">Back</button>
+                <a href="profile.html" id="username-display" style="font-weight: bold; color: inherit; text-decoration: none;"></a>
                 <button id="logout-btn" class="btn">Logout</button>
             </div>
         </div>

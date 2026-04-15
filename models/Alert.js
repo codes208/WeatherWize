@@ -27,6 +27,11 @@ const Alert = sequelize.define('Alert', {
         allowNull: false,
         field: 'threshold_value',
     },
+    thresholdMax: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+        field: 'threshold_max',
+    },
     isActive: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,

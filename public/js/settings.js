@@ -1,11 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (!token) return;
 
     const maintenanceToggle = document.getElementById('maintenance-toggle');
-    const throttleInput = document.getElementById('throttle-input');
     const saveBtn = document.getElementById('save-settings-btn');
     const msgDiv = document.getElementById('settings-message');
+
+    // Populate username in nav
+    const usernameDisplay = document.getElementById('username-display');
+    if (usernameDisplay) usernameDisplay.textContent = user.username || '';
 
     async function loadSettings() {
         try {
@@ -17,9 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (maintenanceToggle) {
                 maintenanceToggle.checked = settings.maintenance_mode === 'true';
-            }
-            if (throttleInput && settings.api_throttle_limit) {
-                throttleInput.value = settings.api_throttle_limit;
             }
         } catch (e) {
             console.error('Error loading settings:', e);
@@ -36,8 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
-                        maintenance_mode: maintenanceToggle ? maintenanceToggle.checked : undefined,
-                        api_throttle_limit: throttleInput ? throttleInput.value : undefined
+                        maintenance_mode: maintenanceToggle ? maintenanceToggle.checked : undefined
                     })
                 });
 

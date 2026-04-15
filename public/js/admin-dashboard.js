@@ -1,6 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (!token) return;
+
+    // Populate username in nav
+    const usernameDisplay = document.getElementById('username-display');
+    if (usernameDisplay) usernameDisplay.textContent = user.username || '';
 
     const statsCards = {
         totalUsers: document.getElementById('stat-total-users'),
@@ -28,5 +33,53 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Load recent system alerts (recently triggered weather alerts across all users)
+    async function loadSystemAlerts() {
+        const container = document.getElementById('system-alerts-list');
+        if (!container) return;
+
+        try {
+            const response = await fetch('/api/alerts/system-recent', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!response.ok) throw new Error('Failed to load system alerts');
+            const alerts = await response.json();
+
+            if (alerts.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary);">No recent alerts triggered.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            alerts.forEach(alert => {
+                const timeAgo = getTimeAgo(new Date(alert.last_triggered_at));
+                const div = document.createElement('div');
+                div.className = 'location-card';
+                div.style.cssText = 'margin-top: 15px; border-left: 4px solid var(--danger);';
+                div.innerHTML = `
+                    <h4 class="alert-title">${alert.trigger_type}</h4>
+                    <p>${timeAgo} — ${alert.location_name} (threshold: ${alert.threshold_value}°) — User: ${alert.username}</p>
+                `;
+                container.appendChild(div);
+            });
+        } catch (error) {
+            console.error('Error loading system alerts:', error);
+            if (container) container.innerHTML = '<p style="color: var(--text-secondary);">Unable to load system alerts.</p>';
+        }
+    }
+
+    function getTimeAgo(date) {
+        const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+        if (seconds < 60) return 'Just now';
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+        const days = Math.floor(hours / 24);
+        return `${days} day${days !== 1 ? 's' : ''} ago`;
+    }
+
     loadStats();
+    loadSystemAlerts();
 });

@@ -59,20 +59,27 @@ cron.schedule('*/10 * * * *', async () => {
                 for (const alert of locAlerts) {
                     let triggered = false;
                     let message = '';
-                    const th = Number(alert.thresholdValue);
+                    const min = Number(alert.thresholdValue);
+                    const max = Number(alert.thresholdMax);
 
                     switch (alert.triggerType) {
-                        case 'Temperature drops below':
-                            if (temp < th) { triggered = true; message = `Alert: Temp in ${alert.locationName} dropped to ${temp}°F (below ${th}°F)`; }
+                        case 'Temperature':
+                            if (temp < min || temp > max) {
+                                triggered = true;
+                                message = `Alert: Temp in ${alert.locationName} is ${temp}°F (outside ${min}°F – ${max}°F range)`;
+                            }
                             break;
-                        case 'Temperature goes above':
-                            if (temp > th) { triggered = true; message = `Alert: Temp in ${alert.locationName} rose to ${temp}°F (above ${th}°F)`; }
+                        case 'Humidity':
+                            if (humidity < min || humidity > max) {
+                                triggered = true;
+                                message = `Alert: Humidity in ${alert.locationName} is ${humidity}% (outside ${min}% – ${max}% range)`;
+                            }
                             break;
-                        case 'Precipitation chance exceeds':
-                            if (humidity > th) { triggered = true; message = `Alert: Humidity in ${alert.locationName} is ${humidity}% (above ${th}%)`; }
-                            break;
-                        case 'Wind speed exceeds':
-                            if (windSpeed > th) { triggered = true; message = `Alert: Wind in ${alert.locationName} is ${windSpeed}mph (exceeds ${th}mph)`; }
+                        case 'Wind Speed':
+                            if (windSpeed < min || windSpeed > max) {
+                                triggered = true;
+                                message = `Alert: Wind in ${alert.locationName} is ${windSpeed}mph (outside ${min} – ${max}mph range)`;
+                            }
                             break;
                     }
 

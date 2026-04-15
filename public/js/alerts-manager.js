@@ -1,13 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (!token) return;
 
-    const locationSelect = document.getElementById('alert-location');
-    const triggerSelect  = document.getElementById('alert-trigger');
-    const thresholdInput = document.getElementById('alert-threshold');
-    const saveBtn        = document.getElementById('save-alert-btn');
-    const alertsList     = document.getElementById('alerts-list');
-    const alertMessage   = document.getElementById('alert-message');
+    const locationSelect  = document.getElementById('alert-location');
+    const triggerSelect   = document.getElementById('alert-trigger');
+    const thresholdMin    = document.getElementById('alert-threshold-min');
+    const thresholdMax    = document.getElementById('alert-threshold-max');
+    const saveBtn         = document.getElementById('save-alert-btn');
+    const alertsList      = document.getElementById('alerts-list');
+    const alertMessage    = document.getElementById('alert-message');
+
+    // Populate username in nav
+    const usernameDisplay = document.getElementById('username-display');
+    if (usernameDisplay) usernameDisplay.textContent = user.username || '';
 
     // ── Load saved locations into dropdown ─────────────────────
     async function loadLocations() {
@@ -40,12 +46,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Save alert ─────────────────────────────────────────────
     saveBtn.addEventListener('click', async () => {
-        const location_name = locationSelect.value;
-        const trigger_type  = triggerSelect.value;
-        const threshold     = thresholdInput.value.trim();
+        const location_name  = locationSelect.value;
+        const trigger_type   = triggerSelect.value;
+        const threshold_min  = thresholdMin.value.trim();
+        const threshold_max  = thresholdMax.value.trim();
 
-        if (!threshold) {
-            showMsg('Please enter a threshold value.', 'error');
+        if (!threshold_min || !threshold_max) {
+            showMsg('Please enter both min and max values.', 'error');
+            return;
+        }
+
+        if (Number(threshold_min) >= Number(threshold_max)) {
+            showMsg('Min must be less than max.', 'error');
             return;
         }
 
@@ -56,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({ location_name, trigger_type, threshold }),
+                body: JSON.stringify({ location_name, trigger_type, threshold_min, threshold_max }),
             });
 
             const data = await response.json();

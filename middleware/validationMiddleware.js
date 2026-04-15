@@ -36,7 +36,8 @@ module.exports = {
 
     validateAlert: validate([
         body('location_name').trim().notEmpty().withMessage('Location name is required'),
-        body('trigger_type').trim().notEmpty().withMessage('Trigger type is required'),
-        body('threshold').isNumeric().withMessage('Threshold must be a precise number')
+        body('trigger_type').trim().notEmpty().withMessage('Metric type is required'),
+        body('threshold_min').isNumeric().withMessage('Min threshold must be a number'),
+        body('threshold_max').isNumeric().withMessage('Max threshold must be a number')
     ])
 };

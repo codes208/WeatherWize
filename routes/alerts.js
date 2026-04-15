@@ -10,8 +10,11 @@ router.get('/', authMiddleware, authMiddleware.requireRole('advanced', 'admin'),
 router.delete('/:id', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), alertsController.deleteAlert);
 router.patch('/:id/enable', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), alertsController.enableAlert);
 
-// Notification endpoints for background alerts
-router.get('/notifications', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), alertsController.getNotifications);
-router.post('/notifications/read', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), alertsController.markNotificationsRead);
+// Admin-only: recently triggered alerts across all users
+router.get('/system-recent', authMiddleware, authMiddleware.requireRole('admin'), alertsController.getSystemRecentAlerts);
+
+// Notification endpoints (all authenticated users — poller runs on every page)
+router.get('/notifications', authMiddleware, alertsController.getNotifications);
+router.post('/notifications/read', authMiddleware, alertsController.markNotificationsRead);
 
 module.exports = router;
