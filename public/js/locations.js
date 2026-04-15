@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 removeBtn.className = 'delete-location-btn';
                 removeBtn.textContent = 'Remove';
                 removeBtn.style.marginTop = '0';
-                removeBtn.addEventListener('click', () => deleteLocation(id));
+                removeBtn.addEventListener('click', () => deleteLocation(id, location_name));
 
                 card.appendChild(removeBtn);
                 locationGrid.appendChild(card);
@@ -52,22 +52,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function deleteLocation(id) {
-        try {
-            const response = await fetch(`/api/weather/saved/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+    async function deleteLocation(id, locationName) {
+        if (msgTimer) clearTimeout(msgTimer);
+        showInlineConfirm(locationMsg, `Remove "${locationName}"?`, async () => {
+            try {
+                const response = await fetch(`/api/weather/saved/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
 
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message || 'Failed to remove location');
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Failed to remove location');
 
-            showMsg('Location removed', 'error');
-            loadLocations();
-        } catch (error) {
-            console.error(error);
-            showMsg(error.message || 'Failed to remove location', 'error');
-        }
+                showMsg('Location removed', 'success');
+                loadLocations();
+            } catch (error) {
+                console.error(error);
+                showMsg(error.message || 'Failed to remove location', 'error');
+            }
+        });
     }
 
     async function addLocation() {

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/weatherWize.CSS">
     <script src="/js/toast.js"></script>
+    <script src="/js/utils.js"></script>
     <script src="/js/auth-check.js" defer></script>
     <script src="/js/alerts-manager.js" defer></script>
 </head>
@@ -64,6 +65,7 @@
         </div>
 
         <h3 style="margin-top: 40px;">Active Alerts</h3>
+        <span id="alert-confirm-msg" class="location-msg"></span>
         <div id="alerts-list">
             <% if (alerts.length === 0) { %>
                 <p style="color: var(--text-secondary); text-align: center;">No alerts configured.</p>
@@ -81,7 +83,7 @@
                             <% if (!alert.is_active) { %>
                                 <button class="btn" style="font-size:0.82rem; padding:6px 12px;" data-id="<%= alert.id %>" data-action="enable">Re-enable</button>
                             <% } %>
-                            <button class="delete-location-btn" data-id="<%= alert.id %>" data-action="delete">Delete</button>
+                            <button class="delete-location-btn" data-id="<%= alert.id %>" data-action="delete" data-location="<%= alert.location_name %>">Delete</button>
                         </div>
                     </div>
                 <% }) %>

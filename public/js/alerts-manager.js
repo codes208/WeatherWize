@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveBtn         = document.getElementById('save-alert-btn');
     const alertsList      = document.getElementById('alerts-list');
     const alertMessage    = document.getElementById('alert-message');
+    const confirmMsg      = document.getElementById('alert-confirm-msg');
 
     // Populate username in nav
     const usernameDisplay = document.getElementById('username-display');
@@ -86,27 +87,30 @@ document.addEventListener('DOMContentLoaded', () => {
     alertsList.addEventListener('click', async (e) => {
         const btn = e.target.closest('[data-action]');
         if (!btn) return;
-        const id     = btn.dataset.id;
-        const action = btn.dataset.action;
-        if (action === 'delete') await deleteAlert(id);
+        const id           = btn.dataset.id;
+        const action       = btn.dataset.action;
+        const locationName = btn.dataset.location;
+        if (action === 'delete') await deleteAlert(id, locationName);
         if (action === 'enable') await enableAlert(id);
     });
 
-    async function deleteAlert(id) {
-        try {
-            const response = await fetch(`/api/alerts/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
-            if (response.ok) {
-                window.location.reload();
-            } else {
-                const data = await response.json();
-                showMsg(data.message || 'Error deleting alert', 'error');
+    async function deleteAlert(id, locationName) {
+        showInlineConfirm(confirmMsg, `Remove alert for "${locationName}"?`, async () => {
+            try {
+                const response = await fetch(`/api/alerts/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                });
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    const data = await response.json();
+                    showMsg(data.message || 'Error deleting alert', 'error');
+                }
+            } catch (e) {
+                showMsg('Error deleting alert', 'error');
             }
-        } catch (e) {
-            showMsg('Error deleting alert', 'error');
-        }
+        });
     }
 
     async function enableAlert(id) {
