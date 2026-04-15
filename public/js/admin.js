@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderUsers(users) {
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
         usersTableBody.innerHTML = '';
         users.forEach(user => {
             const tr = document.createElement('tr');
@@ -38,6 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const suspendActionText = isSuspended ? 'Unsuspend' : 'Suspend';
             const suspendActionColor = isSuspended ? 'var(--success)' : 'var(--danger)';
             const newStatus = isSuspended ? 'active' : 'suspended';
+
+            const isSelf = currentUser.id === user.id;
 
             tr.innerHTML = `
                 <td>${user.username}</td>
@@ -52,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>
                     <button class="btn save-role-btn" data-id="${user.id}" style="padding: 6px 12px;">Save Role</button>
                     <button class="btn toggle-suspend-btn" data-id="${user.id}" data-new-status="${newStatus}" data-username="${user.username}" style="padding: 6px 12px; background-color: ${suspendActionColor};">${suspendActionText}</button>
+                    ${!isSelf ? `<button class="btn delete-user-btn" data-id="${user.id}" data-username="${user.username}" style="padding: 6px 12px; background-color: var(--danger);">Delete</button>` : ''}
                 </td>
             `;
             usersTableBody.appendChild(tr);
@@ -71,8 +75,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const newStatus = e.target.dataset.newStatus;
                 const username = e.target.dataset.username;
                 const action = newStatus === 'suspended' ? 'suspend' : 'unsuspend';
-                if (!confirm(`Are you sure you want to ${action} user "${username}"?`)) return;
                 await updateStatus(id, newStatus);
+            });
+        });
+
+        document.querySelectorAll('.delete-user-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.target.dataset.id;
+                const username = e.target.dataset.username;
+                showConfirmToast(
+                    `Permanently delete user "${username}"? This cannot be undone.`,
+                    () => deleteUser(id)
+                );
             });
         });
     }
@@ -120,6 +134,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (e) {
             showToast('Error updating status', 'error');
+            console.error(e);
+        }
+    }
+
+    async function deleteUser(userId) {
+        try {
+            const response = await fetch(`/api/auth/users/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                showToast('User deleted successfully', 'success');
+                loadUsers();
+            } else {
+                const data = await response.json();
+                showToast(data.message || 'Error deleting user', 'error');
+            }
+        } catch (e) {
+            showToast('Error deleting user', 'error');
             console.error(e);
         }
     }

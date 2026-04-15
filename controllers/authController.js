@@ -240,6 +240,11 @@ exports.updateUserStatus = async (req, res) => {
             return res.status(400).json({ message: 'Invalid status. Use active or suspended.' });
         }
 
+        // Prevent self-suspension
+        if (req.user.id === userId && status === 'suspended') {
+            return res.status(403).json({ message: 'You cannot suspend your own account.' });
+        }
+
         const user = await User.findByPk(userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -254,5 +259,32 @@ exports.updateUserStatus = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error while updating status' });
+    }
+};
+
+exports.deleteUser = async (req, res) => {
+    try {
+        const userId = Number(req.params.id);
+
+        if (!Number.isInteger(userId) || userId <= 0) {
+            return res.status(400).json({ message: 'Invalid user id' });
+        }
+
+        // Prevent self-deletion
+        if (req.user.id === userId) {
+            return res.status(403).json({ message: 'You cannot delete your own account.' });
+        }
+
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        await user.destroy();
+
+        res.json({ message: 'User deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error while deleting user' });
     }
 };

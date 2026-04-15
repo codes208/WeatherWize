@@ -16,5 +16,6 @@ router.get('/users', authMiddleware, authMiddleware.requireRole('admin'), authCo
 router.get('/stats', authMiddleware, authMiddleware.requireRole('admin'), authController.getDashboardStats);
 router.put('/users/:id/role', authMiddleware, authMiddleware.requireRole('admin'), authController.updateUserRole);
 router.put('/users/:id/status', authMiddleware, authMiddleware.requireRole('admin'), authController.updateUserStatus);
+router.delete('/users/:id', authMiddleware, authMiddleware.requireRole('admin'), authController.deleteUser);
 
 module.exports = router;

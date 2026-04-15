@@ -60,6 +60,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
+                // Suspended — force sign-out
+                if (response.status === 403) {
+                    clearInterval(pollInterval);
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = '/index.html';
+                    return;
+                }
+
+                // Maintenance mode — reload to show server maintenance page
+                if (response.status === 503) {
+                    clearInterval(pollInterval);
+                    window.location.reload();
+                    return;
+                }
+
                 if (!response.ok) return;
                 const notifications = await response.json();
 

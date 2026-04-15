@@ -58,6 +58,31 @@
             from { opacity: 1; transform: translateX(0); }
             to   { opacity: 0; transform: translateX(40px); }
         }
+
+        /* Confirm toast buttons */
+        .toast-confirm-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .toast-btn {
+            border: none;
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity .2s;
+        }
+        .toast-btn:hover { opacity: .85; }
+        .toast-btn-confirm {
+            background: rgba(239,68,68,.95);
+            color: #fff;
+        }
+        .toast-btn-cancel {
+            background: rgba(0,0,0,.2);
+            color: #1a1a2e;
+        }
     `;
     document.head.appendChild(style);
 
@@ -105,5 +130,52 @@
         if (duration > 0) {
             setTimeout(() => dismiss(toast), duration);
         }
+    };
+
+    /**
+     * Show a confirmation toast with Confirm / Cancel buttons.
+     * Only one confirm toast is visible at a time.
+     * @param {string} message  – text to display
+     * @param {Function} onConfirm – callback when user clicks Confirm
+     */
+    let activeConfirmToast = null;
+    window.showConfirmToast = function (message, onConfirm) {
+        // Prevent duplicates
+        if (activeConfirmToast && activeConfirmToast.parentNode) {
+            dismiss(activeConfirmToast);
+        }
+
+        const c = ensureContainer();
+
+        const toast = document.createElement('div');
+        toast.className = 'toast toast-warning';
+        toast.style.cursor = 'default';
+        toast.innerHTML = `
+            <span class="toast-icon">${ICONS.warning}</span>
+            <div class="toast-body">
+                <div style="margin-bottom:10px">${message}</div>
+                <div class="toast-confirm-actions">
+                    <button class="toast-btn toast-btn-confirm">Confirm</button>
+                    <button class="toast-btn toast-btn-cancel">Cancel</button>
+                </div>
+            </div>
+        `;
+
+        // Stop click-to-dismiss on the whole toast
+        toast.removeEventListener('click', () => {});
+
+        toast.querySelector('.toast-btn-confirm').addEventListener('click', () => {
+            dismiss(toast);
+            activeConfirmToast = null;
+            if (onConfirm) onConfirm();
+        });
+
+        toast.querySelector('.toast-btn-cancel').addEventListener('click', () => {
+            dismiss(toast);
+            activeConfirmToast = null;
+        });
+
+        c.appendChild(toast);
+        activeConfirmToast = toast;
     };
 })();

@@ -81,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function deleteAlert(id) {
-        if (!confirm('Are you sure you want to delete this alert?')) return;
         try {
             const response = await fetch(`/api/alerts/${id}`, {
                 method: 'DELETE',
