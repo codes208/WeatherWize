@@ -9,12 +9,22 @@ const OPENWEATHER_AQI_URL      = 'http://api.openweathermap.org/data/2.5/air_pol
 const AQI_LABELS = { 1: 'Good', 2: 'Fair', 3: 'Moderate', 4: 'Poor', 5: 'Very Poor' };
 
 async function geocodeLocation(location, apiKey) {
-    const geoUrl = `${OPENWEATHER_GEO_URL}?q=${encodeURIComponent(location)}&limit=1&appid=${apiKey}`;
+    const geoUrl = `${OPENWEATHER_GEO_URL}?q=${encodeURIComponent(location)}&limit=5&appid=${apiKey}`;
     const geoResponse = await fetch(geoUrl);
     if (!geoResponse.ok) return null;
     const geoData = await geoResponse.json();
     if (!geoData.length) return null;
-    const { name, state, country, lat, lon } = geoData[0];
+
+    // If the user typed "City, State", try to match the state from the results
+    const parts = location.split(',');
+    let match = geoData[0];
+    if (parts.length >= 2) {
+        const stateHint = parts[1].trim().toLowerCase();
+        const stateMatch = geoData.find(r => r.state?.toLowerCase().includes(stateHint) || r.state?.toLowerCase() === stateHint);
+        if (stateMatch) match = stateMatch;
+    }
+
+    const { name, state, country, lat, lon } = match;
     const displayName = state ? `${name}, ${state}` : `${name}, ${country}`;
     return { name, state, country, lat, lon, displayName };
 }
@@ -328,11 +338,23 @@ exports.saveLocation = async (req, res) => {
             return res.status(400).json({ message: 'Location is required' });
         }
 
+        if (location.trim().length < 3) {
+            return res.status(400).json({ message: 'Please enter a valid location name (e.g. Portland, Oregon).' });
+        }
+
+        if (!/[a-zA-Z]{2,}/.test(location)) {
+            return res.status(400).json({ message: 'Location must contain a valid city name (e.g. Portland, Oregon).' });
+        }
+
+        if (!location.includes(',')) {
+            return res.status(400).json({ message: 'Please use the format: City, State (e.g. Portland, Oregon).' });
+        }
+
         const apiKey = process.env.OPENWEATHER_API_KEY;
         const geo = apiKey ? await geocodeLocation(location, apiKey) : null;
 
         if (!geo) {
-            return res.status(404).json({ message: 'Location not found. Please check the spelling.' });
+            return res.status(404).json({ message: 'Location not found. Please use the format: City, State (e.g. Portland, Oregon).' });
         }
 
         const canonicalName = geo.displayName;

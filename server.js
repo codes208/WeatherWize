@@ -126,7 +126,7 @@ app.get('/alerts-manager', async (req, res) => {
             })),
         });
     } catch (e) {
-        res.clearCookie('token');
+        // Don't clear the cookie — just redirect without wiping the session
         res.redirect('/');
     }
 });
