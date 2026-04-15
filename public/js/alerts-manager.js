@@ -90,8 +90,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const id           = btn.dataset.id;
         const action       = btn.dataset.action;
         const locationName = btn.dataset.location;
-        if (action === 'delete') await deleteAlert(id, locationName);
-        if (action === 'enable') await enableAlert(id);
+        if (action === 'delete')  await deleteAlert(id, locationName);
+        if (action === 'enable')  await enableAlert(id);
+        if (action === 'disable') await disableAlert(id, locationName);
     });
 
     async function deleteAlert(id, locationName) {
@@ -109,6 +110,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (e) {
                 showMsg('Error deleting alert', 'error');
+            }
+        });
+    }
+
+    async function disableAlert(id, locationName) {
+        showInlineConfirm(confirmMsg, `Disable alert for "${locationName}"?`, async () => {
+            try {
+                const response = await fetch(`/api/alerts/${id}/disable`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                });
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    const data = await response.json();
+                    showMsg(data.message || 'Error disabling alert', 'error');
+                }
+            } catch (e) {
+                showMsg('Error disabling alert', 'error');
             }
         });
     }

@@ -33,7 +33,7 @@
         </div>
     </nav>
     <main class="container dashboard-content">
-        <h2 style="text-align:center;">Severe Weather Alerts</h2>
+        <h2 style="text-align:center;">Weather Alerts</h2>
         <div class="auth-card" style="max-width: 600px; margin: 20px auto 0;">
             <div id="alert-message" class="text-center" style="margin-bottom: 15px; display: none;"></div>
             <div class="form-group">
@@ -75,13 +75,15 @@
                         <h4>
                             <%= alert.location_name %>
                             <% if (!alert.is_active) { %>
-                                <span style="font-size:0.75rem; color:var(--text-secondary);">(triggered — inactive)</span>
+                                <span style="font-size:0.75rem; color:var(--text-secondary);">(inactive)</span>
                             <% } %>
                         </h4>
                         <p style="color: var(--text-secondary);">Alert when: <%= alert.trigger_type %> is outside <%= alert.threshold_value %> – <%= alert.threshold_max %></p>
                         <div style="display:flex; gap:8px; margin-top:8px;">
                             <% if (!alert.is_active) { %>
                                 <button class="btn" style="font-size:0.82rem; padding:6px 12px;" data-id="<%= alert.id %>" data-action="enable">Re-enable</button>
+                            <% } else { %>
+                                <button class="btn-disable" data-id="<%= alert.id %>" data-action="disable" data-location="<%= alert.location_name %>">Disable</button>
                             <% } %>
                             <button class="delete-location-btn" data-id="<%= alert.id %>" data-action="delete" data-location="<%= alert.location_name %>">Delete</button>
                         </div>

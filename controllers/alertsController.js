@@ -87,6 +87,28 @@ exports.enableAlert = async (req, res) => {
     }
 };
 
+exports.disableAlert = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const alertId = Number(req.params.id);
+
+        if (!Number.isInteger(alertId) || alertId <= 0) {
+            return res.status(400).json({ message: 'Invalid alert id' });
+        }
+
+        const alert = await Alert.findOne({ where: { id: alertId, userId } });
+        if (!alert) {
+            return res.status(404).json({ message: 'Alert not found' });
+        }
+
+        await alert.update({ isActive: false });
+        res.json({ message: 'Alert disabled.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error while disabling alert' });
+    }
+};
+
 exports.deleteAlert = async (req, res) => {
     try {
         const userId = req.user.id;

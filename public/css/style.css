@@ -387,6 +387,22 @@ select:focus {
     color: var(--danger);
 }
 
+.btn-disable {
+    border: 1px solid var(--danger);
+    background: transparent;
+    color: var(--danger);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-disable:hover {
+    background-color: var(--danger);
+    color: #fff;
+}
+
 .location-msg {
     font-size: 0.92rem;
     padding: 14px 20px 14px 16px;
