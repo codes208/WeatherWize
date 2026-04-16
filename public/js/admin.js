@@ -6,6 +6,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!usersTableBody) return;
 
     let allUsers = [];
+    const confirmMsg = document.getElementById('admin-confirm-msg');
+
+    function showMsg(text, type) {
+        if (!confirmMsg) return;
+        confirmMsg.textContent = text;
+        confirmMsg.className = `location-msg show ${type === 'error' ? 'msg-error' : 'msg-success'}`;
+        setTimeout(() => { confirmMsg.className = 'location-msg'; }, 4000);
+    }
 
     async function loadUsers() {
         try {
@@ -22,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderUsers(users);
         } catch (error) {
             console.error('Error loading users:', error);
-            showToast('Failed to load users', 'error');
+            showMsg('Failed to load users', 'error');
         }
     }
 
@@ -73,8 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', async (e) => {
                 const id = e.target.dataset.id;
                 const newStatus = e.target.dataset.newStatus;
-                const username = e.target.dataset.username;
-                const action = newStatus === 'suspended' ? 'suspend' : 'unsuspend';
                 await updateStatus(id, newStatus);
             });
         });
@@ -83,10 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', (e) => {
                 const id = e.target.dataset.id;
                 const username = e.target.dataset.username;
-                showConfirmToast(
-                    `Permanently delete user "${username}"? This cannot be undone.`,
-                    () => deleteUser(id)
-                );
+                showInlineConfirm(confirmMsg, `Permanently delete "${username}"? This cannot be undone.`, () => deleteUser(id));
             });
         });
     }
@@ -103,13 +106,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                showToast('Role updated successfully', 'success');
+                showMsg('Role updated successfully', 'success');
             } else {
                 const data = await response.json();
-                showToast(data.message || 'Error updating role', 'error');
+                showMsg(data.message || 'Error updating role', 'error');
             }
         } catch (e) {
-            showToast('Error updating role', 'error');
+            showMsg('Error updating role', 'error');
             console.error(e);
         }
     }
@@ -126,14 +129,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                showToast('User status updated', 'success');
+                showMsg('User status updated', 'success');
                 loadUsers();
             } else {
                 const data = await response.json();
-                showToast(data.message || 'Error updating status', 'error');
+                showMsg(data.message || 'Error updating status', 'error');
             }
         } catch (e) {
-            showToast('Error updating status', 'error');
+            showMsg('Error updating status', 'error');
             console.error(e);
         }
     }
@@ -148,14 +151,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                showToast('User deleted successfully', 'success');
+                showMsg('User deleted successfully', 'success');
                 loadUsers();
             } else {
                 const data = await response.json();
-                showToast(data.message || 'Error deleting user', 'error');
+                showMsg(data.message || 'Error deleting user', 'error');
             }
         } catch (e) {
-            showToast('Error deleting user', 'error');
+            showMsg('Error deleting user', 'error');
             console.error(e);
         }
     }

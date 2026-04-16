@@ -468,7 +468,7 @@ select:focus {
     font-size: 1.1rem;
     font-weight: bold;
     margin-bottom: 10px;
-    color: var(--text-primary);
+    color: #fff;
 }
 
 /* ── Page layout ─────────────────────────────────────────── */
@@ -526,8 +526,8 @@ select:focus {
     padding: 30px;
 }
 
-.admin-stat-label {
-    color: var(--text-primary);
+.dashboard-page .dashboard-content h3.admin-stat-label {
+    color: #000;
 }
 
 #stat-total-users,
