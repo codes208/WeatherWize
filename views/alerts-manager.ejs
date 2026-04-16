@@ -64,7 +64,6 @@
         </div>
 
         <h3 class="alerts-section-heading">Active Alerts</h3>
-        <span id="alert-confirm-msg" class="location-msg"></span>
         <div id="alerts-list">
             <% if (alerts.length === 0) { %>
                 <p class="alerts-empty">No alerts configured.</p>
@@ -86,6 +85,7 @@
                             <% } %>
                             <button class="delete-location-btn" data-id="<%= alert.id %>" data-action="delete" data-location="<%= alert.location_name %>">Delete</button>
                         </div>
+                        <span class="location-msg"></span>
                     </div>
                 <% }) %>
             <% } %>

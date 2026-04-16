@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!usersTableBody) return;
 
     let allUsers = [];
-    const confirmMsg = document.getElementById('admin-confirm-msg');
 
 
     async function loadUsers() {
@@ -24,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
             renderUsers(users);
         } catch (error) {
             console.error('Error loading users:', error);
-            showMsg(confirmMsg,'Failed to load users', 'error');
         }
     }
 
@@ -32,18 +30,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
         usersTableBody.innerHTML = '';
         users.forEach(user => {
-            const tr = document.createElement('tr');
-
             const isSuspended = user.status === 'suspended';
             const statusColor = isSuspended ? 'var(--danger)' : 'var(--success)';
             const statusText = isSuspended ? 'Suspended' : 'Active';
-
             const suspendActionText = isSuspended ? 'Unsuspend' : 'Suspend';
             const suspendActionColor = isSuspended ? 'var(--success)' : 'var(--danger)';
             const newStatus = isSuspended ? 'active' : 'suspended';
-
             const isSelf = currentUser.id === user.id;
 
+            const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${user.username}</td>
                 <td>
@@ -55,42 +50,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 </td>
                 <td><span style="color: ${statusColor};">${statusText}</span></td>
                 <td>
-                    <button class="btn save-role-btn" data-id="${user.id}" style="padding: 6px 12px;">Save Role</button>
-                    <button class="btn toggle-suspend-btn" data-id="${user.id}" data-new-status="${newStatus}" data-username="${user.username}" style="padding: 6px 12px; background-color: ${suspendActionColor};">${suspendActionText}</button>
-                    ${!isSelf ? `<button class="btn delete-user-btn" data-id="${user.id}" data-username="${user.username}" style="padding: 6px 12px; background-color: var(--danger);">Delete</button>` : ''}
+                    <button class="btn save-role-btn" style="padding: 6px 12px;">Save Role</button>
+                    <button class="btn toggle-suspend-btn" style="padding: 6px 12px; background-color: ${suspendActionColor};">${suspendActionText}</button>
+                    ${!isSelf ? `<button class="btn delete-user-btn" style="padding: 6px 12px; background-color: var(--danger);">Delete</button>` : ''}
                 </td>
             `;
+
+            const msgRow = document.createElement('tr');
+            msgRow.className = 'user-msg-row';
+            msgRow.innerHTML = `<td colspan="4" style="padding: 0 12px;"><span class="location-msg row-msg"></span></td>`;
+
             usersTableBody.appendChild(tr);
-        });
+            usersTableBody.appendChild(msgRow);
 
-        document.querySelectorAll('.save-role-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                const id = e.target.dataset.id;
-                const newRole = document.getElementById(`role-select-${id}`).value;
-                await updateRole(id, newRole);
+            const rowMsg = msgRow.querySelector('.row-msg');
+
+            tr.querySelector('.save-role-btn').addEventListener('click', async () => {
+                const newRole = document.getElementById(`role-select-${user.id}`).value;
+                await updateRole(user.id, newRole, rowMsg);
             });
-        });
 
-        document.querySelectorAll('.toggle-suspend-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = e.target.dataset.id;
-                const newStatus = e.target.dataset.newStatus;
-                const username = e.target.dataset.username;
+            tr.querySelector('.toggle-suspend-btn').addEventListener('click', () => {
                 const action = newStatus === 'suspended' ? 'Suspend' : 'Unsuspend';
-                showInlineConfirm(confirmMsg, `${action} user "${username}"?`, () => updateStatus(id, newStatus));
+                showInlineConfirm(rowMsg, `${action} user "${user.username}"?`, () => updateStatus(user.id, newStatus, rowMsg));
             });
-        });
 
-        document.querySelectorAll('.delete-user-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = e.target.dataset.id;
-                const username = e.target.dataset.username;
-                showInlineConfirm(confirmMsg, `Permanently delete "${username}"? This cannot be undone.`, () => deleteUser(id));
-            });
+            if (!isSelf) {
+                tr.querySelector('.delete-user-btn').addEventListener('click', () => {
+                    showInlineConfirm(rowMsg, `Permanently delete "${user.username}"? This cannot be undone.`, () => deleteUser(user.id, rowMsg));
+                });
+            }
         });
     }
 
-    async function updateRole(userId, role) {
+    async function updateRole(userId, role, rowMsg) {
         try {
             const response = await fetch(`/api/auth/users/${userId}/role`, {
                 method: 'PUT',
@@ -102,18 +95,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                showMsg(confirmMsg,'Role updated successfully', 'success');
+                showMsg(rowMsg, 'Role updated successfully', 'success');
             } else {
                 const data = await response.json();
-                showMsg(confirmMsg,data.message || 'Error updating role', 'error');
+                showMsg(rowMsg, data.message || 'Error updating role', 'error', false);
             }
         } catch (e) {
-            showMsg(confirmMsg,'Error updating role', 'error');
+            showMsg(rowMsg, 'Error updating role', 'error', false);
             console.error(e);
         }
     }
 
-    async function updateStatus(userId, status) {
+    async function updateStatus(userId, status, rowMsg) {
         try {
             const response = await fetch(`/api/auth/users/${userId}/status`, {
                 method: 'PUT',
@@ -125,19 +118,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                showMsg(confirmMsg,'User status updated', 'success');
                 loadUsers();
             } else {
                 const data = await response.json();
-                showMsg(confirmMsg,data.message || 'Error updating status', 'error');
+                showMsg(rowMsg, data.message || 'Error updating status', 'error', false);
             }
         } catch (e) {
-            showMsg(confirmMsg,'Error updating status', 'error');
+            showMsg(rowMsg, 'Error updating status', 'error', false);
             console.error(e);
         }
     }
 
-    async function deleteUser(userId) {
+    async function deleteUser(userId, rowMsg) {
         try {
             const response = await fetch(`/api/auth/users/${userId}`, {
                 method: 'DELETE',
@@ -147,14 +139,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                showMsg(confirmMsg,'User deleted successfully', 'success');
                 loadUsers();
             } else {
                 const data = await response.json();
-                showMsg(confirmMsg,data.message || 'Error deleting user', 'error');
+                showMsg(rowMsg, data.message || 'Error deleting user', 'error', false);
             }
         } catch (e) {
-            showMsg(confirmMsg,'Error deleting user', 'error');
+            showMsg(rowMsg, 'Error deleting user', 'error', false);
             console.error(e);
         }
     }

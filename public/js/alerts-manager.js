@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveBtn         = document.getElementById('save-alert-btn');
     const alertsList      = document.getElementById('alerts-list');
     const alertMessage    = document.getElementById('alert-message');
-    const confirmMsg      = document.getElementById('alert-confirm-msg');
 
 
     // ── Load saved locations into dropdown ─────────────────────
@@ -49,12 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const threshold_max  = thresholdMax.value.trim();
 
         if (!threshold_min || !threshold_max) {
-            showMsg(alertMessage,'Please enter both min and max values.', 'error');
+            showMsg(alertMessage,'Please enter both min and max values.', 'error', false);
             return;
         }
 
         if (Number(threshold_min) >= Number(threshold_max)) {
-            showMsg(alertMessage,'Min must be less than max.', 'error');
+            showMsg(alertMessage,'Min must be less than max.', 'error', false);
             return;
         }
 
@@ -70,12 +69,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
             if (response.ok) {
+                clearMsg(alertMessage);
                 window.location.reload();
             } else {
-                showMsg(alertMessage,data.message, 'error');
+                showMsg(alertMessage,data.message, 'error', false);
             }
         } catch (e) {
-            showMsg(alertMessage,'Error saving alert.', 'error');
+            showMsg(alertMessage,'Error saving alert.', 'error', false);
         }
     });
 
@@ -86,63 +86,67 @@ document.addEventListener('DOMContentLoaded', () => {
         const id           = btn.dataset.id;
         const action       = btn.dataset.action;
         const locationName = btn.dataset.location;
-        if (action === 'delete')  await deleteAlert(id, locationName);
-        if (action === 'enable')  await enableAlert(id);
-        if (action === 'disable') await disableAlert(id, locationName);
+        const cardMsg      = btn.closest('.location-card').querySelector('.location-msg');
+        if (action === 'delete')  await deleteAlert(id, locationName, cardMsg);
+        if (action === 'enable')  await enableAlert(id, cardMsg);
+        if (action === 'disable') await disableAlert(id, locationName, cardMsg);
     });
 
-    async function deleteAlert(id, locationName) {
-        showInlineConfirm(confirmMsg, `Remove alert for "${locationName}"?`, async () => {
+    async function deleteAlert(id, locationName, cardMsg) {
+        showInlineConfirm(cardMsg, `Remove alert for "${locationName}"?`, async () => {
             try {
                 const response = await fetch(`/api/alerts/${id}`, {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${token}` },
                 });
                 if (response.ok) {
+                    clearMsg(alertMessage);
                     window.location.reload();
                 } else {
                     const data = await response.json();
-                    showMsg(alertMessage,data.message || 'Error deleting alert', 'error');
+                    showMsg(cardMsg, data.message || 'Error deleting alert', 'error', false);
                 }
             } catch (e) {
-                showMsg(alertMessage,'Error deleting alert', 'error');
+                showMsg(cardMsg, 'Error deleting alert', 'error', false);
             }
         });
     }
 
-    async function disableAlert(id, locationName) {
-        showInlineConfirm(confirmMsg, `Disable alert for "${locationName}"?`, async () => {
+    async function disableAlert(id, locationName, cardMsg) {
+        showInlineConfirm(cardMsg, `Disable alert for "${locationName}"?`, async () => {
             try {
                 const response = await fetch(`/api/alerts/${id}/disable`, {
                     method: 'PATCH',
                     headers: { 'Authorization': `Bearer ${token}` },
                 });
                 if (response.ok) {
+                    clearMsg(alertMessage);
                     window.location.reload();
                 } else {
                     const data = await response.json();
-                    showMsg(alertMessage,data.message || 'Error disabling alert', 'error');
+                    showMsg(cardMsg, data.message || 'Error disabling alert', 'error', false);
                 }
             } catch (e) {
-                showMsg(alertMessage,'Error disabling alert', 'error');
+                showMsg(cardMsg, 'Error disabling alert', 'error', false);
             }
         });
     }
 
-    async function enableAlert(id) {
+    async function enableAlert(id, cardMsg) {
         try {
             const response = await fetch(`/api/alerts/${id}/enable`, {
                 method: 'PATCH',
                 headers: { 'Authorization': `Bearer ${token}` },
             });
             if (response.ok) {
+                clearMsg(alertMessage);
                 window.location.reload();
             } else {
                 const data = await response.json();
-                showMsg(alertMessage,data.message || 'Error re-enabling alert', 'error');
+                showMsg(cardMsg, data.message || 'Error re-enabling alert', 'error', false);
             }
         } catch (e) {
-            showMsg(alertMessage,'Error re-enabling alert', 'error');
+            showMsg(cardMsg, 'Error re-enabling alert', 'error', false);
         }
     }
 

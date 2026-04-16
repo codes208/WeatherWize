@@ -39,12 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (response.ok) {
+                    clearMsg(msgDiv);
                     showMsg(msgDiv,data.message, 'success');
                 } else {
-                    showMsg(msgDiv,data.message, 'error');
+                    showMsg(msgDiv,data.message, 'error', false);
                 }
             } catch (e) {
-                showMsg(msgDiv,'Error saving settings.', 'error');
+                showMsg(msgDiv,'Error saving settings.', 'error', false);
             }
         });
     }
