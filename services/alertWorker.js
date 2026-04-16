@@ -66,19 +66,19 @@ cron.schedule('*/10 * * * *', async () => {
                         case 'Temperature':
                             if (temp < min || temp > max) {
                                 triggered = true;
-                                message = `Alert: Temp in ${alert.locationName} is ${temp}°F (outside ${min}°F – ${max}°F range)`;
+                                message = `Temp in ${alert.locationName} is ${temp}°F (outside ${min}°F – ${max}°F range)`;
                             }
                             break;
                         case 'Humidity':
                             if (humidity < min || humidity > max) {
                                 triggered = true;
-                                message = `Alert: Humidity in ${alert.locationName} is ${humidity}% (outside ${min}% – ${max}% range)`;
+                                message = `Humidity in ${alert.locationName} is ${humidity}% (outside ${min}% – ${max}% range)`;
                             }
                             break;
                         case 'Wind Speed':
                             if (windSpeed < min || windSpeed > max) {
                                 triggered = true;
-                                message = `Alert: Wind in ${alert.locationName} is ${windSpeed}mph (outside ${min} – ${max}mph range)`;
+                                message = `Wind in ${alert.locationName} is ${windSpeed}mph (outside ${min} – ${max}mph range)`;
                             }
                             break;
                     }

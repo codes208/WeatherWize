@@ -469,6 +469,48 @@ select:focus {
 .location-msg.msg-error { background: rgba(239,68,68,.92); }
 .location-msg.msg-success { background: rgba(16,185,129,.92); }
 
+/* ── Alert banners (below navbar, scrolls with page) ─────── */
+.alert-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 24px;
+    font-size: 0.92rem;
+    font-family: inherit;
+    color: #fff;
+    animation: banner-in .35s ease forwards;
+}
+.alert-banner-error   { background: rgba(239,68,68,.92); }
+.alert-banner-warning { background: rgba(245,158,11,.92); color: #1a1a2e; }
+.alert-banner-info    { background: rgba(59,130,246,.92); }
+.alert-banner-success { background: rgba(16,185,129,.92); }
+
+.alert-banner-icon { font-size: 1.15rem; flex-shrink: 0; }
+.alert-banner-body { flex: 1; word-break: break-word; line-height: 1.4; }
+
+.alert-banner-close {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    opacity: 0.75;
+    padding: 0 4px;
+    flex-shrink: 0;
+}
+.alert-banner-close:hover { opacity: 1; }
+
+.alert-banner-out { animation: banner-out .3s ease forwards; }
+
+@keyframes banner-in {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes banner-out {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(-10px); }
+}
+
 /* ── Toast notifications ─────────────────────────────────── */
 #toast-container {
     position: fixed;

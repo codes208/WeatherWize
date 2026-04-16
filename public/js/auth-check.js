@@ -39,12 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Re-show any toasts that were pending before a page reload
+    // Re-show any alert banners that were pending before a page reload
     const pendingToasts = sessionStorage.getItem('pendingToasts');
     if (pendingToasts) {
         sessionStorage.removeItem('pendingToasts');
         JSON.parse(pendingToasts).forEach(msg => {
-            if (window.showToast) window.showToast(msg, 'error', 0);
+            if (window.showAlertBanner) window.showAlertBanner(msg, 'error');
         });
     }
 
@@ -86,8 +86,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (notifications && notifications.length > 0) {
                     const idsToMark = [];
                     notifications.forEach(notification => {
-                        if (window.showToast) {
-                            window.showToast(notification.message, 'error', 0);
+                        if (window.showAlertBanner) {
+                            window.showAlertBanner(notification.message, 'error');
                         }
                         idsToMark.push(notification.id);
                     });
