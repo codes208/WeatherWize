@@ -78,10 +78,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.querySelectorAll('.toggle-suspend-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
+            btn.addEventListener('click', (e) => {
                 const id = e.target.dataset.id;
                 const newStatus = e.target.dataset.newStatus;
-                await updateStatus(id, newStatus);
+                const username = e.target.dataset.username;
+                const action = newStatus === 'suspended' ? 'Suspend' : 'Unsuspend';
+                showInlineConfirm(confirmMsg, `${action} user "${username}"?`, () => updateStatus(id, newStatus));
             });
         });
 
