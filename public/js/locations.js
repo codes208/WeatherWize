@@ -4,14 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const addInput = document.getElementById('add-location-input');
     const addBtn = document.getElementById('add-location-btn');
     const locationMsg = document.getElementById('location-msg');
-    let msgTimer = null;
-
-    function showMsg(message, type) {
-        if (msgTimer) clearTimeout(msgTimer);
-        locationMsg.textContent = message;
-        locationMsg.className = `location-msg show msg-${type}`;
-        msgTimer = setTimeout(() => { locationMsg.className = 'location-msg'; }, 3000);
-    }
 
     async function loadLocations() {
         try {
@@ -53,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function deleteLocation(id, locationName) {
-        if (msgTimer) clearTimeout(msgTimer);
         showInlineConfirm(locationMsg, `Remove "${locationName}"?`, async () => {
             try {
                 const response = await fetch(`/api/weather/saved/${id}`, {
@@ -64,11 +55,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.message || 'Failed to remove location');
 
-                showMsg('Location removed', 'success');
+                showMsg(locationMsg,'Location removed', 'success');
                 loadLocations();
             } catch (error) {
                 console.error(error);
-                showMsg(error.message || 'Failed to remove location', 'error');
+                showMsg(locationMsg,error.message || 'Failed to remove location', 'error');
             }
         });
     }
@@ -91,11 +82,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(data.message || 'Failed to save location');
 
             addInput.value = '';
-            showMsg(data.message || 'Location saved!', 'success');
+            showMsg(locationMsg,data.message || 'Location saved!', 'success');
             loadLocations();
         } catch (error) {
             console.error(error);
-            showMsg(error.message || 'Failed to save location', 'error');
+            showMsg(locationMsg,error.message || 'Failed to save location', 'error');
         }
     }
 

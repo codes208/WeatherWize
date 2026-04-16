@@ -47,6 +47,10 @@ body {
     color: var(--danger);
 }
 
+.text-secondary {
+    color: var(--text-secondary);
+}
+
 .danger-zone {
     margin-top: 40px;
     padding-top: 20px;
@@ -464,6 +468,63 @@ select:focus {
 .location-msg.msg-error { background: rgba(239,68,68,.92); }
 .location-msg.msg-success { background: rgba(16,185,129,.92); }
 
+/* ── Toast notifications ─────────────────────────────────── */
+#toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.toast {
+    pointer-events: auto;
+    min-width: 280px;
+    max-width: 420px;
+    padding: 14px 20px 14px 16px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    line-height: 1.4;
+    color: #fff;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    animation: toast-in .35s ease forwards;
+    cursor: pointer;
+    transition: opacity .25s, transform .25s;
+}
+
+.toast:hover { opacity: .85; }
+
+.toast.toast-out {
+    animation: toast-out .3s ease forwards;
+}
+
+.toast-icon { font-size: 1.15rem; flex-shrink: 0; margin-top: 1px; }
+.toast-body { flex: 1; word-break: break-word; }
+
+.toast-success { background: rgba(16,185,129,.92); }
+.toast-error   { background: rgba(239,68,68,.92); }
+.toast-warning { background: rgba(245,158,11,.92); color: #1a1a2e; }
+.toast-info    { background: rgba(59,130,246,.92); }
+
+@keyframes toast-in {
+    from { opacity: 0; transform: translateX(40px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toast-out {
+    from { opacity: 1; transform: translateX(0); }
+    to   { opacity: 0; transform: translateX(40px); }
+}
+
 .map-location-label {
     font-size: 1.1rem;
     font-weight: bold;
@@ -496,20 +557,13 @@ select:focus {
 }
 
 /* ── Form feedback messages ───────────────────────────────── */
-.form-message {
-    margin-bottom: 15px;
-    display: none;
-}
-
 #login-error,
 #register-error,
 #forgot-message {
     margin-bottom: 15px;
 }
 
-#alert-message,
-#profile-message,
-#settings-message {
+#profile-message {
     margin-bottom: 15px;
     display: none;
 }

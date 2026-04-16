@@ -4,6 +4,20 @@
  * @param {string} message      - The confirmation question to display
  * @param {Function} onConfirm  - Callback when user clicks Yes
  */
+/**
+ * Shows an inline status message in the given location-msg element.
+ * @param {HTMLElement} el   - The element to render the message into
+ * @param {string} text      - The message to display
+ * @param {'success'|'error'} type
+ */
+function showMsg(el, text, type) {
+    if (!el) return;
+    el.textContent = text;
+    const cls = type === 'success' ? 'msg-success' : 'msg-error';
+    el.className = `location-msg show ${cls}`;
+    setTimeout(() => { el.className = 'location-msg'; }, 4000);
+}
+
 function showInlineConfirm(msgEl, message, onConfirm) {
     msgEl.innerHTML = `${message}
         <button id="confirm-yes-btn" style="margin-left:10px; padding:2px 10px; border-radius:5px; border:none; background:#fff; color:#e53e3e; font-weight:bold; cursor:pointer;">Yes</button>

@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (!token) return;
 
     const locationSelect  = document.getElementById('alert-location');
@@ -12,9 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const alertMessage    = document.getElementById('alert-message');
     const confirmMsg      = document.getElementById('alert-confirm-msg');
 
-    // Populate username in nav
-    const usernameDisplay = document.getElementById('username-display');
-    if (usernameDisplay) usernameDisplay.textContent = user.username || '';
 
     // ── Load saved locations into dropdown ─────────────────────
     async function loadLocations() {
@@ -53,12 +49,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const threshold_max  = thresholdMax.value.trim();
 
         if (!threshold_min || !threshold_max) {
-            showMsg('Please enter both min and max values.', 'error');
+            showMsg(alertMessage,'Please enter both min and max values.', 'error');
             return;
         }
 
         if (Number(threshold_min) >= Number(threshold_max)) {
-            showMsg('Min must be less than max.', 'error');
+            showMsg(alertMessage,'Min must be less than max.', 'error');
             return;
         }
 
@@ -76,10 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 window.location.reload();
             } else {
-                showMsg(data.message, 'error');
+                showMsg(alertMessage,data.message, 'error');
             }
         } catch (e) {
-            showMsg('Error saving alert.', 'error');
+            showMsg(alertMessage,'Error saving alert.', 'error');
         }
     });
 
@@ -106,10 +102,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.location.reload();
                 } else {
                     const data = await response.json();
-                    showMsg(data.message || 'Error deleting alert', 'error');
+                    showMsg(alertMessage,data.message || 'Error deleting alert', 'error');
                 }
             } catch (e) {
-                showMsg('Error deleting alert', 'error');
+                showMsg(alertMessage,'Error deleting alert', 'error');
             }
         });
     }
@@ -125,10 +121,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.location.reload();
                 } else {
                     const data = await response.json();
-                    showMsg(data.message || 'Error disabling alert', 'error');
+                    showMsg(alertMessage,data.message || 'Error disabling alert', 'error');
                 }
             } catch (e) {
-                showMsg('Error disabling alert', 'error');
+                showMsg(alertMessage,'Error disabling alert', 'error');
             }
         });
     }
@@ -143,20 +139,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.reload();
             } else {
                 const data = await response.json();
-                showMsg(data.message || 'Error re-enabling alert', 'error');
+                showMsg(alertMessage,data.message || 'Error re-enabling alert', 'error');
             }
         } catch (e) {
-            showMsg('Error re-enabling alert', 'error');
+            showMsg(alertMessage,'Error re-enabling alert', 'error');
         }
     }
 
-    function showMsg(text, type) {
-        if (!alertMessage) return;
-        alertMessage.textContent = text;
-        alertMessage.style.display = 'block';
-        alertMessage.className = type === 'success' ? 'text-center text-success' : 'text-center text-danger';
-        setTimeout(() => { alertMessage.style.display = 'none'; }, 4000);
-    }
 
     loadLocations();
 });

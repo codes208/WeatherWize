@@ -8,12 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let allUsers = [];
     const confirmMsg = document.getElementById('admin-confirm-msg');
 
-    function showMsg(text, type) {
-        if (!confirmMsg) return;
-        confirmMsg.textContent = text;
-        confirmMsg.className = `location-msg show ${type === 'error' ? 'msg-error' : 'msg-success'}`;
-        setTimeout(() => { confirmMsg.className = 'location-msg'; }, 4000);
-    }
 
     async function loadUsers() {
         try {
@@ -30,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderUsers(users);
         } catch (error) {
             console.error('Error loading users:', error);
-            showMsg('Failed to load users', 'error');
+            showMsg(confirmMsg,'Failed to load users', 'error');
         }
     }
 
@@ -108,13 +102,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                showMsg('Role updated successfully', 'success');
+                showMsg(confirmMsg,'Role updated successfully', 'success');
             } else {
                 const data = await response.json();
-                showMsg(data.message || 'Error updating role', 'error');
+                showMsg(confirmMsg,data.message || 'Error updating role', 'error');
             }
         } catch (e) {
-            showMsg('Error updating role', 'error');
+            showMsg(confirmMsg,'Error updating role', 'error');
             console.error(e);
         }
     }
@@ -131,14 +125,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                showMsg('User status updated', 'success');
+                showMsg(confirmMsg,'User status updated', 'success');
                 loadUsers();
             } else {
                 const data = await response.json();
-                showMsg(data.message || 'Error updating status', 'error');
+                showMsg(confirmMsg,data.message || 'Error updating status', 'error');
             }
         } catch (e) {
-            showMsg('Error updating status', 'error');
+            showMsg(confirmMsg,'Error updating status', 'error');
             console.error(e);
         }
     }
@@ -153,14 +147,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                showMsg('User deleted successfully', 'success');
+                showMsg(confirmMsg,'User deleted successfully', 'success');
                 loadUsers();
             } else {
                 const data = await response.json();
-                showMsg(data.message || 'Error deleting user', 'error');
+                showMsg(confirmMsg,data.message || 'Error deleting user', 'error');
             }
         } catch (e) {
-            showMsg('Error deleting user', 'error');
+            showMsg(confirmMsg,'Error deleting user', 'error');
             console.error(e);
         }
     }

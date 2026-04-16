@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const chartContainer  = document.getElementById('chart-container');
 
     let chartInstance = null;
+    const historyMsg = document.getElementById('history-msg');
 
     // Default date range — last 30 days
     const today = new Date();
@@ -169,15 +170,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const endDate   = endDateInput.value;
 
         if (!location || locationSelect.selectedOptions[0]?.disabled) {
-            showToast('Please select a location.', 'warning');
+            showMsg(historyMsg,'Please select a location.', 'warning');
             return;
         }
         if (!startDate || !endDate) {
-            showToast('Please select both a start and end date.', 'warning');
+            showMsg(historyMsg,'Please select both a start and end date.', 'warning');
             return;
         }
         if (new Date(endDate) < new Date(startDate)) {
-            showToast('End date must be after start date.', 'error');
+            showMsg(historyMsg,'End date must be after start date.', 'error');
             return;
         }
 
@@ -185,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .map(cb => cb.value);
 
         if (selectedTrends.length === 0) {
-            showToast('Please select at least one trend to display.', 'warning');
+            showMsg(historyMsg,'Please select at least one trend to display.', 'warning');
             return;
         }
 
@@ -200,19 +201,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (!response.ok) {
-                showToast(data.message || 'Error fetching historical data.', 'error');
+                showMsg(historyMsg,data.message || 'Error fetching historical data.', 'error');
                 return;
             }
 
             if (!data.daily || data.daily.length === 0) {
-                showToast('No data available for this date range.', 'error');
+                showMsg(historyMsg,'No data available for this date range.', 'error');
                 return;
             }
 
             renderChart(data.location, data.daily, selectedTrends);
         } catch (e) {
             console.error(e);
-            showToast('Error fetching historical data.', 'error');
+            showMsg(historyMsg,'Error fetching historical data.', 'error');
         } finally {
             fetchBtn.disabled = false;
             fetchBtn.textContent = 'Fetch Historical Data';

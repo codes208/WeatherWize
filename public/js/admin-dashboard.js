@@ -1,11 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (!token) return;
-
-    // Populate username in nav
-    const usernameDisplay = document.getElementById('username-display');
-    if (usernameDisplay) usernameDisplay.textContent = user.username || '';
 
     const statsCards = {
         totalUsers: document.getElementById('stat-total-users'),
@@ -47,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const alerts = await response.json();
 
             if (alerts.length === 0) {
-                container.innerHTML = '<p style="color: var(--text-secondary);">No recent alerts triggered.</p>';
+                container.innerHTML = '<p class="text-secondary">No recent alerts triggered.</p>';
                 return;
             }
 
@@ -55,8 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alerts.forEach(alert => {
                 const timeAgo = getTimeAgo(new Date(alert.last_triggered_at));
                 const div = document.createElement('div');
-                div.className = 'location-card';
-                div.style.cssText = 'margin-top: 15px; border-left: 4px solid var(--danger);';
+                div.className = 'location-card alert-card alert-card--active';
                 div.innerHTML = `
                     <h4 class="alert-title">${alert.trigger_type}</h4>
                     <p>${timeAgo} — ${alert.location_name} (threshold: ${alert.threshold_value}°) — User: ${alert.username}</p>
@@ -65,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } catch (error) {
             console.error('Error loading system alerts:', error);
-            if (container) container.innerHTML = '<p style="color: var(--text-secondary);">Unable to load system alerts.</p>';
+            if (container) container.innerHTML = '<p class="text-secondary">Unable to load system alerts.</p>';
         }
     }
 

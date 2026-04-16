@@ -467,13 +467,11 @@ body {
 .auth-title {
     margin-top: 0;
     margin-bottom: 18px;
-    text-align: center;
     letter-spacing: 0.6px;
     color: #1b75be;
 }
 
 .form-group label {
-    display: block;
     margin-bottom: 6px;
     font-weight: 600;
 }
@@ -508,13 +506,11 @@ body {
 
 .form-group input:focus {
     border-color: #1b75be;
-    outline: none;
     box-shadow: 0 0 0 3px rgba(27, 117, 190, 0.15);
 }
 
 .form-group select:focus {
     border-color: #1b75be;
-    outline: none;
     box-shadow: 0 0 0 3px rgba(27, 117, 190, 0.15);
 }
 
@@ -538,14 +534,12 @@ body {
 
 .auth-link {
     margin-top: 15px;
-    text-align: center;
 }
 
 .auth-link a {
     color: #1b75be;
     /*"Register here" link color*/
     font-weight: 700;
-    text-decoration: none;
 }
 
 .auth-link a:hover {
