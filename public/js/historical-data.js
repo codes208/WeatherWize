@@ -170,15 +170,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const endDate   = endDateInput.value;
 
         if (!location || locationSelect.selectedOptions[0]?.disabled) {
-            showMsg(historyMsg,'Please select a location.', 'warning');
+            showMsg(historyMsg, 'Please select a location.', 'error', false);
             return;
         }
         if (!startDate || !endDate) {
-            showMsg(historyMsg,'Please select both a start and end date.', 'warning');
+            showMsg(historyMsg, 'Please select both a start and end date.', 'error', false);
             return;
         }
         if (new Date(endDate) < new Date(startDate)) {
-            showMsg(historyMsg,'End date must be after start date.', 'error');
+            showMsg(historyMsg, 'End date must be after start date.', 'error', false);
             return;
         }
 
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .map(cb => cb.value);
 
         if (selectedTrends.length === 0) {
-            showMsg(historyMsg,'Please select at least one trend to display.', 'warning');
+            showMsg(historyMsg, 'Please select at least one trend to display.', 'error', false);
             return;
         }
 
@@ -201,19 +201,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (!response.ok) {
-                showMsg(historyMsg,data.message || 'Error fetching historical data.', 'error');
+                showMsg(historyMsg, data.message || 'Error fetching historical data.', 'error', false);
                 return;
             }
 
             if (!data.daily || data.daily.length === 0) {
-                showMsg(historyMsg,'No data available for this date range.', 'error');
+                showMsg(historyMsg, 'No data available for this date range.', 'error', false);
                 return;
             }
 
+            clearMsg(historyMsg);
             renderChart(data.location, data.daily, selectedTrends);
         } catch (e) {
             console.error(e);
-            showMsg(historyMsg,'Error fetching historical data.', 'error');
+            showMsg(historyMsg, 'Error fetching historical data.', 'error', false);
         } finally {
             fetchBtn.disabled = false;
             fetchBtn.textContent = 'Fetch Historical Data';

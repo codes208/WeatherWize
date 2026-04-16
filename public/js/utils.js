@@ -10,26 +10,31 @@
  * @param {string} text      - The message to display
  * @param {'success'|'error'} type
  */
-function showMsg(el, text, type) {
+function showMsg(el, text, type, autoDismiss = true) {
     if (!el) return;
     el.textContent = text;
     const cls = type === 'success' ? 'msg-success' : 'msg-error';
     el.className = `location-msg show ${cls}`;
-    setTimeout(() => { el.className = 'location-msg'; }, 4000);
+    if (autoDismiss) setTimeout(() => { el.className = 'location-msg'; }, 4000);
+}
+
+function clearMsg(el) {
+    if (!el) return;
+    el.className = 'location-msg';
 }
 
 function showInlineConfirm(msgEl, message, onConfirm) {
     msgEl.innerHTML = `${message}
-        <button id="confirm-yes-btn" style="margin-left:10px; padding:2px 10px; border-radius:5px; border:none; background:#fff; color:#e53e3e; font-weight:bold; cursor:pointer;">Yes</button>
-        <button id="confirm-no-btn" style="margin-left:6px; padding:2px 10px; border-radius:5px; border:none; background:rgba(255,255,255,0.2); color:#fff; cursor:pointer;">No</button>`;
+        <button class="confirm-yes-btn" style="margin-left:10px; padding:2px 10px; border-radius:5px; border:none; background:#fff; color:#e53e3e; font-weight:bold; cursor:pointer;">Yes</button>
+        <button class="confirm-no-btn" style="margin-left:6px; padding:2px 10px; border-radius:5px; border:none; background:rgba(255,255,255,0.2); color:#fff; cursor:pointer;">No</button>`;
     msgEl.className = 'location-msg show msg-error';
 
-    document.getElementById('confirm-yes-btn').addEventListener('click', async () => {
+    msgEl.querySelector('.confirm-yes-btn').addEventListener('click', async () => {
         msgEl.className = 'location-msg';
         await onConfirm();
     });
 
-    document.getElementById('confirm-no-btn').addEventListener('click', () => {
+    msgEl.querySelector('.confirm-no-btn').addEventListener('click', () => {
         msgEl.className = 'location-msg';
     });
 }

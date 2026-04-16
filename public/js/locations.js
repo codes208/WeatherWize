@@ -22,20 +22,23 @@ document.addEventListener('DOMContentLoaded', () => {
             locations.forEach(({ id, location_name }) => {
                 const card = document.createElement('div');
                 card.className = 'location-card';
-                card.style.cssText = 'display: flex; justify-content: space-between; align-items: center;';
-                card.innerHTML = `
-                    <div>
-                        <h4 style="margin-bottom: 5px;">${location_name}</h4>
-                    </div>
-                `;
+                const row = document.createElement('div');
+                row.className = 'location-card-row';
+                row.innerHTML = `<h4>${location_name}</h4>`;
 
                 const removeBtn = document.createElement('button');
                 removeBtn.className = 'delete-location-btn';
                 removeBtn.textContent = 'Remove';
                 removeBtn.style.marginTop = '0';
-                removeBtn.addEventListener('click', () => deleteLocation(id, location_name));
 
-                card.appendChild(removeBtn);
+                const cardMsg = document.createElement('span');
+                cardMsg.className = 'location-msg';
+
+                removeBtn.addEventListener('click', () => deleteLocation(id, location_name, cardMsg));
+
+                row.appendChild(removeBtn);
+                card.appendChild(row);
+                card.appendChild(cardMsg);
                 locationGrid.appendChild(card);
             });
         } catch (error) {
@@ -44,8 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function deleteLocation(id, locationName) {
-        showInlineConfirm(locationMsg, `Remove "${locationName}"?`, async () => {
+    async function deleteLocation(id, locationName, cardMsg) {
+        showInlineConfirm(cardMsg, `Remove "${locationName}"?`, async () => {
             try {
                 const response = await fetch(`/api/weather/saved/${id}`, {
                     method: 'DELETE',
@@ -55,11 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.message || 'Failed to remove location');
 
-                showMsg(locationMsg,'Location removed', 'success');
                 loadLocations();
             } catch (error) {
                 console.error(error);
-                showMsg(locationMsg,error.message || 'Failed to remove location', 'error');
+                showMsg(cardMsg, error.message || 'Failed to remove location', 'error', false);
             }
         });
     }
@@ -82,11 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(data.message || 'Failed to save location');
 
             addInput.value = '';
-            showMsg(locationMsg,data.message || 'Location saved!', 'success');
+            clearMsg(locationMsg);
             loadLocations();
         } catch (error) {
             console.error(error);
-            showMsg(locationMsg,error.message || 'Failed to save location', 'error');
+            showMsg(locationMsg, error.message || 'Failed to save location', 'error', false);
         }
     }
 

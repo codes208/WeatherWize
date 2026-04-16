@@ -331,7 +331,8 @@ select:focus {
     border: 1px solid var(--border);
     text-decoration: none;
     color: inherit;
-    display: block;
+    display: flex;
+    flex-direction: column;
 }
 
 .location-card:hover {
@@ -760,6 +761,12 @@ select:focus {
 /* ── Locations page ──────────────────────────────────────── */
 .location-search {
     margin-top: 20px;
+}
+
+.location-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 #locations-list {
