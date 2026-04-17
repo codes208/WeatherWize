@@ -45,6 +45,17 @@ async function initDatabase() {
             }
         }
 
+        try {
+            await connection.query('ALTER TABLE alerts ADD COLUMN last_triggered_at TIMESTAMP NULL');
+            console.log('✅ Migration: added last_triggered_at column to alerts');
+        } catch (e) {
+            if (e.code === 'ER_DUP_FIELDNAME') {
+                console.log('ℹ️  Migration: last_triggered_at column already exists');
+            } else {
+                throw e;
+            }
+        }
+
         // 4. Create default admin user
         const bcrypt = require('bcrypt');
 

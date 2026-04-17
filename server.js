@@ -133,8 +133,9 @@ app.get('/alerts-manager', async (req, res) => {
             })),
         });
     } catch (e) {
-        // Don't clear the cookie — just redirect without wiping the session
-        res.redirect('/');
+        console.error('Error rendering alerts-manager:', e);
+        // Preserve session; show a simple error page instead of redirecting
+        res.status(500).send('<h1>Unable to load Alerts Manager</h1><p>Please try again later.</p>');
     }
 });
 
