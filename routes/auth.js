@@ -10,6 +10,7 @@ router.post('/forgot-password', authController.forgotPassword);
 
 // Authenticated user profile
 router.put('/profile', authMiddleware, authController.updateProfile);
+router.delete('/profile', authMiddleware, authController.suspendSelf);
 
 // Admin-only role and user management.
 router.get('/users', authMiddleware, authMiddleware.requireRole('admin'), authController.getAllUsers);

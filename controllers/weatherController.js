@@ -68,7 +68,7 @@ exports.getWeather = async (req, res) => {
         const url = `${OPENWEATHER_BASE_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}&units=imperial`;
         const [response, aqiResponse] = await Promise.all([
             fetch(url),
-            fetch(`${OPENWEATHER_AQI_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}`),
+            fetch(`${OPENWEATHER_AQI_URL}?lat=${geo.lat}&lon=${geo.lon}&appid=${apiKey}`)
         ]);
         const data = await response.json();
 

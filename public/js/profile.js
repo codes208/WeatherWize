@@ -72,4 +72,47 @@ document.addEventListener('DOMContentLoaded', () => {
         else div.classList.add('text-warning');
         div.style.display = 'block';
     }
+
+    // DELETE ACCOUNT (SELF-SUSPEND) LOGIC
+    // This allows a normal or advanced user to "Delete" their account.
+    // Instead of a hard database delete, we safely suspend the account.
+    // We use a custom inline UI (showInlineConfirm) instead of the 
+    // native window.confirm() dialog for a better, integrated user experience.
+    const deleteAccountBtn = document.getElementById('delete-account-btn');
+    if (deleteAccountBtn) {
+        deleteAccountBtn.addEventListener('click', () => {
+            const msgEl = document.getElementById('delete-confirm-msg');
+            showInlineConfirm(msgEl, 'Are you sure you want to delete your account? You will be logged out immediately.', async () => {
+                try {
+                    const response = await fetch('/api/auth/profile', {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // After successful backend suspension, we avoid using a native alert() popup here.
+                        // We use the same inline message UI as the profile update form, 
+                        // wait 2 seconds so the user can read it, and forcefully log them out.
+                        const msgDiv = document.getElementById('profile-message');
+                        showMessage(msgDiv, data.message, 'success');
+                        sessionStorage.clear();
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 5000);
+                    } else {
+                        const msgDiv = document.getElementById('profile-message');
+                        showMessage(msgDiv, data.message || 'Failed to suspend account.', 'error');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    const msgDiv = document.getElementById('profile-message');
+                    showMessage(msgDiv, 'An error occurred while trying to suspend account.', 'error');
+                }
+            });
+        });
+    }
 });

@@ -72,7 +72,7 @@ exports.login = async (req, res) => {
         }
 
         if (user.status === 'suspended') {
-            return res.status(403).json({ message: 'This account has been suspended by an administrator.' });
+            return res.status(403).json({ message: 'This account has been suspended.' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
@@ -286,5 +286,33 @@ exports.deleteUser = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error while deleting user' });
+    }
+};
+
+// SELF-SUSPENSION ENDPOINT (Delete User logic)
+// This endpoint powers the "Delete Account" button for non-admin users. 
+// It does not permanently DELETE the user's database record. Instead, 
+// it safely flips their status to 'suspended' and enforces an immediate 
+// frontend session logout. Only administrators can unsuspend them afterwards.
+exports.suspendSelf = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Admins should not use this endpoint to suspend themselves
+        if (user.role === 'admin') {
+            return res.status(403).json({ message: 'Admins cannot suspend their own account via this endpoint.' });
+        }
+
+        await user.update({ status: 'suspended' });
+
+        res.clearCookie('token'); // Clear backend session cookie (if used)
+        res.json({ message: 'Account suspended successfully.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error while suspending account' });
     }
 };
