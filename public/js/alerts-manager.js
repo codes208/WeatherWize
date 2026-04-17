@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const token = sessionStorage.getItem('token');
-    if (!token) return;
+    if (!getToken()) return;
 
     const locationSelect  = document.getElementById('alert-location');
     const triggerSelect   = document.getElementById('alert-trigger');
@@ -14,9 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Load saved locations into dropdown ─────────────────────
     async function loadLocations() {
         try {
-            const response = await fetch('/api/weather/saved', {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
+            const response = await fetchWithAuth('/api/weather/saved');
             if (!response.ok) return;
             const locations = await response.json();
 
@@ -58,12 +55,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch('/api/alerts', {
+            const response = await fetchWithAuth('/api/alerts', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ location_name, trigger_type, threshold_min, threshold_max }),
             });
 
@@ -95,10 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function deleteAlert(id, locationName, cardMsg) {
         showInlineConfirm(cardMsg, `Remove alert for "${locationName}"?`, async () => {
             try {
-                const response = await fetch(`/api/alerts/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                });
+                const response = await fetchWithAuth(`/api/alerts/${id}`, { method: 'DELETE' });
                 if (response.ok) {
                     clearMsg(alertMessage);
                     window.location.reload();
@@ -115,10 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function disableAlert(id, locationName, cardMsg) {
         showInlineConfirm(cardMsg, `Disable alert for "${locationName}"?`, async () => {
             try {
-                const response = await fetch(`/api/alerts/${id}/disable`, {
-                    method: 'PATCH',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                });
+                const response = await fetchWithAuth(`/api/alerts/${id}/disable`, { method: 'PATCH' });
                 if (response.ok) {
                     clearMsg(alertMessage);
                     window.location.reload();
@@ -134,10 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function enableAlert(id, cardMsg) {
         try {
-            const response = await fetch(`/api/alerts/${id}/enable`, {
-                method: 'PATCH',
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
+            const response = await fetchWithAuth(`/api/alerts/${id}/enable`, { method: 'PATCH' });
             if (response.ok) {
                 clearMsg(alertMessage);
                 window.location.reload();
@@ -152,4 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     loadLocations();
+
+    // When the background poller detects a fired alert, reload so card states reflect the DB
+    document.addEventListener('alertsUpdated', () => window.location.reload());
 });

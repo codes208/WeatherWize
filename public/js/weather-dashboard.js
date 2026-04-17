@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const token = sessionStorage.getItem('token');
+    const token = getToken();
     const user = JSON.parse(sessionStorage.getItem('user') || '{}');
 
     if (!token) {
@@ -27,9 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (lat && lon) {
             url += `&lat=${lat}&lon=${lon}`;
         }
-        const response = await fetch(url, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(url);
 
         const data = await response.json();
         if (!response.ok) {
@@ -40,9 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadSavedLocations() {
         try {
-            const response = await fetch('/api/weather/saved', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await fetchWithAuth('/api/weather/saved');
             const locations = await response.json();
 
             savedLocationsContainer.innerHTML = '';

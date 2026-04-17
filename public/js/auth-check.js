@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.showAlertBanner) window.showAlertBanner(message, 'error', id, bannerKey);
     });
 
-    // Clear other users' banners from sessionStorage on login
+    // Clear other users' banners from sessionStorage on login (why shoul)
     Object.keys(sessionStorage)
         .filter(k => k.startsWith('activeAlertBanners_') && k !== bannerKey)
         .forEach(k => sessionStorage.removeItem(k));
@@ -98,6 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                         idsToMark.push(notification.id);
                     });
+
+                    // Let page-specific scripts react to new alerts firing
+                    document.dispatchEvent(new CustomEvent('alertsUpdated'));
 
                     sessionStorage.setItem(bannerKey, JSON.stringify(stored));
 

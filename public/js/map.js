@@ -1,6 +1,4 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const token = sessionStorage.getItem('token');
-
     document.getElementById('logout-btn').addEventListener('click', () => {
         sessionStorage.removeItem('token');
         sessionStorage.removeItem('user');
@@ -16,9 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (lastLocation) {
         locationLabel.textContent = `Showing: ${lastLocation}`;
         try {
-            const response = await fetch(`/api/weather?location=${encodeURIComponent(lastLocation)}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await fetchWithAuth(`/api/weather?location=${encodeURIComponent(lastLocation)}`);
             const data = await response.json();
             if (response.ok && data.lat != null && data.lon != null) {
                 lat = data.lat;

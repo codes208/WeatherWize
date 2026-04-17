@@ -11,6 +11,9 @@ router.delete('/:id', authMiddleware, authMiddleware.requireRole('advanced', 'ad
 router.patch('/:id/enable', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), alertsController.enableAlert);
 router.patch('/:id/disable', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), alertsController.disableAlert);
 
+// Server-rendered alerts manager page
+router.get('/manager', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), alertsController.renderAlertsManager);
+
 // Admin-only: recently triggered alerts across all users
 router.get('/system-recent', authMiddleware, authMiddleware.requireRole('admin'), alertsController.getSystemRecentAlerts);
 

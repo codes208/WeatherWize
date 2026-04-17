@@ -1,6 +1,9 @@
 const { Op } = require('sequelize');
 const { Alert, Notification } = require('../models');
 
+// Whitelisted trigger types — must match alertWorker.js switch cases
+const VALID_TRIGGER_TYPES = new Set(['Temperature', 'Humidity', 'Wind Speed']);
+
 exports.createAlert = async (req, res) => {
     try {
         const userId = req.user.id;
@@ -8,6 +11,10 @@ exports.createAlert = async (req, res) => {
 
         if (!location_name || !trigger_type || threshold_min === undefined || threshold_min === '' || threshold_max === undefined || threshold_max === '') {
             return res.status(400).json({ message: 'Please fill in all fields (location, metric, min, and max).' });
+        }
+
+        if (!VALID_TRIGGER_TYPES.has(trigger_type)) {
+            return res.status(400).json({ message: 'Invalid trigger type. Must be Temperature, Humidity, or Wind Speed.' });
         }
 
         const min = Number(threshold_min);
@@ -166,6 +173,33 @@ exports.markNotificationsRead = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error marking read' });
+    }
+};
+
+/**
+ * Renders the alerts-manager EJS view with the current user's alerts.
+ * Separated from the API layer so server.js stays free of DB logic.
+ */
+exports.renderAlertsManager = async (req, res) => {
+    try {
+        const alerts = await Alert.findAll({
+            where: { userId: req.user.id },
+            order: [['created_at', 'DESC']],
+        });
+
+        res.render('alerts-manager', {
+            alerts: alerts.map(a => ({
+                id:              a.id,
+                location_name:   a.locationName,
+                trigger_type:    a.triggerType,
+                threshold_value: Number(a.thresholdValue),
+                threshold_max:   Number(a.thresholdMax),
+                is_active:       a.isActive,
+            })),
+        });
+    } catch (e) {
+        console.error('Error rendering alerts-manager:', e);
+        res.status(500).send('<h1>Unable to load Alerts Manager</h1><p>Please try again later.</p>');
     }
 };
 

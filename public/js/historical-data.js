@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const token = sessionStorage.getItem('token');
-    if (!token) return;
+    if (!getToken()) return;
 
     const locationSelect  = document.getElementById('history-location');
     const startDateInput  = document.getElementById('history-start-date');
@@ -137,9 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Load saved locations ───────────────────────────────────
     async function loadLocations() {
         try {
-            const response = await fetch('/api/weather/saved', {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
+            const response = await fetchWithAuth('/api/weather/saved');
             if (!response.ok) return;
             const locations = await response.json();
 
@@ -195,9 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const url = `/api/weather/history?location=${encodeURIComponent(location)}&start=${startDate}&end=${endDate}`;
-            const response = await fetch(url, {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
+            const response = await fetchWithAuth(url);
             const data = await response.json();
 
             if (!response.ok) {

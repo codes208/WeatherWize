@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const token = sessionStorage.getItem('token');
     const user = JSON.parse(sessionStorage.getItem('user') || '{}');
 
     const usernameInput = document.getElementById('username-input');
@@ -35,12 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (newPassword) body.password = newPassword;
 
             try {
-                const response = await fetch('/api/auth/profile', {
+                const response = await fetchWithAuth('/api/auth/profile', {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(body)
                 });
 
@@ -84,12 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const msgEl = document.getElementById('delete-confirm-msg');
             showInlineConfirm(msgEl, 'Are you sure you want to delete your account? You will be logged out immediately.', async () => {
                 try {
-                    const response = await fetch('/api/auth/profile', {
-                        method: 'DELETE',
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
+                    const response = await fetchWithAuth('/api/auth/profile', { method: 'DELETE' });
 
                     const data = await response.json();
 

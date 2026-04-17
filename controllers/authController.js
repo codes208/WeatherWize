@@ -45,7 +45,6 @@ exports.register = async (req, res) => {
             { expiresIn: '1h' }
         );
 
-        res.cookie('token', token, { httpOnly: false, sameSite: 'strict', maxAge: 60 * 60 * 1000 });
         res.status(201).json({
             message: 'User registered successfully',
             token,
@@ -89,7 +88,6 @@ exports.login = async (req, res) => {
             { expiresIn: '1h' }
         );
 
-        res.cookie('token', token, { httpOnly: false, sameSite: 'strict', maxAge: 60 * 60 * 1000 });
         res.json({
             token,
             user: { id: user.id, username: user.username, email: user.email, role: user.role },
@@ -194,6 +192,17 @@ exports.updateProfile = async (req, res) => {
     }
 };
 
+/**
+ * STUB — Forgot password handler.
+ *
+ * Currently generates a cryptographically secure reset token and logs it to
+ * the console for development/demo purposes. In production this token should
+ * be stored (hashed) in the database with an expiry and emailed to the user
+ * via emailService.
+ *
+ * The response is intentionally vague ("if an account exists...") to prevent
+ * username enumeration attacks — we never reveal whether the username exists.
+ */
 exports.forgotPassword = async (req, res) => {
     try {
         const username = req.body.username?.trim();
@@ -203,6 +212,7 @@ exports.forgotPassword = async (req, res) => {
 
         const user = await User.findOne({ where: { username } });
         if (user) {
+            // TODO: store hashed token in DB with expiry and email it to the user.
             const resetToken = require('crypto').randomBytes(32).toString('hex');
             console.log(`[FORGOT PASSWORD] Reset token for user "${username}": ${resetToken}`);
         }
@@ -312,7 +322,6 @@ exports.suspendSelf = async (req, res) => {
 
         await user.update({ status: 'suspended', deleted: true });
 
-        res.clearCookie('token'); // Clear backend session cookie (if used)
         res.json({ message: 'Account suspended successfully.' });
     } catch (error) {
         console.error(error);

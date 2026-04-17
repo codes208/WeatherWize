@@ -11,7 +11,7 @@ const weatherRoutes  = require('./routes/weather');
 const alertsRoutes   = require('./routes/alerts');
 const settingsRoutes = require('./routes/settings');
 
-const { Setting, Alert } = require('./models');
+const { Setting } = require('./models');
 const globalState = require('./config/state');
 require('./services/alertWorker');
 
@@ -55,7 +55,7 @@ app.use(async (req, res, next) => {
     try {
         const setting = await Setting.findOne({ where: { settingKey: 'maintenance_mode' } });
         if (setting && setting.settingValue === 'true') {
-            const token = req.header('Authorization')?.replace('Bearer ', '') || req.query?.token || req.cookies?.token;
+            const token = req.header('Authorization')?.replace('Bearer ', '') || req.query?.token;
             if (token) {
                 try {
                     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -121,34 +121,11 @@ app.get('/dashboard', (req, res) => {
 // Admin dashboard
 app.get('/admin-dashboard', (_req, res) => res.render('admin-dashboard'));
 
-// Alerts Manager — server-rendered EJS with current alert states
-app.get('/alerts-manager', async (req, res) => {
-    const token = req.query.token || req.cookies?.token;
-    if (!token) return res.redirect('/');
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        if (!['advanced', 'admin'].includes(decoded.role)) return res.redirect('/dashboard');
-
-        const alerts = await Alert.findAll({
-            where: { userId: decoded.id },
-            order: [['created_at', 'DESC']],
-        });
-
-        res.render('alerts-manager', {
-            alerts: alerts.map(a => ({
-                id:              a.id,
-                location_name:   a.locationName,
-                trigger_type:    a.triggerType,
-                threshold_value: Number(a.thresholdValue),
-                threshold_max:   Number(a.thresholdMax),
-                is_active:       a.isActive,
-            })),
-        });
-    } catch (e) {
-        console.error('Error rendering alerts-manager:', e);
-        res.status(500).send('<h1>Unable to load Alerts Manager</h1><p>Please try again later.</p>');
-    }
+// Alerts Manager — handled by alertsController via /api/alerts/manager
+app.get('/alerts-manager', (req, res) => {
+    const token = req.query.token;
+    const redirect = token ? `/api/alerts/manager?token=${token}` : '/api/alerts/manager';
+    res.redirect(redirect);
 });
 
 // Start Server

@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const token = sessionStorage.getItem('token');
-    if (!token) return;
+    if (!getToken()) return;
 
     const usersTableBody = document.querySelector('tbody');
     if (!usersTableBody) return;
@@ -10,9 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadUsers() {
         try {
-            const response = await fetch('/api/auth/users', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await fetchWithAuth('/api/auth/users');
 
             if (!response.ok) {
                 throw new Error('Backend route might not exist for getting all users yet.');
@@ -85,12 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function updateRole(userId, role, rowMsg) {
         try {
-            const response = await fetch(`/api/auth/users/${userId}/role`, {
+            const response = await fetchWithAuth(`/api/auth/users/${userId}/role`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ role })
             });
 
@@ -108,12 +102,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function updateStatus(userId, status, rowMsg) {
         try {
-            const response = await fetch(`/api/auth/users/${userId}/status`, {
+            const response = await fetchWithAuth(`/api/auth/users/${userId}/status`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status })
             });
 
@@ -131,12 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function deleteUser(userId, rowMsg) {
         try {
-            const response = await fetch(`/api/auth/users/${userId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const response = await fetchWithAuth(`/api/auth/users/${userId}`, { method: 'DELETE' });
 
             if (response.ok) {
                 loadUsers();

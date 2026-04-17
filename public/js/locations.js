@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const token = sessionStorage.getItem('token');
     const locationGrid = document.getElementById('locations-list');
     const addInput = document.getElementById('add-location-input');
     const addBtn = document.getElementById('add-location-btn');
@@ -7,9 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadLocations() {
         try {
-            const response = await fetch('/api/weather/saved', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await fetchWithAuth('/api/weather/saved');
             const locations = await response.json();
 
             locationGrid.innerHTML = '';
@@ -50,10 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function deleteLocation(id, locationName, cardMsg) {
         showInlineConfirm(cardMsg, `Remove "${locationName}"?`, async () => {
             try {
-                const response = await fetch(`/api/weather/saved/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const response = await fetchWithAuth(`/api/weather/saved/${id}`, { method: 'DELETE' });
 
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.message || 'Failed to remove location');
@@ -71,12 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!location) return;
 
         try {
-            const response = await fetch('/api/weather/save', {
+            const response = await fetchWithAuth('/api/weather/save', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ location })
             });
 

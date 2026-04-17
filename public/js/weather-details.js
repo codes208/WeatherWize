@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const token = sessionStorage.getItem('token');
     const user = JSON.parse(sessionStorage.getItem('user') || '{}');
     const isAdvanced = user.role === 'advanced' || user.role === 'admin';
 
@@ -139,9 +138,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         let qs = `location=${encodeURIComponent(location)}`;
         if (lat && lon) qs += `&lat=${lat}&lon=${lon}`;
-        const response = await fetch(`/api/weather?${qs}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`/api/weather?${qs}`);
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || 'Error fetching weather');
 
@@ -187,9 +184,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             let qs = `location=${encodeURIComponent(location)}`;
             if (lat && lon) qs += `&lat=${lat}&lon=${lon}`;
-            const response = await fetch(`/api/weather/hourly?${qs}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await fetchWithAuth(`/api/weather/hourly?${qs}`);
             const data = await response.json();
             if (!response.ok) throw new Error(data.message || 'Error fetching hourly forecast');
 
@@ -221,9 +216,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             let qs = `location=${encodeURIComponent(location)}`;
             if (lat && lon) qs += `&lat=${lat}&lon=${lon}`;
-            const response = await fetch(`/api/weather/daily?${qs}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await fetchWithAuth(`/api/weather/daily?${qs}`);
             const data = await response.json();
             if (!response.ok) throw new Error(data.message || 'Error fetching 5-day forecast');
 

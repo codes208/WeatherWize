@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const token = sessionStorage.getItem('token');
-    if (!token) return;
+    if (!getToken()) return;
 
     const statsCards = {
         totalUsers: document.getElementById('stat-total-users'),
@@ -11,9 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadStats() {
         try {
-            const response = await fetch('/api/auth/stats', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await fetchWithAuth('/api/auth/stats');
 
             if (!response.ok) throw new Error('Failed to load stats');
 
@@ -34,9 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!container) return;
 
         try {
-            const response = await fetch('/api/alerts/system-recent', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await fetchWithAuth('/api/alerts/system-recent');
 
             if (!response.ok) throw new Error('Failed to load system alerts');
             const alerts = await response.json();

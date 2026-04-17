@@ -39,6 +39,33 @@ function showInlineConfirm(msgEl, message, onConfirm) {
     });
 }
 
+/**
+ * Returns the current user's JWT token from sessionStorage.
+ * Centralised here so every page reads from the same key.
+ * @returns {string|null}
+ */
+function getToken() {
+    return sessionStorage.getItem('token');
+}
+
+/**
+ * Wrapper around fetch that automatically attaches the Authorization header.
+ * Mirrors the native fetch signature — pass any options you normally would.
+ * @param {string} url
+ * @param {RequestInit} [options]
+ * @returns {Promise<Response>}
+ */
+function fetchWithAuth(url, options = {}) {
+    const token = getToken();
+    return fetch(url, {
+        ...options,
+        headers: {
+            ...(options.headers || {}),
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+}
+
 function conditionIcon(condition) {
     const c = (condition || '').toLowerCase();
     let img;

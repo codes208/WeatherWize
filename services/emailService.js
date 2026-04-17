@@ -4,6 +4,19 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM_ADDRESS = process.env.RESEND_FROM || 'WeatherWize Alerts <onboarding@resend.dev>';
 
 /**
+ * Escapes user-controlled strings before interpolating into HTML email templates
+ * to prevent XSS if data is ever compromised or malformed.
+ */
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+/**
  * Sends a weather alert email to a user.
  * @param {string} toEmail   - Recipient email address
  * @param {string} username  - Recipient's username (used in greeting)
@@ -20,6 +33,9 @@ async function sendAlertEmail(toEmail, username, message) {
         return;
     }
 
+    const safeUsername = escapeHtml(username);
+    const safeMessage  = escapeHtml(message);
+
     const { error } = await resend.emails.send({
         from:    FROM_ADDRESS,
         to:      [toEmail],
@@ -27,10 +43,10 @@ async function sendAlertEmail(toEmail, username, message) {
         html: `
             <div style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 32px; background: #1a1a2e; color: #ffffff; border-radius: 12px;">
                 <h2 style="color: #4fc3f7; margin-top: 0;">⛈ WeatherWize Alert</h2>
-                <p style="font-size: 1rem; line-height: 1.6;">Hi <strong>${username}</strong>,</p>
+                <p style="font-size: 1rem; line-height: 1.6;">Hi <strong>${safeUsername}</strong>,</p>
                 <p style="font-size: 1rem; line-height: 1.6;">One of your weather alerts has been triggered:</p>
                 <div style="background: rgba(255,255,255,0.08); border-left: 4px solid #4fc3f7; border-radius: 6px; padding: 16px; margin: 20px 0; font-size: 1rem;">
-                    ${message}
+                    ${safeMessage}
                 </div>
                 <p style="font-size: 0.85rem; color: #aaa; margin-top: 28px;">
                     You can manage your alerts from your
