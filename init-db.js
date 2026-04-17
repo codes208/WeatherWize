@@ -56,6 +56,17 @@ async function initDatabase() {
             }
         }
 
+        try {
+            await connection.query('ALTER TABLE users ADD COLUMN deleted TINYINT(1) NOT NULL DEFAULT 0');
+            console.log('✅ Migration: added deleted column to users');
+        } catch (e) {
+            if (e.code === 'ER_DUP_FIELDNAME') {
+                console.log('ℹ️  Migration: deleted column already exists');
+            } else {
+                throw e;
+            }
+        }
+
         // 4. Create default admin user
         const bcrypt = require('bcrypt');
 

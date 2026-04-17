@@ -72,6 +72,9 @@ exports.login = async (req, res) => {
         }
 
         if (user.status === 'suspended') {
+            if (user.deleted) {
+                return res.status(403).json({ message: 'This account has been deactivated. Please contact admin for reactivation at admin@weatherwize.com' });
+            }
             return res.status(403).json({ message: 'This account has been suspended.' });
         }
 
@@ -250,7 +253,7 @@ exports.updateUserStatus = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        await user.update({ status });
+        await user.update({ status, ...(status === 'active' ? { deleted: false } : {}) });
 
         res.json({
             message: 'User status updated successfully',
@@ -307,7 +310,7 @@ exports.suspendSelf = async (req, res) => {
             return res.status(403).json({ message: 'Admins cannot suspend their own account via this endpoint.' });
         }
 
-        await user.update({ status: 'suspended' });
+        await user.update({ status: 'suspended', deleted: true });
 
         res.clearCookie('token'); // Clear backend session cookie (if used)
         res.json({ message: 'Account suspended successfully.' });

@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         // We use the same inline message UI as the profile update form, 
                         // wait 2 seconds so the user can read it, and forcefully log them out.
                         const msgDiv = document.getElementById('profile-message');
-                        showMessage(msgDiv, data.message, 'success');
+                        showMessage(msgDiv, 'Your account has been successfully deleted.', 'success');
                         sessionStorage.clear();
                         setTimeout(() => {
                             window.location.href = 'index.html';
