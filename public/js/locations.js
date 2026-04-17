@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const locationGrid = document.getElementById('locations-list');
     const addInput = document.getElementById('add-location-input');
     const addBtn = document.getElementById('add-location-btn');

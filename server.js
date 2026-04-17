@@ -83,9 +83,9 @@ app.get('/', (_req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
-// Dashboard — rendered by EJS based on role from JWT cookie
+// Dashboard — rendered by EJS based on role from JWT
 app.get('/dashboard', (req, res) => {
-    const token = req.cookies?.token;
+    const token = req.query.token || req.cookies?.token;
     if (!token) return res.redirect('/');
 
     try {
@@ -96,14 +96,13 @@ app.get('/dashboard', (req, res) => {
 
         res.render('dashboard', { role });
     } catch (e) {
-        res.clearCookie('token');
         res.redirect('/');
     }
 });
 
 // Alerts Manager — server-rendered EJS with current alert states
 app.get('/alerts-manager', async (req, res) => {
-    const token = req.cookies?.token;
+    const token = req.query.token || req.cookies?.token;
     if (!token) return res.redirect('/');
 
     try {

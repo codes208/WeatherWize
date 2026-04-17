@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const token = sessionStorage.getItem('token');
+    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
 
     if (!token) {
         window.location.href = '/index.html';
@@ -15,16 +15,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!allowedRoles.includes(user.role)) {
         showToast('Unauthorized access. Redirecting...', 'warning');
         if (user.role === 'admin') window.location.href = '/admin-dashboard.html';
-        else if (user.role === 'advanced') window.location.href = '/dashboard';
-        else window.location.href = '/dashboard';
+        else window.location.href = `/dashboard?token=${token}`;
         return;
     }
 
     const logoutBtns = document.querySelectorAll('#logout-btn');
     logoutBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('user');
             window.location.href = '/index.html';
         });
     });
@@ -34,19 +33,22 @@ document.addEventListener('DOMContentLoaded', () => {
         brand.addEventListener('click', (e) => {
             e.preventDefault();
             if (user.role === 'admin') window.location.href = '/admin-dashboard.html';
-            else if (user.role === 'advanced') window.location.href = '/dashboard';
-            else window.location.href = '/dashboard';
+            else window.location.href = `/dashboard?token=${token}`;
         });
     });
 
-    // Re-show any alert banners that were pending before a page reload
-    const pendingToasts = sessionStorage.getItem('pendingToasts');
-    if (pendingToasts) {
-        sessionStorage.removeItem('pendingToasts');
-        JSON.parse(pendingToasts).forEach(msg => {
-            if (window.showAlertBanner) window.showAlertBanner(msg, 'error');
-        });
-    }
+    const bannerKey = `activeAlertBanners_${user.id}`;
+
+    // Re-show any persisted alert banners on every page load
+    const storedBanners = JSON.parse(sessionStorage.getItem(bannerKey) || '[]');
+    storedBanners.forEach(({ id, message }) => {
+        if (window.showAlertBanner) window.showAlertBanner(message, 'error', id, bannerKey);
+    });
+
+    // Clear other users' banners from sessionStorage on login
+    Object.keys(sessionStorage)
+        .filter(k => k.startsWith('activeAlertBanners_') && k !== bannerKey)
+        .forEach(k => sessionStorage.removeItem(k));
 
     // Start background notification poller
     if (token) {
@@ -58,8 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (response.status === 401) {
                     clearInterval(pollInterval);
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('user');
+                    sessionStorage.removeItem('token');
+                    sessionStorage.removeItem('user');
                     window.location.href = '/index.html';
                     return;
                 }
@@ -67,8 +69,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Suspended — force sign-out
                 if (response.status === 403) {
                     clearInterval(pollInterval);
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('user');
+                    sessionStorage.removeItem('token');
+                    sessionStorage.removeItem('user');
                     window.location.href = '/index.html';
                     return;
                 }
@@ -85,12 +87,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (notifications && notifications.length > 0) {
                     const idsToMark = [];
+                    const stored = JSON.parse(sessionStorage.getItem(bannerKey) || '[]');
+
                     notifications.forEach(notification => {
+                        if (!stored.find(b => b.id === notification.id)) {
+                            stored.push({ id: notification.id, message: notification.message });
+                        }
                         if (window.showAlertBanner) {
-                            window.showAlertBanner(notification.message, 'error');
+                            window.showAlertBanner(notification.message, 'error', notification.id, bannerKey);
                         }
                         idsToMark.push(notification.id);
                     });
+
+                    sessionStorage.setItem(bannerKey, JSON.stringify(stored));
 
                     await fetch('/api/alerts/notifications/read', {
                         method: 'POST',
@@ -100,12 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         body: JSON.stringify({ notificationIds: idsToMark })
                     });
-
-                    if (window.location.pathname === '/alerts-manager') {
-                        sessionStorage.setItem('pendingToasts', JSON.stringify(idsToMark.map((_, i) => notifications[i].message)));
-                        window.location.reload();
-                        return;
-                    }
                 }
             } catch (err) {
                 // Silently ignore polling errors

@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const token = sessionStorage.getItem('token');
+    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
 
     const usernameInput = document.getElementById('username-input');
     if (usernameInput && user.username) {
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (response.ok) {
                     const updatedUser = { ...user, ...data.user };
-                    localStorage.setItem('user', JSON.stringify(updatedUser));
+                    sessionStorage.setItem('user', JSON.stringify(updatedUser));
                     showMessage(msgDiv, data.message, 'success');
                     if (document.getElementById('password-input')) {
                         document.getElementById('password-input').value = '';

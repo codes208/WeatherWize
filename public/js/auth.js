@@ -21,15 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (response.ok) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
+                    sessionStorage.setItem('token', data.token);
+                    sessionStorage.setItem('user', JSON.stringify(data.user));
 
                     if (data.user.role === 'admin') {
                         window.location.href = '/admin-dashboard.html';
-                    } else if (data.user.role === 'advanced') {
-                        window.location.href = '/dashboard';
                     } else {
-                        window.location.href = '/dashboard';
+                        window.location.href = `/dashboard?token=${data.token}`;
                     }
                 } else {
                     errorDiv.textContent = data.message;
@@ -126,16 +124,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (response.ok) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
+                    sessionStorage.setItem('token', data.token);
+                    sessionStorage.setItem('user', JSON.stringify(data.user));
                     showToast('Registration successful!', 'success');
 
                     if (data.user.role === 'admin') {
                         window.location.href = '/admin-dashboard.html';
-                    } else if (data.user.role === 'advanced') {
-                        window.location.href = '/dashboard';
                     } else {
-                        window.location.href = '/dashboard';
+                        window.location.href = `/dashboard?token=${data.token}`;
                     }
                 } else {
                     errorDiv.textContent = data.message;

@@ -38,7 +38,7 @@
         banner.addEventListener('animationend', () => banner.remove());
     }
 
-    window.showAlertBanner = function (message, type = 'error') {
+    window.showAlertBanner = function (message, type = 'error', id = null, bannerKey = 'activeAlertBanners') {
         const navbar = document.querySelector('.navbar');
         if (!navbar) {
             window.showToast(message, type, 0);
@@ -48,12 +48,17 @@
         const banner = document.createElement('div');
         banner.className = `alert-banner alert-banner-${type}`;
         banner.innerHTML = `
-            <span class="alert-banner-icon">${ICONS[type] || ICONS.info}</span>
             <span class="alert-banner-body">${message}</span>
-            <button class="alert-banner-close" aria-label="Dismiss">✕</button>
+            <button class="alert-banner-close">Dismiss</button>
         `;
 
-        banner.querySelector('.alert-banner-close').addEventListener('click', () => dismissBanner(banner));
+        banner.querySelector('.alert-banner-close').addEventListener('click', () => {
+            if (id !== null) {
+                const stored = JSON.parse(sessionStorage.getItem(bannerKey) || '[]');
+                sessionStorage.setItem(bannerKey, JSON.stringify(stored.filter(b => b.id !== id)));
+            }
+            dismissBanner(banner);
+        });
         navbar.insertAdjacentElement('afterend', banner);
     };
 

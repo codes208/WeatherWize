@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const token = sessionStorage.getItem('token');
+    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
 
     if (!token) {
         window.location.href = '/index.html';
@@ -12,9 +12,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedLocationsContainer = document.getElementById('saved-locations-list');
 
     document.getElementById('logout-btn').addEventListener('click', () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
         window.location.href = '/index.html';
+    });
+
+    const alertsBtn = document.getElementById('alerts-manager-btn');
+    if (alertsBtn) alertsBtn.addEventListener('click', () => {
+        window.location.href = `/alerts-manager?token=${token}`;
     });
 
     async function fetchWeatherData(location, lat, lon) {

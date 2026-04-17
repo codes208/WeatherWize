@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) return;
 
     const usersTableBody = document.querySelector('tbody');
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderUsers(users) {
-        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        const currentUser = JSON.parse(sessionStorage.getItem('user') || '{}');
         usersTableBody.innerHTML = '';
         users.forEach(user => {
             const isSuspended = user.status === 'suspended';
