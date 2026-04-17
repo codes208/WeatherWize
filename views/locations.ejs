@@ -4,17 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radar Map - WeatherWize</title>
+    <title>Manage Locations - WeatherWize</title>
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/weatherWize.CSS">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="./js/toast.js"></script>
+    <script src="./js/utils.js"></script>
     <script src="./js/auth-check.js" defer></script>
-    <script src="./js/map.js" defer></script>
+    <script src="./js/locations.js" defer></script>
 </head>
 
-<body data-allowed-roles="advanced,admin" class="dashboard-page">
+<body data-allowed-roles="general,advanced" class="dashboard-page">
     <div class="sky-wrap" aria-hidden="true">
         <div class="cloud cloud-1"></div>
         <div class="cloud cloud-2"></div>
@@ -27,20 +26,21 @@
                 WeatherWize
             </a>
             <div class="nav-right">
-                <a href="profile.html" id="username-display"></a>
-                <button id="logout-btn" class="btn">Logout</button>
+                <a href="/profile" id="username-display"></a>
+                <button id="logout-btn" class="btn" onclick="window.location.href='/'">Logout</button>
             </div>
         </div>
     </nav>
     <main class="container dashboard-content">
-        <div id="map-location-label" class="map-location-label"></div>
-        <div id="full-map"></div>
-        <div id="radar-controls-bar">
-            <button id="radar-play-btn" class="btn radar-btn">&#9646;&#9646;</button>
-            <span class="radar-time-label">Time:</span>
-            <span id="radar-timestamp" class="radar-timestamp">--</span>
-            <span id="radar-frame-label" class="radar-frame-label"></span>
+        <h2>Manage Saved Locations</h2>
+
+        <div class="weather-search location-search">
+            <input type="text" id="add-location-input" placeholder="e.g. Seattle, Washington">
+            <button id="add-location-btn" class="btn">Add</button>
         </div>
+        <span id="location-msg" class="location-msg"></span>
+
+        <div id="locations-list" class="location-grid"></div>
     </main>
 </body>
 

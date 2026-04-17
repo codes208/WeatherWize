@@ -38,6 +38,10 @@ app.use('/api', limiter);
 app.use(async (req, res, next) => {
     if (
         req.path === '/' ||
+        req.path === '/forgot-password' ||
+        req.path === '/select-account-type' ||
+        req.path === '/register-general-user' ||
+        req.path === '/register-advanced-user' ||
         req.path.startsWith('/css/') ||
         req.path.startsWith('/js/') ||
         req.path.startsWith('/images/') ||
@@ -86,9 +90,15 @@ app.use('/api/weather',  weatherRoutes);
 app.use('/api/alerts',   alertsRoutes);
 app.use('/api/settings', settingsRoutes);
 
-// Root → login page
-app.get('/', (_req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'index.html'));
+// Simple EJS page routes
+const simplePages = [
+    'index', 'profile', 'locations', 'map', 'historical-data',
+    'settings', 'admin-users', 'forgot-password', 'select-account-type',
+    'register-general-user', 'register-advanced-user', 'weather-details'
+];
+simplePages.forEach(page => {
+    const route = page === 'index' ? '/' : `/${page}`;
+    app.get(route, (_req, res) => res.render(page));
 });
 
 // Dashboard — rendered by EJS based on role from JWT
@@ -100,13 +110,16 @@ app.get('/dashboard', (req, res) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const role = decoded.role;
 
-        if (role === 'admin') return res.redirect('/admin-dashboard.html');
+        if (role === 'admin') return res.redirect('/admin-dashboard');
 
         res.render('dashboard', { role });
     } catch (e) {
         res.redirect('/');
     }
 });
+
+// Admin dashboard
+app.get('/admin-dashboard', (_req, res) => res.render('admin-dashboard'));
 
 // Alerts Manager — server-rendered EJS with current alert states
 app.get('/alerts-manager', async (req, res) => {
@@ -134,13 +147,9 @@ app.get('/alerts-manager', async (req, res) => {
         });
     } catch (e) {
         console.error('Error rendering alerts-manager:', e);
-        // Preserve session; show a simple error page instead of redirecting
         res.status(500).send('<h1>Unable to load Alerts Manager</h1><p>Please try again later.</p>');
     }
 });
-
-// Static HTML views (non-EJS pages)
-app.use(express.static(path.join(__dirname, 'views')));
 
 // Start Server
 app.listen(PORT, async () => {

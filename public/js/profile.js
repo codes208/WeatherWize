@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         showMessage(msgDiv, 'Your account has been successfully deleted.', 'success');
                         sessionStorage.clear();
                         setTimeout(() => {
-                            window.location.href = 'index.html';
+                            window.location.href = '/';
                         }, 5000);
                     } else {
                         const msgDiv = document.getElementById('profile-message');

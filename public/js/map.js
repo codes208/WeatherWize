@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('logout-btn').addEventListener('click', () => {
         sessionStorage.removeItem('token');
         sessionStorage.removeItem('user');
-        window.location.href = '/index.html';
+        window.location.href = '/';
     });
 
     const lastLocation = localStorage.getItem('lastMapLocation');

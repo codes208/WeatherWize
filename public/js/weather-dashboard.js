@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const user = JSON.parse(sessionStorage.getItem('user') || '{}');
 
     if (!token) {
-        window.location.href = '/index.html';
+        window.location.href = '/';
         return;
     }
 
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('logout-btn').addEventListener('click', () => {
         sessionStorage.removeItem('token');
         sessionStorage.removeItem('user');
-        window.location.href = '/index.html';
+        window.location.href = '/';
     });
 
     const alertsBtn = document.getElementById('alerts-manager-btn');
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.className = 'location-card weather-location-card';
                 card.addEventListener('click', () => {
                     localStorage.setItem('lastMapLocation', location);
-                    let navUrl = `weather-details.html?location=${encodeURIComponent(location)}`;
+                    let navUrl = `/weather-details?location=${encodeURIComponent(location)}`;
                     if (lat && lon) navUrl += `&lat=${lat}&lon=${lon}`;
                     window.location.href = navUrl;
                 });

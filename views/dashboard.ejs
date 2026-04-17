@@ -32,14 +32,14 @@
             </a>
             <div class="nav-links">
                 <% if (role === 'advanced') { %>
-                <button class="btn btn-text" onclick="window.location.href='historical-data.html'">Historical Data</button>
+                <button class="btn btn-text" onclick="window.location.href='/historical-data'">Historical Data</button>
                 <button class="btn btn-text" id="alerts-manager-btn">Manage Alerts</button>
-                <button class="btn btn-text" onclick="window.location.href='map.html'">Map</button>
+                <button class="btn btn-text" onclick="window.location.href='/map'">Map</button>
                 <% } %>
-                <button class="btn btn-text" onclick="window.location.href='locations.html'">Manage Locations</button>
+                <button class="btn btn-text" onclick="window.location.href='/locations'">Manage Locations</button>
             </div>
             <div class="nav-right">
-                <a href="profile.html" id="username-display"></a>
+                <a href="/profile" id="username-display"></a>
                 <button id="logout-btn" class="btn">Logout</button>
             </div>
         </div>
