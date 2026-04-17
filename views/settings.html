@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/weatherWize.CSS">
     <script src="./js/toast.js"></script>
+    <script src="./js/utils.js"></script>
     <script src="./js/auth-check.js" defer></script>
     <script src="./js/settings.js" defer></script>
 </head>
@@ -34,7 +35,6 @@
         <h2 class="text-center">Global System Settings</h2>
 
         <div class="auth-card auth-card-lg">
-            <span id="settings-message" class="location-msg"></span>
             <div class="form-group settings-toggle-row">
                 <div>
                     <h3 class="settings-section-title">Maintenance Mode</h3>
@@ -46,6 +46,7 @@
                 </label>
             </div>
 
+            <span id="settings-message" class="location-msg"></span>
             <button id="save-settings-btn" class="btn btn-block">Save System Configuration</button>
         </div>
     </main>

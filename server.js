@@ -36,14 +36,22 @@ app.use('/api', limiter);
 
 // Maintenance Mode (blocks non-admins when active)
 app.use(async (req, res, next) => {
-    if (req.path.startsWith('/api/settings') || req.path.startsWith('/api/auth/login')) {
+    if (
+        req.path === '/' ||
+        req.path.startsWith('/css/') ||
+        req.path.startsWith('/js/') ||
+        req.path.startsWith('/images/') ||
+        req.path.startsWith('/api/settings') ||
+        req.path.startsWith('/api/auth/login') ||
+        req.path.startsWith('/api/auth/register')
+    ) {
         return next();
     }
 
     try {
         const setting = await Setting.findOne({ where: { settingKey: 'maintenance_mode' } });
         if (setting && setting.settingValue === 'true') {
-            const token = req.header('Authorization')?.replace('Bearer ', '') || req.cookies?.token;
+            const token = req.header('Authorization')?.replace('Bearer ', '') || req.query?.token || req.cookies?.token;
             if (token) {
                 try {
                     const decoded = jwt.verify(token, process.env.JWT_SECRET);

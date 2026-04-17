@@ -23,30 +23,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (saveBtn) {
-        saveBtn.addEventListener('click', async () => {
-            try {
-                const response = await fetch('/api/settings', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        maintenance_mode: maintenanceToggle ? maintenanceToggle.checked : undefined
-                    })
-                });
+        saveBtn.addEventListener('click', () => {
+            showInlineConfirm(msgDiv, 'Save system configuration?', async () => {
+                try {
+                    const response = await fetch('/api/settings', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            maintenance_mode: maintenanceToggle ? maintenanceToggle.checked : undefined
+                        })
+                    });
 
-                const data = await response.json();
+                    const data = await response.json();
 
-                if (response.ok) {
-                    clearMsg(msgDiv);
-                    showMsg(msgDiv,data.message, 'success');
-                } else {
-                    showMsg(msgDiv,data.message, 'error', false);
+                    if (response.ok) {
+                        clearMsg(msgDiv);
+                        showMsg(msgDiv, data.message, 'success');
+                    } else {
+                        showMsg(msgDiv, data.message, 'error', false);
+                    }
+                } catch (e) {
+                    showMsg(msgDiv, 'Error saving settings.', 'error', false);
                 }
-            } catch (e) {
-                showMsg(msgDiv,'Error saving settings.', 'error', false);
-            }
+            });
         });
     }
 
