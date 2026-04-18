@@ -42,7 +42,7 @@ async function run() {
         section('Core Weather Functionality');
 
         // Test 3: Fetch current weather (UC-005)
-        const weatherRes = await api('GET', '/api/weather?location=Seattle', null, generalToken);
+        const weatherRes = await api('GET', '/api/weather?location=Seattle,%20WA', null, generalToken);
         assertStatus(weatherRes, 200, 'Fetch current weather for Seattle → 200');
         assert(
             weatherRes.data.temp !== undefined && weatherRes.data.condition !== undefined,
@@ -50,8 +50,8 @@ async function run() {
         );
 
         // Test 4: Save a location (UC-006)
-        const saveRes = await api('POST', '/api/weather/save', { location: 'Portland' }, generalToken);
-        assertStatus(saveRes, 201, 'Save location (Portland) → 201');
+        const saveRes = await api('POST', '/api/weather/save', { location: 'Portland, OR' }, generalToken);
+        assertStatus(saveRes, 201, 'Save location (Portland, OR) → 201');
 
         // Grab location ID for cleanup
         const savedRes = await api('GET', '/api/weather/saved', null, generalToken);
@@ -77,7 +77,7 @@ async function run() {
         assertStatus(blockedRes, 403, 'General user GET /api/auth/users → 403 (RBAC)');
 
         // Test 8: General user blocked from historical data (UC-009)
-        const histRes = await api('GET', '/api/weather/history?location=Seattle', null, generalToken);
+        const histRes = await api('GET', '/api/weather/history?location=Seattle,%20WA', null, generalToken);
         assertStatus(histRes, 403, 'General user GET /api/weather/history → 403 (RBAC)');
 
     } catch (err) {

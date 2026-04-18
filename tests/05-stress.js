@@ -18,7 +18,7 @@ const {
 
 const WORKERS = parseInt(process.env.STRESS_WORKERS) || 20;
 const BURST_SIZE = parseInt(process.env.STRESS_BURST_SIZE) || 50;
-const CITIES = ['Seattle', 'Portland', 'Denver', 'Chicago', 'Miami', 'Houston', 'Phoenix', 'Dallas', 'Atlanta', 'Boston'];
+const CITIES = ['Seattle, WA', 'Portland, OR', 'Denver, CO', 'Chicago, IL', 'Miami, FL', 'Houston, TX', 'Phoenix, AZ', 'Dallas, TX', 'Atlanta, GA', 'Boston, MA'];
 
 // ─── Helpers ────────────────────────────────────────────────
 

@@ -172,7 +172,7 @@ try {
 Write-Info "Initializing database (node init-db.js)..."
 Push-Location $ProjectRoot
 try {
-    $dbOutput = & node --no-deprecation init-db.js 2>&1
+    $dbOutput = & node --no-deprecation database/init.js 2>&1
     if ($LASTEXITCODE -ne 0) {
         Write-Fail "Database initialization failed."
         Write-Host $dbOutput -ForegroundColor Red
@@ -225,11 +225,11 @@ if ($Dev) {
     Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkCyan
     Write-Host ""
     $env:NODE_OPTIONS = "--no-deprecation"
-    & npx nodemon server.js
+    & npx nodemon src/server.js
 } else {
     Write-Info "Starting server..."
     Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkCyan
     Write-Host ""
-    & node --no-deprecation server.js
+    & node --no-deprecation src/server.js
 }
 Pop-Location

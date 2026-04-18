@@ -38,9 +38,9 @@ async function run() {
             cleanup.userIds.push(user.user.id);
             const login = await loginUser(user.credentials.username, user.credentials.password);
 
-            // Save location
-            const saveRes = await api('POST', '/api/weather/save', { location: 'Denver' }, login.token);
-            assertStatus(saveRes, 201, 'Save location → 201');
+            // Save a location for login user
+            const saveRes = await api('POST', '/api/weather/save', { location: 'Denver, CO' }, login.token);
+            assertStatus(saveRes, 201, 'Denver location saved');
 
             // List saved locations
             const listRes = await api('GET', '/api/weather/saved', null, login.token);
@@ -72,10 +72,10 @@ async function run() {
 
             // Create alert
             const createRes = await api('POST', '/api/alerts', {
-                location_name: 'Chicago',
-                trigger_type: 'Temperature drops below',
-                threshold: 32,
-                threshold_value: 32,
+                location_name: 'Chicago, IL',
+                trigger_type: 'Temperature',
+                threshold_min: 0,
+                threshold_max: 32,
             }, advUser.token);
             assertStatus(createRes, 201, 'Create alert → 201');
 
@@ -108,9 +108,12 @@ async function run() {
             cleanup.userIds.push(userA.user.id, userB.user.id);
 
             // User A saves Miami
-            await api('POST', '/api/weather/save', { location: 'Miami' }, userA.token);
+            await api('POST', '/api/weather/save', { location: 'Miami, FL' }, userA.token);
 
             // User B lists saved — should NOT see Miami
+            // Clean up: delete Miami for userA
+            const savedResA = await api('GET', '/api/weather/saved', null, userA.token);
+            await api('DELETE', `/api/weather/saved/${savedResA.data[0].id}`, null, userA.token);
             const listB = await api('GET', '/api/weather/saved', null, userB.token);
             const leaked = listB.data.find(loc => loc.location_name.toLowerCase().includes('miami'));
             assert(!leaked, 'User B cannot see User A\'s saved location (tenant isolation)');
@@ -128,10 +131,10 @@ async function run() {
             cleanup.userIds.push(userA.user.id, userB.user.id);
 
             await api('POST', '/api/alerts', {
-                location_name: 'Boston',
-                trigger_type: 'Wind speed exceeds',
-                threshold: 50,
-                threshold_value: 50,
+                location_name: 'Boston, MA',
+                trigger_type: 'Wind Speed',
+                threshold_min: 50,
+                threshold_max: 999,
             }, userA.token);
 
             const listB = await api('GET', '/api/alerts', null, userB.token);
@@ -191,18 +194,18 @@ async function run() {
             cleanup.userIds.push(user.user.id);
 
             // General user → historical data blocked
-            const blockedRes = await api('GET', '/api/weather/history?location=Seattle', null, user.token);
-            assertStatus(blockedRes, 403, 'General user → historical data → 403');
+            const blockedRes = await api('GET', '/api/weather/history?location=Seattle,%20WA&start=2023-01-01&end=2023-01-05', null, user.token);
+            assertStatus(blockedRes, 403, 'Historical data blocked for general user');
 
-            // Admin promotes to advanced
-            await api('PUT', `/api/auth/users/${user.user.id}/role`, { role: 'advanced' }, cleanup.adminToken);
+            // 5. Upgrade user to advanced
+            await api('PUT', `/api/auth/users/${user.user.id}/role`, { role: 'advanced' }, admin.token);
 
-            // Re-login to get fresh token with new role
+            // 6. User re-logs in
             const freshLogin = await loginUser(user.credentials.username, user.credentials.password);
 
-            // Advanced user → historical data accessible
-            const unlockedRes = await api('GET', '/api/weather/history?location=Seattle', null, freshLogin.token);
-            assertStatus(unlockedRes, 200, 'Promoted to advanced → historical data → 200');
+            // 7. Try fetching historical data again
+            const unlockedRes = await api('GET', '/api/weather/history?location=Seattle,%20WA&start=2023-01-01&end=2023-01-05', null, freshLogin.token);
+            assertStatus(unlockedRes, 200, 'Historical data allowed after role upgrade');
         }
 
         // ─────────────────────────────────────────────────────
@@ -215,10 +218,10 @@ async function run() {
             cleanup.userIds.push(user.user.id);
 
             const res = await api('POST', '/api/alerts', {
-                location_name: 'Seattle',
-                trigger_type: 'Temperature drops below',
-                threshold: 32,
-                threshold_value: 32,
+                location_name: 'Seattle, WA',
+                trigger_type: 'Temperature',
+                threshold_min: 0,
+                threshold_max: 32,
             }, user.token);
             assertStatus(res, 403, 'General user POST /api/alerts → 403');
         }

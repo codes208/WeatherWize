@@ -19,8 +19,8 @@ const {
 
 const SOAK_DURATION_MS = parseInt(process.env.SOAK_DURATION_MS) || 120_000; // 2 minutes
 const SOAK_INTERVAL_MS = parseInt(process.env.SOAK_INTERVAL_MS) || 500;
+const CITIES = (process.env.SOAK_CITIES || 'Seattle, WA;Portland, OR;Denver, CO;Chicago, IL;Miami, FL').split(';');
 const LATENCY_THRESHOLD_PCT = parseInt(process.env.LATENCY_THRESHOLD_PCT) || 50;
-const CITIES = (process.env.SOAK_CITIES || 'Seattle,Portland,Denver,Chicago,Miami').split(',');
 
 // ─── Circular Buffer ────────────────────────────────────────
 class LatencyBuffer {

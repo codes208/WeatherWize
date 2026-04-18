@@ -8,26 +8,7 @@ const OPENWEATHER_AQI_URL      = 'http://api.openweathermap.org/data/2.5/air_pol
 
 const AQI_LABELS = { 1: 'Good', 2: 'Fair', 3: 'Moderate', 4: 'Poor', 5: 'Very Poor' };
 
-async function geocodeLocation(location, apiKey) {
-    const geoUrl = `${OPENWEATHER_GEO_URL}?q=${encodeURIComponent(location)}&limit=5&appid=${apiKey}`;
-    const geoResponse = await fetch(geoUrl);
-    if (!geoResponse.ok) return null;
-    const geoData = await geoResponse.json();
-    if (!geoData.length) return null;
-
-    // If the user typed "City, State", try to match the state from the results
-    const parts = location.split(',');
-    let match = geoData[0];
-    if (parts.length >= 2) {
-        const stateHint = parts[1].trim().toLowerCase();
-        const stateMatch = geoData.find(r => r.state?.toLowerCase().includes(stateHint) || r.state?.toLowerCase() === stateHint);
-        if (stateMatch) match = stateMatch;
-    }
-
-    const { name, state, country, lat, lon } = match;
-    const displayName = state ? `${name}, ${state}` : `${name}, ${country}`;
-    return { name, state, country, lat, lon, displayName };
-}
+const { geocodeLocation } = require('../services/weatherService');
 
 async function resolveCoordinates(req, res) {
     const location = req.query.location?.trim();
@@ -45,10 +26,12 @@ async function resolveCoordinates(req, res) {
     }
 
     let geo;
+    console.log("resolveCoordinates called with location:", location);
     if (req.query.lat && req.query.lon && req.query.lat !== 'undefined' && req.query.lon !== 'undefined') {
         geo = { displayName: location, lat: req.query.lat, lon: req.query.lon };
     } else {
         geo = await geocodeLocation(location, apiKey);
+        console.log("geocodeLocation returned:", geo);
     }
 
     if (!geo) {

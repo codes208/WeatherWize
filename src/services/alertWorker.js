@@ -2,6 +2,7 @@ const cron = require('node-cron');
 const { Op } = require('sequelize');
 const { Alert, Notification, User } = require('../models');
 const { sendAlertEmail } = require('./emailService');
+const { geocodeLocation, fetchCurrentWeather } = require('./weatherService');
 
 /**
  * Background alert worker — runs every 10 minutes.
@@ -61,19 +62,17 @@ cron.schedule('*/10 * * * *', async () => {
         for (const [locationQuery, locAlerts] of Object.entries(groupedAlerts)) {
             try {
                 // Step 1: Geocode the location name to lat/lon.
-                const geoUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(locationQuery)}&limit=1&appid=${apiKey}`;
-                const geoRes = await fetch(geoUrl);
-                const geoData = await geoRes.json();
-                if (!geoData || !geoData.length) continue;
-
-                const { lat, lon } = geoData[0];
+                const geoData = await geocodeLocation(locationQuery, apiKey);
+                if (!geoData) continue;
+                const { lat, lon } = geoData;
 
                 // Step 2: Fetch current weather conditions for that location.
-                const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
-                const weatherRes = await fetch(url);
-                const weatherData = await weatherRes.json();
-
-                if (!weatherRes.ok) continue;
+                let weatherData;
+                try {
+                    weatherData = await fetchCurrentWeather(lat, lon, apiKey);
+                } catch (err) {
+                    continue;
+                }
 
                 const temp      = weatherData.main?.temp;
                 const windSpeed = weatherData.wind?.speed;

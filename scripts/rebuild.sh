@@ -143,7 +143,7 @@ fi
 # ─── Step 6: Initialize database ────────────────────────────
 info "Initializing database (node init-db.js)..."
 
-DB_OUTPUT=$(node --no-deprecation init-db.js 2>&1) || {
+DB_OUTPUT=$(node --no-deprecation database/init.js 2>&1) || {
     fail "Database initialization failed."
     echo -e "${RED}$DB_OUTPUT${NC}"
     exit 1
@@ -183,10 +183,10 @@ if [ "$DEV_MODE" = true ]; then
     info "Starting server in DEV mode (nodemon)..."
     echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
-    NODE_OPTIONS="--no-deprecation" npx nodemon server.js
+    NODE_OPTIONS="--no-deprecation" npx nodemon src/server.js
 else
     info "Starting server..."
     echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
-    node --no-deprecation server.js
+    node --no-deprecation src/server.js
 fi

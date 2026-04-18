@@ -2,12 +2,12 @@
   "name": "weatherwize",
   "version": "1.0.0",
   "description": "WeatherWize App Refactored to Node/Express",
-  "main": "server.js",
+  "main": "src/server.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "db:init": "node init-db.js"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "db:init": "node database/init.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
