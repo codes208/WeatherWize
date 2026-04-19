@@ -1,5 +1,6 @@
+const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
-const { Alert, Notification } = require('../models');
+const { Alert, Notification, User, Location } = require('../models');
 
 // Whitelisted trigger types — must match alertWorker.js switch cases
 const VALID_TRIGGER_TYPES = new Set(['Temperature', 'Humidity', 'Wind Speed']);
@@ -203,9 +204,65 @@ exports.renderAlertsManager = async (req, res) => {
     }
 };
 
+/**
+ * Renders the admin dashboard with stats and recent system alerts pre-loaded.
+ * Fetches all data server-side so the page renders complete — no client-side API calls needed.
+ */
+exports.renderAdminDashboard = async (req, res) => {
+    const token = req.header('Authorization')?.replace('Bearer ', '') || req.query.token;
+    if (!token) return res.redirect('/');
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (decoded.role !== 'admin') return res.redirect('/');
+    } catch (e) {
+        return res.redirect('/');
+    }
+
+    try {
+        const [totalUsers, premiumUsers, totalLocations, suspendedUsers, recentAlerts] = await Promise.all([
+            User.count({ where: { status: 'active' } }),
+            User.count({ where: { role: 'advanced', status: 'active' } }),
+            Location.count(),
+            User.count({ where: { status: 'suspended' } }),
+            Alert.findAll({
+                where: { isActive: false, lastTriggeredAt: { [Op.ne]: null } },
+                order: [['lastTriggeredAt', 'DESC']],
+                limit: 10,
+                include: [{ model: User, attributes: ['username'] }],
+            }),
+        ]);
+
+        const now = Date.now();
+        const formatTimeAgo = (date) => {
+            const seconds = Math.floor((now - new Date(date).getTime()) / 1000);
+            if (seconds < 60) return 'Just now';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+            const days = Math.floor(hours / 24);
+            return `${days} day${days !== 1 ? 's' : ''} ago`;
+        };
+
+        res.render('admin-dashboard', {
+            stats: { totalUsers, premiumUsers, totalLocations, suspendedUsers },
+            recentAlerts: recentAlerts.map(a => ({
+                trigger_type:    a.triggerType,
+                location_name:   a.locationName,
+                threshold_value: Number(a.thresholdValue),
+                username:        a.User?.username || 'Unknown',
+                timeAgo:         formatTimeAgo(a.lastTriggeredAt),
+            })),
+        });
+    } catch (e) {
+        console.error('Error rendering admin dashboard:', e);
+        res.status(500).send('<h1>Unable to load Admin Dashboard</h1>');
+    }
+};
+
 exports.getSystemRecentAlerts = async (req, res) => {
     try {
-        const { User } = require('../models');
         const alerts = await Alert.findAll({
             where: {
                 isActive: false,

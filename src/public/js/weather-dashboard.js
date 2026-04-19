@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Advanced features
-    if (user.role === 'advanced' || user.role === 'admin') {
+    if (user.role === 'advanced') {
         const precipMapSection = document.getElementById('precip-map-section');
         if (precipMapSection && document.getElementById('precip-map')) {
             let precipMap = null;

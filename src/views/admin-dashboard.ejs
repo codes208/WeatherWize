@@ -10,7 +10,6 @@
     <script src="./js/toast.js"></script>
     <script src="./js/utils.js"></script>
     <script src="./js/auth-check.js" defer></script>
-    <script src="./js/admin-dashboard.js" defer></script>
 </head>
 
 <body data-allowed-roles="admin" class="dashboard-page">
@@ -26,11 +25,11 @@
                 WeatherWize
             </a>
             <div class="nav-links">
-                <button class="btn btn-text" onclick="window.location.href='/admin-users'">Manage Users</button>
-                <button class="btn btn-text" onclick="window.location.href='/settings'">System Settings</button>
+                <button class="btn btn-text" onclick="window.location.href='/admin-users?token='+sessionStorage.getItem('token')">Manage Users</button>
+                <button class="btn btn-text" onclick="window.location.href='/settings?token='+sessionStorage.getItem('token')">System Settings</button>
             </div>
             <div class="nav-right">
-                <a href="/profile" id="username-display"></a>
+                <a href="#" id="username-display" onclick="window.location.href='/profile?token='+sessionStorage.getItem('token')"></a>
                 <button id="logout-btn" class="btn" onclick="window.location.href='/'">Logout</button>
             </div>
         </div>
@@ -41,25 +40,34 @@
         <div class="hourly-grid admin-stats-grid">
             <div class="hourly-card admin-stat-card">
                 <h3 class="admin-stat-label">Total Active Users</h3>
-                <div id="stat-total-users">—</div>
+                <div id="stat-total-users"><%= stats.totalUsers.toLocaleString() %></div>
             </div>
             <div class="hourly-card admin-stat-card">
                 <h3 class="admin-stat-label">Advanced Subscribers</h3>
-                <div id="stat-premium-users">—</div>
+                <div id="stat-premium-users"><%= stats.premiumUsers.toLocaleString() %></div>
             </div>
             <div class="hourly-card admin-stat-card">
                 <h3 class="admin-stat-label">Saved Locations</h3>
-                <div id="stat-total-locations">—</div>
+                <div id="stat-total-locations"><%= stats.totalLocations.toLocaleString() %></div>
             </div>
             <div class="hourly-card admin-stat-card">
                 <h3 class="admin-stat-label">Suspended Users</h3>
-                <div id="stat-suspended-users">—</div>
+                <div id="stat-suspended-users"><%= stats.suspendedUsers.toLocaleString() %></div>
             </div>
         </div>
 
-        <h3 class="section-heading">Recent System Alerts</h3>
+        <h3 class="section-heading">Recent User Alerts</h3>
         <div id="system-alerts-list">
-            <p class="text-secondary">Loading...</p>
+            <% if (recentAlerts.length === 0) { %>
+                <p class="text-secondary">No recent alerts triggered.</p>
+            <% } else { %>
+                <% recentAlerts.forEach(alert => { %>
+                    <div class="location-card alert-card alert-card--active">
+                        <h4 class="alert-title"><%= alert.trigger_type %></h4>
+                        <p><%= alert.timeAgo %> — <%= alert.location_name %> (threshold: <%= alert.threshold_value %>°) — User: <%= alert.username %></p>
+                    </div>
+                <% }) %>
+            <% } %>
         </div>
     </main>
 </body>

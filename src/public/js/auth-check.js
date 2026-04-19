@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const allowedRoles = document.body.dataset.allowedRoles ? document.body.dataset.allowedRoles.split(',') : ['general', 'advanced', 'admin'];
     if (!allowedRoles.includes(user.role)) {
         showToast('Unauthorized access. Redirecting...', 'warning');
-        if (user.role === 'admin') window.location.href = '/admin-dashboard';
+        if (user.role === 'admin') window.location.href = `/admin-dashboard?token=${token}`;
         else window.location.href = `/dashboard?token=${token}`;
         return;
     }
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     navBrands.forEach(brand => {
         brand.addEventListener('click', (e) => {
             e.preventDefault();
-            if (user.role === 'admin') window.location.href = '/admin-dashboard';
+            if (user.role === 'admin') window.location.href = `/admin-dashboard?token=${token}`;
             else window.location.href = `/dashboard?token=${token}`;
         });
     });
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.showAlertBanner) window.showAlertBanner(message, 'error', id, bannerKey);
     });
 
-    // Clear other users' banners from sessionStorage on login (why shoul)
+    // Clear other users' banners from sessionStorage to prevent stale data accumulation
     Object.keys(sessionStorage)
         .filter(k => k.startsWith('activeAlertBanners_') && k !== bannerKey)
         .forEach(k => sessionStorage.removeItem(k));

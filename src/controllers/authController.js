@@ -328,3 +328,18 @@ exports.suspendSelf = async (req, res) => {
         res.status(500).json({ message: 'Server error while suspending account' });
     }
 };
+
+// Renders the appropriate dashboard view based on the user's role.
+// Token is passed as a query param from the client since this is a server-rendered page.
+exports.renderDashboard = (req, res) => {
+    const token = req.query.token || req.cookies?.token;
+    if (!token) return res.redirect('/');
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (decoded.role === 'admin') return res.redirect('/admin-dashboard');
+        res.render('dashboard', { role: decoded.role });
+    } catch (e) {
+        res.redirect('/');
+    }
+};

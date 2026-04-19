@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     sessionStorage.setItem('user', JSON.stringify(data.user));
 
                     if (data.user.role === 'admin') {
-                        window.location.href = '/admin-dashboard';
+                        window.location.href = `/admin-dashboard?token=${data.token}`;
                     } else {
                         window.location.href = `/dashboard?token=${data.token}`;
                     }
@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     showToast('Registration successful!', 'success');
 
                     if (data.user.role === 'admin') {
-                        window.location.href = '/admin-dashboard';
+                        window.location.href = `/admin-dashboard?token=${data.token}`;
                     } else {
                         window.location.href = `/dashboard?token=${data.token}`;
                     }

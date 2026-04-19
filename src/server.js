@@ -4,13 +4,17 @@ const cors = require('cors');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
-const jwt = require('jsonwebtoken');
 
-const authRoutes     = require('./routes/auth');
-const weatherRoutes  = require('./routes/weather');
-const alertsRoutes   = require('./routes/alerts');
-const settingsRoutes = require('./routes/settings');
+const authRoutes      = require('./routes/auth');
+const authController  = require('./controllers/authController');
+const weatherRoutes   = require('./routes/weather');
+const alertsRoutes    = require('./routes/alerts');
+const settingsRoutes  = require('./routes/settings');
 
+const alertsController = require('./controllers/alertsController');
+const authMiddleware   = require('./middleware/authMiddleware');
+
+const maintenanceMiddleware = require('./middleware/maintenanceMiddleware');
 const { Setting } = require('./models');
 const globalState = require('./config/state');
 require('./services/alertWorker');
@@ -35,51 +39,7 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 // Maintenance Mode (blocks non-admins when active)
-app.use(async (req, res, next) => {
-    if (
-        req.path === '/' ||
-        req.path === '/forgot-password' ||
-        req.path === '/select-account-type' ||
-        req.path === '/register-general-user' ||
-        req.path === '/register-advanced-user' ||
-        req.path.startsWith('/css/') ||
-        req.path.startsWith('/js/') ||
-        req.path.startsWith('/images/') ||
-        req.path.startsWith('/api/settings') ||
-        req.path.startsWith('/api/auth/login') ||
-        req.path.startsWith('/api/auth/register')
-    ) {
-        return next();
-    }
-
-    try {
-        const setting = await Setting.findOne({ where: { settingKey: 'maintenance_mode' } });
-        if (setting && setting.settingValue === 'true') {
-            const token = req.header('Authorization')?.replace('Bearer ', '') || req.query?.token;
-            if (token) {
-                try {
-                    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                    if (decoded.role === 'admin') return next();
-                } catch (e) {
-                    if (req.path.startsWith('/api/')) {
-                        return res.status(401).json({ message: 'Token expired. Please re-authenticate.' });
-                    }
-                }
-            }
-            if (req.path.startsWith('/api/')) {
-                return res.status(503).json({ message: 'System is currently under maintenance. Please check back later.' });
-            }
-            return res.status(503).send(`
-                <!DOCTYPE html>
-                <html><head><title>Maintenance - WeatherWize</title>
-                <style>body{font-family:sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#1a1a2e;color:#fff;text-align:center;}
-                .box{padding:60px;border-radius:16px;background:rgba(255,255,255,0.05);}h1{font-size:2rem;margin-bottom:10px;}p{color:#aaa;}</style></head>
-                <body><div class="box"><h1>🔧 Down for Maintenance</h1><p>WeatherWize is temporarily offline. Please check back later.</p></div></body></html>
-            `);
-        }
-    } catch (e) {}
-    next();
-});
+app.use(maintenanceMiddleware);
 
 // Static assets (CSS, JS, images)
 app.use(express.static(path.join(__dirname, 'public')));
@@ -101,32 +61,14 @@ simplePages.forEach(page => {
     app.get(route, (_req, res) => res.render(page));
 });
 
-// Dashboard — rendered by EJS based on role from JWT
-app.get('/dashboard', (req, res) => {
-    const token = req.query.token || req.cookies?.token;
-    if (!token) return res.redirect('/');
+// Dashboard — role-based render handled by authController
+app.get('/dashboard', authController.renderDashboard);
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const role = decoded.role;
+// Admin dashboard — stats and recent alerts rendered server-side
+app.get('/admin-dashboard', alertsController.renderAdminDashboard);
 
-        if (role === 'admin') return res.redirect('/admin-dashboard');
-
-        res.render('dashboard', { role });
-    } catch (e) {
-        res.redirect('/');
-    }
-});
-
-// Admin dashboard
-app.get('/admin-dashboard', (_req, res) => res.render('admin-dashboard'));
-
-// Alerts Manager — handled by alertsController via /api/alerts/manager
-app.get('/alerts-manager', (req, res) => {
-    const token = req.query.token;
-    const redirect = token ? `/api/alerts/manager?token=${token}` : '/api/alerts/manager';
-    res.redirect(redirect);
-});
+// Alerts Manager — server-rendered page, auth handled via query token
+app.get('/alerts-manager', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), alertsController.renderAlertsManager);
 
 // Start Server
 app.listen(PORT, async () => {

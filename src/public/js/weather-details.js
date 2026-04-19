@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const user = JSON.parse(sessionStorage.getItem('user') || '{}');
-    const isAdvanced = user.role === 'advanced' || user.role === 'admin';
+    const isAdvanced = user.role === 'advanced';
 
     document.getElementById('logout-btn').addEventListener('click', () => {
         sessionStorage.removeItem('token');
