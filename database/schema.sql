@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR(255),
   role ENUM('admin', 'general', 'advanced') NOT NULL DEFAULT 'general',
   status ENUM('active', 'suspended') NOT NULL DEFAULT 'active',
+  deleted BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
