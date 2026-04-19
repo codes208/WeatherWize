@@ -572,6 +572,15 @@ body.register-page {
     left: 16px;
     z-index: 2;
     display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.page-logo-name {
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: #1565a8;
 }
 
 .page-logo {
