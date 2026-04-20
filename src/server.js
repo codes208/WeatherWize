@@ -52,7 +52,7 @@ app.use('/api/settings', settingsRoutes);
 
 // Simple EJS page routes
 const simplePages = [
-    'index', 'profile', 'locations', 'map', 'historical-data',
+    'index', 'profile', 'locations',
     'settings', 'admin-users', 'forgot-password', 'select-account-type',
     'register-general-user', 'register-advanced-user', 'weather-details'
 ];
@@ -61,6 +61,10 @@ simplePages.forEach(page => {
     app.get(route, (_req, res) => res.render(page));
 });
 
+// Advanced-only pages — server-side role enforcement
+app.get('/map', authMiddleware, authMiddleware.requireRole('advanced'), (_req, res) => res.render('map'));
+app.get('/historical-data', authMiddleware, authMiddleware.requireRole('advanced'), (_req, res) => res.render('historical-data'));
+
 // Dashboard — role-based render handled by authController
 app.get('/dashboard', authController.renderDashboard);
 
@@ -68,7 +72,7 @@ app.get('/dashboard', authController.renderDashboard);
 app.get('/admin-dashboard', alertsController.renderAdminDashboard);
 
 // Alerts Manager — server-rendered page, auth handled via query token
-app.get('/alerts-manager', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), alertsController.renderAlertsManager);
+app.get('/alerts-manager', authMiddleware, authMiddleware.requireRole('advanced'), alertsController.renderAlertsManager);
 
 // Start Server
 app.listen(PORT, async () => {

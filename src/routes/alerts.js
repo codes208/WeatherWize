@@ -5,14 +5,14 @@ const authMiddleware = require('../middleware/authMiddleware');
 const { validateAlert } = require('../middleware/validationMiddleware');
 
 // All alert routes require auth + advanced or admin role
-router.post('/', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), validateAlert, alertsController.createAlert);
-router.get('/', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), alertsController.getAlerts);
-router.delete('/:id', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), alertsController.deleteAlert);
-router.patch('/:id/enable', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), alertsController.enableAlert);
-router.patch('/:id/disable', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), alertsController.disableAlert);
+router.post('/', authMiddleware, authMiddleware.requireRole('advanced'), validateAlert, alertsController.createAlert);
+router.get('/', authMiddleware, authMiddleware.requireRole('advanced'), alertsController.getAlerts);
+router.delete('/:id', authMiddleware, authMiddleware.requireRole('advanced'), alertsController.deleteAlert);
+router.patch('/:id/enable', authMiddleware, authMiddleware.requireRole('advanced'), alertsController.enableAlert);
+router.patch('/:id/disable', authMiddleware, authMiddleware.requireRole('advanced'), alertsController.disableAlert);
 
 // Server-rendered alerts manager page
-router.get('/manager', authMiddleware, authMiddleware.requireRole('advanced', 'admin'), alertsController.renderAlertsManager);
+router.get('/manager', authMiddleware, authMiddleware.requireRole('advanced'), alertsController.renderAlertsManager);
 
 // Admin-only: recently triggered alerts across all users
 router.get('/system-recent', authMiddleware, authMiddleware.requireRole('admin'), alertsController.getSystemRecentAlerts);
