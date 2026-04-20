@@ -32,9 +32,9 @@
             </a>
             <div class="nav-links">
                 <% if (role === 'advanced') { %>
-                <button class="btn btn-text" onclick="window.location.href='/historical-data'">Historical Data</button>
+                <button class="btn btn-text" id="historical-data-btn">Historical Data</button>
                 <button class="btn btn-text" id="alerts-manager-btn">Manage Alerts</button>
-                <button class="btn btn-text" onclick="window.location.href='/map'">Map</button>
+                <button class="btn btn-text" id="map-btn">Map</button>
                 <% } %>
                 <button class="btn btn-text" onclick="window.location.href='/locations'">Manage Locations</button>
             </div>

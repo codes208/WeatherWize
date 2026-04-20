@@ -22,6 +22,16 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = `/alerts-manager?token=${token}`;
     });
 
+    const historicalBtn = document.getElementById('historical-data-btn');
+    if (historicalBtn) historicalBtn.addEventListener('click', () => {
+        window.location.href = `/historical-data?token=${token}`;
+    });
+
+    const mapBtn = document.getElementById('map-btn');
+    if (mapBtn) mapBtn.addEventListener('click', () => {
+        window.location.href = `/map?token=${token}`;
+    });
+
     async function fetchWeatherData(location, lat, lon) {
         let url = `/api/weather?location=${encodeURIComponent(location)}`;
         if (lat && lon) {
